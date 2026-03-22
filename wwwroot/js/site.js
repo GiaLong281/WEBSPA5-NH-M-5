@@ -3,6 +3,16 @@
 
 // Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", function () {
+    // Preloader Logic
+    const preloader = document.getElementById('spa-preloader');
+    if (preloader) {
+        window.addEventListener('load', function () {
+            setTimeout(function() {
+                preloader.classList.add('fade-out');
+            }, 800); // Đợi 800ms để người dùng thấy logo
+        });
+    }
+
     const navbar = document.querySelector('.spa-navbar');
     
     // Add scroll effect for navbar
