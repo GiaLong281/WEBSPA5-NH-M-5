@@ -1,0 +1,68 @@
+@model SpaN5.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gold text-white text-center py-4 border-0">
+                    <h2 class="mb-0 font-playfair">Đăng ký</h2>
+                    <p class="mb-0 mt-2 text-white-50">Trở thành thành viên SpaN5</p>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label">Họ và tên</label>
+                            <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">Số điện thoại</label>
+                            <input asp-for="Phone" class="form-control" placeholder="0123456789" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email (tùy chọn)</label>
+                            <input asp-for="Email" class="form-control" placeholder="example@email.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">Tên đăng nhập</label>
+                            <input asp-for="Username" class="form-control" placeholder="username" />
+                            <span asp-validation-for="Username" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Mật khẩu</label>
+                            <input asp-for="Password" class="form-control" placeholder="Ít nhất 6 ký tự" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input asp-for="AcceptTerms" class="form-check-input" />
+                            <label class="form-check-label" asp-for="AcceptTerms">
+                                Tôi đã đọc và đồng ý với <a asp-controller="Home" asp-action="Terms" target="_blank">Điều khoản sử dụng</a>
+                            </label>
+                            <span asp-validation-for="AcceptTerms" class="text-danger small d-block"></span>
+                        </div>
+                        <button type="submit" class="btn btn-gold w-100 py-2 rounded-pill fw-bold">Đăng ký</button>
+                    </form>
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Đã có tài khoản? <a asp-action="Login" class="text-gold fw-bold">Đăng nhập ngay</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,0 +1,39 @@
+@model SpaN5.Models.Service
+@{
+    ViewData["Title"] = "Thêm dịch vụ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h1>Thêm dịch vụ</h1>
+    <form asp-action="CreateService" method="post" class="mt-4">
+        <div class="form-group mb-3">
+            <label asp-for="ServiceName" class="form-label">Tên dịch vụ</label>
+            <input asp-for="ServiceName" class="form-control" required />
+            <span asp-validation-for="ServiceName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Price" class="form-label">Giá</label>
+            <input asp-for="Price" type="number" step="0.01" class="form-control" required />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Duration" class="form-label">Thời gian (phút)</label>
+            <input asp-for="Duration" type="number" class="form-control" required />
+            <span asp-validation-for="Duration" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="CategoryId" class="form-label">Danh mục</label>
+            <select asp-for="CategoryId" class="form-control" required>
+                <option value="">-- Chọn danh mục --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Thêm dịch vụ</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

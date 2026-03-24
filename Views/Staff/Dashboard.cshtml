@@ -1,0 +1,8 @@
+@{
+    ViewData["Title"] = "Staff Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5" style="margin-top: 80px;">
+    <h1 class="font-playfair text-gold">Dashboard Staff</h1>
+    <p>Chào mừng, @User.FindFirst("FullName")?.Value! Bạn có thể quản lý lịch hẹn và dịch vụ.</p>
+</div>

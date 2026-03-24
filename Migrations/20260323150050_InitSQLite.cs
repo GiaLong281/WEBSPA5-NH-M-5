@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SpaN5.Migrations
 {
     /// <inheritdoc />
-    public partial class InitFullDB : Migration
+    public partial class InitSQLite : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,25 +15,25 @@ namespace SpaN5.Migrations
                 name: "Branches",
                 columns: table => new
                 {
-                    BranchId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BranchName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BranchCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    District = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GoogleMapLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FacebookLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    ClosingTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Workday = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    BranchId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    BranchName = table.Column<string>(type: "TEXT", nullable: false),
+                    BranchCode = table.Column<string>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: false),
+                    District = table.Column<string>(type: "TEXT", nullable: true),
+                    City = table.Column<string>(type: "TEXT", nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    GoogleMapLink = table.Column<string>(type: "TEXT", nullable: true),
+                    FacebookLink = table.Column<string>(type: "TEXT", nullable: true),
+                    OpeningTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    ClosingTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    Workday = table.Column<string>(type: "TEXT", nullable: true),
+                    Image = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,16 +44,16 @@ namespace SpaN5.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LoyaltyPoints = table.Column<int>(type: "int", nullable: false),
-                    TotalSpent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CustomerId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FullName = table.Column<string>(type: "TEXT", nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    BirthDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    LoyaltyPoints = table.Column<int>(type: "INTEGER", nullable: false),
+                    TotalSpent = table.Column<decimal>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,15 +64,15 @@ namespace SpaN5.Migrations
                 name: "Materials",
                 columns: table => new
                 {
-                    MaterialId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MaterialName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CurrentStock = table.Column<int>(type: "int", nullable: false),
-                    MinStock = table.Column<int>(type: "int", nullable: false),
-                    PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Supplier = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    MaterialId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    MaterialName = table.Column<string>(type: "TEXT", nullable: false),
+                    Unit = table.Column<string>(type: "TEXT", nullable: false),
+                    CurrentStock = table.Column<int>(type: "INTEGER", nullable: false),
+                    MinStock = table.Column<int>(type: "INTEGER", nullable: false),
+                    PurchasePrice = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Supplier = table.Column<string>(type: "TEXT", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,9 +83,9 @@ namespace SpaN5.Migrations
                 name: "ServiceCategories",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,17 +96,17 @@ namespace SpaN5.Migrations
                 name: "Staffs",
                 columns: table => new
                 {
-                    StaffId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Position = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BranchId = table.Column<int>(type: "int", nullable: true),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    StaffId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FullName = table.Column<string>(type: "TEXT", nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    Gender = table.Column<string>(type: "TEXT", nullable: true),
+                    Position = table.Column<string>(type: "TEXT", nullable: true),
+                    BranchId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Avatar = table.Column<string>(type: "TEXT", nullable: true),
+                    Status = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,18 +122,18 @@ namespace SpaN5.Migrations
                 name: "Bookings",
                 columns: table => new
                 {
-                    BookingId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BookingCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    BranchId = table.Column<int>(type: "int", nullable: false),
-                    BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    BookingId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    BookingCode = table.Column<string>(type: "TEXT", nullable: false),
+                    CustomerId = table.Column<int>(type: "INTEGER", nullable: false),
+                    BranchId = table.Column<int>(type: "INTEGER", nullable: false),
+                    BookingDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -156,13 +156,13 @@ namespace SpaN5.Migrations
                 name: "StockTransactions",
                 columns: table => new
                 {
-                    TransactionId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MaterialId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    TransactionId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    MaterialId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    Reason = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -179,17 +179,17 @@ namespace SpaN5.Migrations
                 name: "Services",
                 columns: table => new
                 {
-                    ServiceId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Duration = table.Column<int>(type: "int", nullable: false),
+                    ServiceId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ServiceName = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    Duration = table.Column<int>(type: "INTEGER", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    IsPopular = table.Column<bool>(type: "bit", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Image = table.Column<string>(type: "TEXT", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsPopular = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,12 +206,12 @@ namespace SpaN5.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StaffId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Username = table.Column<string>(type: "TEXT", nullable: false),
+                    Password = table.Column<string>(type: "TEXT", nullable: false),
+                    Role = table.Column<string>(type: "TEXT", nullable: false),
+                    StaffId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -227,13 +227,13 @@ namespace SpaN5.Migrations
                 name: "Payments",
                 columns: table => new
                 {
-                    PaymentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BookingId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Method = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    PaymentId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    BookingId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Method = table.Column<int>(type: "INTEGER", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -250,12 +250,12 @@ namespace SpaN5.Migrations
                 name: "BookingDetails",
                 columns: table => new
                 {
-                    DetailId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BookingId = table.Column<int>(type: "int", nullable: false),
-                    ServiceId = table.Column<int>(type: "int", nullable: false),
-                    StaffId = table.Column<int>(type: "int", nullable: true),
-                    PriceAtTime = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    DetailId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    BookingId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ServiceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    StaffId = table.Column<int>(type: "INTEGER", nullable: true),
+                    PriceAtTime = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -283,11 +283,11 @@ namespace SpaN5.Migrations
                 name: "ServiceMaterials",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceId = table.Column<int>(type: "int", nullable: false),
-                    MaterialId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", precision: 18, scale: 2, nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ServiceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MaterialId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {

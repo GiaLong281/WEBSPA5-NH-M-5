@@ -39,6 +39,17 @@ namespace SpaN5.Models
                 .HasOne(sm => sm.Material)
                 .WithMany(m => m.ServiceMaterials)
                 .HasForeignKey(sm => sm.MaterialId);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Customer)
+                .WithOne()
+                .HasForeignKey<User>(u => u.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Staff)
+                .WithOne()
+                .HasForeignKey<User>(u => u.StaffId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ✅ FIX LỖI DECIMAL (QUAN TRỌNG)
             modelBuilder.Entity<ServiceMaterial>()
@@ -58,5 +69,6 @@ namespace SpaN5.Models
                       .OnDelete(DeleteBehavior.Restrict); // hoặc Cascade tùy logic
             });
         }
+        public DbSet<AuditLog> AuditLogs { get; set; }
     }
 }
