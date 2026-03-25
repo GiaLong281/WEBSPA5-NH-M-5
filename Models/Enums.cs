@@ -1,4 +1,4 @@
-﻿namespace SpaN5.Models
+namespace SpaN5.Models
 {
     public enum BookingStatus
     {
@@ -13,7 +13,8 @@
     {
         Cash,
         Momo,
-        VNPay
+        VNPay,
+        BankTransfer
     }
 
     public enum PaymentStatus

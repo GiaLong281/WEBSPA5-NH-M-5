@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SpaN5.Models.SpaN5.Models;
 
 namespace SpaN5.Models
@@ -43,6 +43,22 @@ namespace SpaN5.Models
             // ✅ FIX LỖI DECIMAL (QUAN TRỌNG)
             modelBuilder.Entity<ServiceMaterial>()
                 .Property(sm => sm.Quantity)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Service>()
+                .Property(s => s.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<BookingDetail>()
+                .Property(bd => bd.PriceAtTime)
                 .HasPrecision(18, 2);
             modelBuilder.Entity<StockTransaction>(entity =>
             {

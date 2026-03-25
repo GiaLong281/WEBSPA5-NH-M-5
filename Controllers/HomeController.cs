@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
 
 namespace SpaN5.Controllers
@@ -7,15 +8,32 @@ namespace SpaN5.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly SpaDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, SpaDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var service = await _context.Services
+                .Include(s => s.ServiceMaterials)
+                .ThenInclude(sm => sm.Material)
+                .FirstOrDefaultAsync(m => m.ServiceId == id && m.IsActive);
+
+            if (service == null)
+            {
+                return NotFound("Không tìm thấy dịch vụ hoặc dịch vụ không còn hoạt động.");
+            }
+
+            return View(service);
         }
 
         public IActionResult Privacy()

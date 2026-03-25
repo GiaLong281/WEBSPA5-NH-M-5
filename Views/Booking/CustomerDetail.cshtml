@@ -1,0 +1,198 @@
+@model SpaN5.Models.Customer
+
+@{
+    ViewData["Title"] = "Lịch sử dịch vụ - " + Model.FullName;
+    Layout = "_Layout";
+}
+
+<style>
+    .customer-detail-container {
+        padding-top: 120px;
+        padding-bottom: 80px;
+        background-color: #fcfaf7;
+        min-height: 100vh;
+    }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    }
+    
+    .font-playfair {
+        font-family: 'Playfair Display', serif;
+    }
+    
+    .text-gold {
+        color: #C5A059;
+    }
+    
+    .booking-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        margin-bottom: 25px;
+        background: white;
+        border-left: 5px solid #C5A059;
+    }
+    
+    .booking-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+    
+    .booking-header {
+        background-color: #fcfaf7;
+        padding: 15px 25px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .service-item {
+        padding: 15px 25px;
+        border-bottom: 1px solid #f9f9f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .service-item:last-child {
+        border-bottom: none;
+    }
+    
+    .service-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    
+    .status-badge {
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-pending { background-color: #fff3cd; color: #856404; }
+    .status-confirmed { background-color: #d4edda; color: #155724; }
+    .status-cancelled { background-color: #f8d7da; color: #721c24; }
+    
+    .back-link {
+        color: #888;
+        text-decoration: none;
+        transition: color 0.2s;
+        font-size: 0.9rem;
+    }
+    
+    .back-link:hover {
+        color: #C5A059;
+    }
+</style>
+
+<div class="customer-detail-container">
+    <div class="container">
+        <div class="mb-4">
+            <a asp-action="CustomerList" class="back-link">
+                <i class="fas fa-arrow-left me-2"></i> Trở về danh sách
+            </a>
+        </div>
+
+        <div class="row align-items-center mb-5">
+            <div class="col-md-8">
+                <h6 class="text-gold text-uppercase fw-bold ls-2 mb-2">Chi tiết lịch sử khách hàng</h6>
+                <h1 class="font-playfair display-5 mb-0">@Model.FullName</h1>
+                <div class="mt-2 text-muted">
+                    <span><i class="fas fa-phone-alt me-2 text-gold"></i> @Model.Phone</span>
+                    <span class="ms-4"><i class="fas fa-envelope me-2 text-gold"></i> @(string.IsNullOrEmpty(Model.Email) ? "N/A" : Model.Email)</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="glass-card d-inline-block px-4 py-3 text-center">
+                    <div class="h3 mb-0 text-gold fw-bold">@Model.Bookings.SelectMany(b => b.BookingDetails).Count()</div>
+                    <small class="text-muted text-uppercase ls-1">Dịch vụ đã đặt</small>
+                </div>
+            </div>
+        </div>
+
+        @if (!Model.Bookings.Any())
+        {
+            <div class="glass-card p-5 text-center">
+                <i class="fas fa-calendar-times display-1 text-light mb-3"></i>
+                <h4 class="text-muted">Chưa có lịch hẹn nào</h4>
+                <p>Khách hàng này hiện chưa đăng ký dịch vụ nào tại hệ thống.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    @foreach (var booking in Model.Bookings.OrderByDescending(b => b.BookingDate))
+                    {
+                        <div class="booking-card shadow-sm">
+                            <div class="booking-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold text-dark">Lịch hẹn #@booking.BookingCode</span>
+                                    <span class="ms-3 text-muted small"><i class="far fa-calendar-alt me-1"></i> @booking.BookingDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <div>
+                                    @{
+                                        var statusClass = booking.Status.ToString().ToLower();
+                                        var statusText = booking.Status switch {
+                                            SpaN5.Models.BookingStatus.Pending => "Chờ xác nhận",
+                                            SpaN5.Models.BookingStatus.Confirmed => "Đã xác nhận",
+                                            SpaN5.Models.BookingStatus.Cancelled => "Đã hủy",
+                                            _ => booking.Status.ToString()
+                                        };
+                                    }
+                                    <span class="status-badge status-@statusClass">@statusText</span>
+                                </div>
+                            </div>
+                            <div class="booking-body">
+                                @foreach (var detail in booking.BookingDetails)
+                                {
+                                    <div class="service-item">
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(detail.Service.Image))
+                                            {
+                                                <img src="@detail.Service.Image" alt="@detail.Service.ServiceName" class="service-img me-3" />
+                                            }
+                                            else
+                                            {
+                                                <div class="service-img me-3 d-flex align-items-center justify-content-center bg-light text-gold">
+                                                    <i class="fas fa-spa"></i>
+                                                </div>
+                                            }
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">@detail.Service.ServiceName</h6>
+                                                <div class="small text-muted">
+                                                    <span><i class="far fa-clock me-1"></i> @detail.Service.Duration phút</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-dark">@detail.PriceAtTime.ToString("N0") VNĐ</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="card-footer bg-white border-top-0 px-4 py-3 d-flex justify-content-between align-items-center">
+                                <div class="text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i> Ghi chú: @(string.IsNullOrEmpty(booking.Notes) ? "Không có" : booking.Notes)
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-muted small me-2">Tổng thanh toán:</span>
+                                    <span class="h5 mb-0 text-gold fw-bold">@booking.TotalAmount.ToString("N0") VNĐ</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

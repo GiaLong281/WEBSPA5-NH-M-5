@@ -1,0 +1,596 @@
+@model SpaN5.Models.BookingViewModel
+@{
+    ViewData["Title"] = "Đặt Lịch Dịch Vụ";
+}
+
+<style>
+    :root {
+        --navy: #1a2b3c;
+        --gold: #d4af37;
+        --beige: #f5f5dc;
+        --light-gray: #f8f9fa;
+    }
+
+    body {
+        background-color: var(--light-gray);
+    }
+
+    .booking-container {
+        max-width: 900px;
+        margin: 50px auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .step-header {
+        background: var(--navy);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .step-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        z-index: 1;
+    }
+
+    .step-item::after {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: rgba(255,255,255,0.2);
+        z-index: -1;
+    }
+
+    .step-item:last-child::after {
+        display: none;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+
+    .step-item.active .step-circle {
+        background: var(--gold);
+        border-color: white;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    }
+
+    .step-item.completed .step-circle {
+        background: var(--gold);
+    }
+
+    .step-label {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        opacity: 0.7;
+    }
+
+    .step-item.active .step-label,
+    .step-item.completed .step-label {
+        opacity: 1;
+        font-weight: bold;
+        color: var(--gold);
+    }
+
+    .step-content {
+        padding: 40px;
+        display: none;
+        animation: fadeIn 0.5s;
+    }
+
+    .step-content.active {
+        display: block;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Step 1: Services */
+    .service-card {
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        height: 100%;
+        background: var(--light-gray);
+    }
+
+    .service-card:hover {
+        border-color: var(--gold);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1);
+    }
+
+    .service-card.selected {
+        border-color: var(--gold);
+        background: rgba(212, 175, 55, 0.05);
+        position: relative;
+    }
+
+    .service-card.selected::before {
+        content: '\f058'; /* fa-check-circle */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: var(--gold);
+        font-size: 1.5rem;
+    }
+
+    /* Step 2: Date & Time */
+    .time-slot {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        background: white;
+    }
+
+    .time-slot:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .time-slot.selected {
+        background: var(--gold);
+        color: white;
+        border-color: var(--gold);
+    }
+
+    .time-slot.disabled {
+        background: #f1f1f1;
+        color: #aaa;
+        cursor: not-allowed;
+        border-color: #eee;
+    }
+
+    /* Buttons */
+    .btn-gold {
+        background-color: var(--gold);
+        color: white;
+        border: none;
+    }
+    
+    .btn-gold:hover {
+        background-color: #c49f2c;
+        color: white;
+    }
+
+    .btn-outline-navy {
+        border: 1px solid var(--navy);
+        color: var(--navy);
+    }
+
+    .btn-outline-navy:hover {
+        background-color: var(--navy);
+        color: white;
+    }
+
+    /* Detail Button */
+    .btn-detail {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        z-index: 10;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .btn-detail:hover {
+        background: var(--gold);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .service-card.selected .btn-detail {
+        left: 45px; /* Adjust if checkmark is on right */
+    }
+
+    .material-item {
+        background: #fdfaf0;
+        border-left: 3px solid var(--gold);
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="booking-container">
+        <!-- Header -->
+        <div class="step-header">
+            <h2 class="font-playfair mb-4">Hoàn Tất Đặt Lịch Chăm Sóc</h2>
+            <div class="step-indicator">
+                <div class="step-item active" id="indicator-1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label text-uppercase">Dịch Vụ</div>
+                </div>
+                <div class="step-item" id="indicator-2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label text-uppercase">Thời Gian</div>
+                </div>
+                <div class="step-item" id="indicator-3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label text-uppercase">Thông Tin</div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-controller="Booking" asp-action="SubmitBooking" method="post" id="bookingForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ServiceId" id="ServiceId" />
+            <input type="hidden" asp-for="Date" id="Date" />
+            <input type="hidden" asp-for="Time" id="Time" />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger mx-4 mt-4">
+                    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Lỗi Đặt Lịch</h5>
+                    @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                </div>
+            }
+
+            <!-- Step 1: Chọn Dịch Vụ -->
+            <div class="step-content active" id="step-1">
+                <h4 class="font-playfair text-center mb-4 text-navy">Chọn Liệu Trình Bạn Mong Muốn</h4>
+                <div class="row g-4 mb-4">
+                    @foreach (var service in ViewBag.Services)
+                    {
+                        var isSelected = Model?.ServiceId == service.ServiceId ? "selected" : "";
+                        <div class="col-md-6 col-lg-4">
+                            <div class="service-card @isSelected" onclick="selectService(@service.ServiceId, this)" data-service-id="@service.ServiceId">
+                                <button type="button" class="btn-detail" onclick="event.stopPropagation(); showServiceDetails(@service.ServiceId)" title="Xem chi tiết">
+                                    <i class="fas fa-info"></i>
+                                </button>
+
+                                @if (!string.IsNullOrEmpty(service.Image))
+                                {
+                                    <img src="@service.Image" style="height:120px; object-fit:cover; width: 100%; border-radius: 8px; margin-bottom: 10px;" />
+                                }
+                                <h5 class="font-playfair mb-2">@service.ServiceName</h5>
+                                <div class="d-flex justify-content-between text-muted small mb-2">
+                                    <span><i class="far fa-clock me-1"></i> @service.Duration phút</span>
+                                    <span class="fw-bold text-gold">@string.Format("{0:0,0}", service.Price) đ</span>
+                                </div>
+                                <p class="small text-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@service.Description</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <!-- Validation for Step 1 -->
+                <div class="alert alert-danger d-none" id="step1-error">
+                    <i class="fas fa-exclamation-circle me-2"></i> Vui lòng chọn một dịch vụ để tiếp tục.
+                </div>
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-gold rounded-pill px-4 py-2 fw-bold letter-spacing-1" onclick="nextStep(2)">Tiếp Tục <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Chọn Thời Gian -->
+            <div class="step-content" id="step-2">
+                <h4 class="font-playfair text-center mb-4 text-navy">Chọn Lịch Hẹn Thoải Mái Nhất</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold">Chọn Ngày</label>
+                        <input type="date" class="form-control form-control-lg" id="datePicker" min="@DateTime.Now.ToString("yyyy-MM-dd")" onchange="loadTimes(this.value)">
+                    </div>
+                </div>
+                
+                <div class="time-container mt-3 d-none" id="timeSelectionArea">
+                    <label class="form-label fw-bold mb-3">Chọn Giờ Khả Dụng</label>
+                    <div class="row g-3" id="timeSlotsGrid">
+                        <!-- Time slots will be loaded here via JS -->
+                    </div>
+                </div>
+
+                <!-- Validation for Step 2 -->
+                <div class="alert alert-danger d-none mt-3" id="step2-error">
+                    <i class="fas fa-exclamation-circle me-2"></i> Vui lòng chọn ngày và giờ hợp lệ.
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-navy rounded-pill px-4 py-2 fw-bold" onclick="prevStep(1)"><i class="fas fa-arrow-left me-2"></i> Quay Lại</button>
+                    <button type="button" class="btn btn-gold rounded-pill px-4 py-2 fw-bold letter-spacing-1" onclick="nextStep(3)">Tiếp Tục <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: Thông Tin Cá Nhân -->
+            <div class="step-content" id="step-3">
+                <h4 class="font-playfair text-center mb-4 text-navy">Thông Tin Khách Hàng</h4>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Họ và Tên <span class="text-danger">*</span></label>
+                        <input asp-for="CustomerName" class="form-control form-control-lg" id="CustomerName" placeholder="Tên của bạn">
+                        <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+                        <input asp-for="PhoneNumber" class="form-control form-control-lg" id="PhoneNumber" placeholder="Nhập SĐT">
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Email (Tuỳ chọn)</label>
+                        <input asp-for="Email" class="form-control form-control-lg" placeholder="example@email.com">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Ghi Chú</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Yêu cầu đặc biệt của bạn (VD: Muốn kỹ thuật viên nữ, tránh xoa bóp mạnh,..)"></textarea>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <strong><i class="fas fa-info-circle me-2"></i> Xác nhận:</strong> Bằng việc nhấn "Hoàn Tất Đặt Lịch", bạn xác nhận đồng ý với các chính sách dịch vụ của SpaN5.
+                </div>
+
+                <!-- Validation for Step 3 -->
+                <div class="alert alert-danger d-none mt-3" id="step3-error">
+                    <i class="fas fa-exclamation-circle me-2"></i> Vui lòng điền đầy đủ Họ Tên và Số Điện Thoại.
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-navy rounded-pill px-4 py-2 fw-bold" onclick="prevStep(2)"><i class="fas fa-arrow-left me-2"></i> Quay Lại</button>
+                    <button type="button" class="btn btn-gold rounded-pill px-5 py-2 fw-bold letter-spacing-1 text-uppercase" onclick="submitForm()">Hoàn Tất Đặt Lịch</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Service Detail Modal -->
+<div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-navy text-white border-0">
+                <h5 class="modal-title font-playfair" id="modalServiceName">Chi Tiết Dịch Vụ</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <img id="modalServiceImage" src="" class="img-fluid h-100 object-fit-cover" style="min-height: 250px;" alt="">
+                    </div>
+                    <div class="col-md-7 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-gold text-dark p-2" id="modalServiceDuration"></span>
+                            <span class="h4 text-gold mb-0 fw-bold" id="modalServicePrice"></span>
+                        </div>
+                        <h4 class="font-playfair text-navy mb-3" id="modalServiceTitle"></h4>
+                        <p class="text-muted mb-4" id="modalServiceDesc"></p>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-navy mb-3"><i class="fas fa-leaf me-2 text-success"></i>Thành phần nguyên liệu:</h6>
+                            <div id="modalMaterialsList">
+                                <!-- Materials will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-gold rounded-pill px-4 fw-bold" id="btnSelectFromModal">Chọn Dịch Vụ Này</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // JS Logic
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto Select Service if passed
+            const preselectedServiceId = document.getElementById('ServiceId').value;
+            if (preselectedServiceId && preselectedServiceId !== '0') {
+                const selectedCard = document.querySelector(`.service-card[data-service-id="${preselectedServiceId}"]`);
+                if (selectedCard) {
+                    selectedCard.classList.add('selected');
+                }
+            }
+            
+            // Nếu có lỗi ModelState, có thể tự động next tới bước 2 hoặc 3 nếu cần thiết
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <text>
+                if (document.getElementById('Date').value) {
+                    nextStep(2);
+                }
+                </text>
+            }
+        });
+
+        // Step 1: Select Service
+        function selectService(id, element) {
+            document.getElementById('ServiceId').value = id;
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('step1-error').classList.add('d-none');
+        }
+
+        // Navigate Next
+        function nextStep(step) {
+            // Validate step 1
+            if (step === 2 && !document.getElementById('ServiceId').value) {
+                document.getElementById('step1-error').classList.remove('d-none');
+                return;
+            }
+            // Validate step 2
+            if (step === 3 && (!document.getElementById('Date').value || !document.getElementById('Time').value)) {
+                document.getElementById('step2-error').classList.remove('d-none');
+                return;
+            }
+
+            // Move
+            document.getElementById('step-' + currentStep).classList.remove('active');
+            document.getElementById('step-' + step).classList.add('active');
+            
+            // Update indicator
+            document.getElementById('indicator-' + currentStep).classList.remove('active');
+            document.getElementById('indicator-' + currentStep).classList.add('completed');
+            document.getElementById('indicator-' + step).classList.add('active');
+            
+            currentStep = step;
+        }
+
+        // Navigate Prev
+        function prevStep(step) {
+            document.getElementById('step-' + currentStep).classList.remove('active');
+            document.getElementById('step-' + step).classList.add('active');
+            
+            document.getElementById('indicator-' + currentStep).classList.remove('active');
+            document.getElementById('indicator-' + step).classList.remove('completed');
+            document.getElementById('indicator-' + step).classList.add('active');
+            
+            currentStep = step;
+        }
+
+        // Load Times via API
+        function loadTimes(date) {
+            document.getElementById('Date').value = date;
+            document.getElementById('Time').value = ''; // Reset
+            
+            if(!date) return;
+
+            const serviceId = document.getElementById('ServiceId').value || 0;
+            const grid = document.getElementById('timeSlotsGrid');
+            const area = document.getElementById('timeSelectionArea');
+            
+            grid.innerHTML = '<div class="text-center p-3"><i class="fas fa-spinner fa-spin fa-2x text-gold"></i></div>';
+            area.classList.remove('d-none');
+            document.getElementById('step2-error').classList.add('d-none');
+
+            // API Call
+            fetch(`/Booking/GetAvailableTimes?date=${date}&serviceId=${serviceId}`)
+                .then(res => res.json())
+                .then(data => {
+                    grid.innerHTML = '';
+                    if (data.success && data.times.length > 0) {
+                        data.times.forEach(time => {
+                            grid.innerHTML += `
+                                <div class="col-4 col-md-3 col-lg-2">
+                                    <div class="time-slot" onclick="selectTime('${time}', this)">${time}</div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        grid.innerHTML = '<div class="text-danger px-3">Không có khung giờ nào trống trong ngày này.</div>';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    grid.innerHTML = '<div class="text-danger px-3">Lỗi tải dữ liệu. Vui lòng thử lại.</div>';
+                });
+        }
+
+        function selectTime(time, element) {
+            document.getElementById('Time').value = time;
+            document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('step2-error').classList.add('d-none');
+        }
+
+        function submitForm() {
+            // Basic validation for Step 3
+            const name = document.getElementById('CustomerName').value.trim();
+            const phone = document.getElementById('PhoneNumber').value.trim();
+            
+            if (!name || !phone) {
+                document.getElementById('step3-error').classList.remove('d-none');
+                return;
+            }
+            
+            document.getElementById('bookingForm').submit();
+        }
+
+        // Service Details Logic
+        function showServiceDetails(id) {
+            const modal = new bootstrap.Modal(document.getElementById('serviceDetailModal'));
+            const materialsList = document.getElementById('modalMaterialsList');
+            
+            // Loading state
+            materialsList.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-gold"></i> Đang tải...</div>';
+            modal.show();
+
+            fetch(`/Booking/GetServiceDetails/${id}`)
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success) {
+                        const data = response.data;
+                        document.getElementById('modalServiceTitle').innerText = data.serviceName;
+                        document.getElementById('modalServiceDesc').innerText = data.description || 'Chưa có mô tả.';
+                        document.getElementById('modalServicePrice').innerText = data.price.toLocaleString('vi-VN') + ' đ';
+                        document.getElementById('modalServiceDuration').innerHTML = `<i class="far fa-clock me-1"></i> ${data.duration} phút`;
+                        document.getElementById('modalServiceImage').src = data.image || '/images/default-spa.jpg';
+                        
+                        materialsList.innerHTML = '';
+                        if (data.materials && data.materials.length > 0) {
+                            data.materials.forEach(m => {
+                                materialsList.innerHTML += `
+                                    <div class="material-item d-flex justify-content-between align-items-center">
+                                        <span>${m.materialName}</span>
+                                        <span class="badge bg-light text-dark fw-normal">${m.quantity} ${m.unit}</span>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            materialsList.innerHTML = '<p class="text-muted small">Thông tin nguyên liệu đang được cập nhật.</p>';
+                        }
+
+                        // Update select button in modal
+                        document.getElementById('btnSelectFromModal').onclick = function() {
+                            const card = document.querySelector(`.service-card[data-service-id="${id}"]`);
+                            selectService(id, card);
+                            modal.hide();
+                        };
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    materialsList.innerHTML = '<div class="text-danger">Lỗi tải dữ liệu.</div>';
+                });
+        }
+    </script>
+}

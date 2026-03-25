@@ -4009,11 +4009,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\DELL\\source\\repos\\SpaN5\\SpaN5.csproj",
+      "projectUniqueName": "C:\\Users\\DELL\\OneDrive\\Desktop\\Web spa\\Long(ThanhToan_DatLich\\SpaN5.csproj",
       "projectName": "SpaN5",
-      "projectPath": "C:\\Users\\DELL\\source\\repos\\SpaN5\\SpaN5.csproj",
+      "projectPath": "C:\\Users\\DELL\\OneDrive\\Desktop\\Web spa\\Long(ThanhToan_DatLich\\SpaN5.csproj",
       "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\DELL\\source\\repos\\SpaN5\\obj\\",
+      "outputPath": "C:\\Users\\DELL\\OneDrive\\Desktop\\Web spa\\Long(ThanhToan_DatLich\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

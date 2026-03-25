@@ -1,0 +1,84 @@
+@model SpaN5.Models.Service
+
+@{
+    ViewData["Title"] = Model.ServiceName;
+}
+
+<section class="py-5" style="background-color: var(--beige); min-height: 100vh; padding-top: 100px !important;">
+    <div class="container py-5">
+        <a href="/" class="text-decoration-none text-muted mb-4 d-inline-block">
+            <i class="fas fa-arrow-left me-2"></i> Quay lại trang chủ
+        </a>
+
+        <div class="row bg-white rounded-4 shadow-sm overflow-hidden">
+            <!-- Hình ảnh dịch vụ -->
+            <div class="col-lg-6 p-0">
+                @{
+                    var imageUrl = string.IsNullOrEmpty(Model.Image) 
+                        ? "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                        : Model.Image;
+                }
+                <img src="@imageUrl" alt="@Model.ServiceName" class="w-100 h-100" style="object-fit: cover; min-height: 400px;">
+            </div>
+
+            <!-- Thông tin chi tiết -->
+            <div class="col-lg-6 p-5 d-flex flex-column justify-content-center">
+                <span class="text-gold fw-bold text-uppercase letter-spacing-2 mb-2">Thông tin dịch vụ</span>
+                <h1 class="font-playfair display-5 mb-3">@Model.ServiceName</h1>
+                
+                <div class="d-flex gap-4 mb-4 text-muted">
+                    <span><i class="far fa-clock text-gold me-2"></i> @Model.Duration phút</span>
+                    <span><i class="fas fa-money-bill-wave text-gold me-2"></i> @Model.Price.ToString("N0") VNĐ</span>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">Mô tả</h5>
+                    <p class="text-muted lh-lg">
+                        @(string.IsNullOrEmpty(Model.Description) ? "Đang cập nhật mô tả cho dịch vụ này." : Model.Description)
+                    </p>
+                </div>
+
+                <div class="mb-5">
+                    <h5 class="fw-bold mb-3">Nguyên liệu nổi bật của liệu trình</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (Model.ServiceMaterials != null && Model.ServiceMaterials.Any())
+                        {
+                            foreach (var item in Model.ServiceMaterials)
+                            {
+                                <span class="badge bg-light text-dark border p-2 px-3 rounded-pill fw-normal">
+                                    <i class="fas fa-leaf text-success me-1"></i> @item.Material.MaterialName
+                                </span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted fst-italic">Sử dụng các tinh chất và nguyên liệu cơ bản cho liệu trình này.</span>
+                        }
+                    </div>
+                </div>
+
+                <a href="/Booking?serviceId=@Model.ServiceId" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1 w-100 shadow-sm mt-auto">
+                    Đặt Lịch Cùng Dịch Vụ Này
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .letter-spacing-1 { letter-spacing: 1px; }
+    .letter-spacing-2 { letter-spacing: 2px; }
+    .bg-gold { background-color: var(--gold) !important; }
+    .text-gold { color: var(--gold) !important; }
+    .btn-gold {
+        background-color: var(--gold);
+        color: white;
+        border: none;
+        transition: all 0.3s;
+    }
+    .btn-gold:hover {
+        background-color: #B8860B; /* Darker gold */
+        color: white;
+        transform: translateY(-2px);
+    }
+</style>
