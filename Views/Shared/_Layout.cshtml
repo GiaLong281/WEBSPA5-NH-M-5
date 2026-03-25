@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SpaN5 Premium</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SpaN5.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="spa-preloader" class="d-flex justify-content-center align-items-center">
+        <div class="text-center preloader-content">
+            <h1 class="font-playfair text-gold display-3 fw-bold mb-3 animate-pulse">Spa<span class="text-dark">N5</span></h1>
+            <div class="spinner-grow text-gold" style="width: 2rem; height: 2rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top spa-navbar transition-all">
+            <div class="container">
+                <a class="navbar-brand spa-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="fs-4">Spa<span class="text-gold">N5</span></span>
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#spaNav" aria-controls="spaNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="spaNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#services">Dịch vụ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">Về chúng tôi</a>
+                        </li>
+                        <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                            <a class="btn btn-gold rounded-pill px-4 py-2" href="#booking">Đặt lịch ngay</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="spa-footer">
+        <div class="container pt-5 pb-4">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="text-gold mb-3 font-playfair fs-4">SpaN5</h5>
+                    <p class="text-white-50">Nơi mang lại sự thư giãn tuyệt đối cho tâm hồn và cơ thể bạn. Đội ngũ chuyên gia của chúng tôi luôn sẵn sàng chăm sóc bạn.</p>
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Liên kết</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Trang chủ</a></li>
+                        <li><a href="#services">Dịch vụ</a></li>
+                        <li><a href="#about">Giới thiệu</a></li>
+                        <li><a href="#testimonials">Khách hàng</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Dịch vụ</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">Massage Thư Giãn</a></li>
+                        <li><a href="#">Chăm Sóc Da Mặt</a></li>
+                        <li><a href="#">Trị Liệu Thảo Dược</a></li>
+                        <li><a href="#">Chăm Sóc Toàn Thân</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Liên hệ</h5>
+                    <ul class="list-unstyled text-white-50 contact-info">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt text-gold me-2"></i> 123 Đường Tự Do, Quận 1, TP HCM</li>
+                        <li class="mb-2"><i class="fas fa-phone text-gold me-2"></i> +84 123 456 789</li>
+                        <li class="mb-2"><i class="fas fa-envelope text-gold me-2"></i> contact@span5.com</li>
+                        <li class="mb-2"><i class="fas fa-clock text-gold me-2"></i> 08:00 - 22:00 Hàng ngày</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary mt-4 mb-4">
+            <div class="text-center text-white-50">
+                <small>&copy; 2026 SpaN5 - Bản quyền thuộc hệ thống Spa chuyên nghiệp N5.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

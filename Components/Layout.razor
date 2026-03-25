@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+
+<div class="min-h-screen flex flex-col bg-[#F9F7F4] text-[#3A3A3A] font-sans">
+
+    <!-- Navbar -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#E8E0D9]/50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="/" class="text-2xl font-serif font-bold text-[#A8B5A2]">Spa Long</a>
+
+            <nav class="hidden md:flex space-x-10">
+                <a href="/" class="hover:text-[#A8B5A2] transition">Trang chủ</a>
+                <a href="/services" class="hover:text-[#A8B5A2] transition">Dịch vụ</a>
+                <a href="/booking" class="hover:text-[#A8B5A2] transition font-medium">Đặt lịch</a>
+                <a href="/about" class="hover:text-[#A8B5A2] transition">Về chúng tôi</a>
+                <a href="/contact" class="hover:text-[#A8B5A2] transition">Liên hệ</a>
+            </nav>
+
+            <div class="flex items-center space-x-6">
+                <a href="/booking" class="bg-[#A8B5A2] text-white px-6 py-3 rounded-full hover:bg-[#8F9A89] transition">
+                    Đặt lịch ngay
+                </a>
+                <!-- Icon user / login -->
+                <button>👤</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-grow pt-24">
+        @Body
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#3A3A3A] text-white py-16">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12">
+            <div>
+                <h3 class="text-xl font-serif mb-6">Spa Long</h3>
+                <p class="text-gray-400">Nơi thư giãn và chăm sóc bản thân toàn diện tại Đồng Nai.</p>
+            </div>
+            <div>
+                <h4 class="font-medium mb-4">Dịch vụ</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li>Massage</li>
+                    <li>Chăm sóc da</li>
+                    <li>Trị liệu</li>
+                </ul>
+            </div>
+            <!-- Thêm chi nhánh, liên hệ, social -->
+        </div>
+        <div class="mt-12 text-center text-gray-500 text-sm">
+            © 2026 Spa Long. All rights reserved.
+        </div>
+    </footer>
+
+</div>
