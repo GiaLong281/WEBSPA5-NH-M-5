@@ -58,12 +58,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditService.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFNlcnZpY2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFN0YWZmLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageBookings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlQm9va2luZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageCustomers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlQ3VzdG9tZXJzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageServices.cshtml]
@@ -100,6 +108,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Home/Terms.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxUZXJtcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Shared/Error.cshtml]

@@ -1,0 +1,35 @@
+@model IEnumerable<SpaN5.Models.Customer>
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5" style="margin-top: 80px;">
+    <h1>Quản lý khách hàng</h1>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Điện thoại</th>
+                <th>Email</th>
+                <th>Điểm tích lũy</th>
+                <th>Ngày tạo</th>
+                <th>Số lần đặt</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.CustomerId</td>
+                    <td>@c.FullName</td>
+                    <td>@c.Phone</td>
+                    <td>@c.Email</td>
+                    <td>@c.LoyaltyPoints</td>
+                    <td>@c.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>@c.Bookings?.Count()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

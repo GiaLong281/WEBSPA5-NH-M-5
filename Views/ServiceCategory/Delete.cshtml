@@ -1,0 +1,41 @@
+@model SpaN5.Models.ServiceCategory
+@{
+    ViewData["Title"] = "Xóa loại dịch vụ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h1>Xóa loại dịch vụ</h1>
+    
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> Bạn có chắc chắn muốn xóa loại dịch vụ này?
+    </div>
+    
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+        
+        <dt class="col-sm-2">Tên loại dịch vụ</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+        
+        <dt class="col-sm-2">Số lượng dịch vụ</dt>
+        <dd class="col-sm-10">
+            <span class="badge bg-info">@(Model.Services?.Count ?? 0)</span>
+            @if (Model.Services != null && Model.Services.Any())
+            {
+                <div class="text-danger mt-2">
+                    <i class="fas fa-ban"></i> Không thể xóa vì có dịch vụ đang sử dụng!
+                </div>
+            }
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-danger" @(Model.Services != null && Model.Services.Any() ? "disabled" : "")>
+            Xóa
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

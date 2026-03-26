@@ -52,35 +52,37 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse justify-content-end" id="spaNav">
-                    <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
-
+                <div class="collapse navbar-collapse justify-content-between" id="spaNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link" href="#services">Dịch vụ</a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link" href="#about">Về chúng tôi</a>
                         </li>
+                    </ul>
 
+                    <div class="d-flex align-items-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item dropdown ms-lg-3">
-                                <a class="nav-link dropdown-toggle"
-                                   href="#"
-                                   id="userDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
+                            <div class="dropdown me-3">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-globe"></i> VI
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                    <li><a class="dropdown-item" href="?culture=vi">VI</a></li>
+                                    <li><a class="dropdown-item" href="?culture=en">EN</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-circle"></i> @User.FindFirst("FullName")?.Value
                                 </a>
-
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <li>
@@ -89,33 +91,7 @@
                                             </a>
                                         </li>
                                     }
-
-                                    @if (User.IsInRole("Staff"))
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Staff" asp-action="Dashboard">
-                                                <i class="fas fa-calendar-alt"></i> Dashboard Staff
-                                            </a>
-                                        </li>
-                                    }
-
-                                    @if (User.IsInRole("Customer"))
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Customer" asp-action="Profile">
-                                                <i class="fas fa-user"></i> Hồ sơ cá nhân
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings">
-                                                <i class="fas fa-book"></i> Lịch sử đặt lịch
-                                            </a>
-                                        </li>
-                                    }
-
                                     <li><hr class="dropdown-divider"></li>
-
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" method="post">
                                             <button type="submit" class="dropdown-item">
@@ -124,28 +100,23 @@
                                         </form>
                                     </li>
                                 </ul>
-                            </li>
+                            </div>
                         }
                         else
                         {
-                            <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                                <a class="btn btn-outline-gold rounded-pill px-4 py-2"
-                                   asp-controller="Account"
-                                   asp-action="Login">
-                                    Đăng nhập
-                                </a>
-                            </li>
-
-                            <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
-                                <a class="btn btn-gold rounded-pill px-4 py-2"
-                                   asp-controller="Account"
-                                   asp-action="Register">
-                                    Đăng ký
-                                </a>
-                            </li>
+                            <div class="dropdown me-3">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-globe"></i> VI
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                    <li><a class="dropdown-item" href="?culture=vi">VI</a></li>
+                                    <li><a class="dropdown-item" href="?culture=en">EN</a></li>
+                                </ul>
+                            </div>
+                            <a class="btn btn-outline-gold rounded-pill px-4 py-2 me-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                            <a class="btn btn-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Register">Đăng ký</a>
                         }
-
-                    </ul>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -156,7 +127,6 @@
     </main>
 
     <footer class="spa-footer">
-        <li><a asp-controller="Home" asp-action="Terms">Điều khoản sử dụng</a></li>
         <div class="container pt-5 pb-4">
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
@@ -164,6 +134,9 @@
                     <p class="text-white-50">
                         Nơi mang lại sự thư giãn tuyệt đối cho tâm hồn và cơ thể bạn.
                     </p>
+                    <ul class="list-unstyled mt-3">
+                        <li><a asp-controller="Home" asp-action="Terms" class="text-white-50 text-decoration-none">Điều khoản sử dụng</a></li>
+                    </ul>
                 </div>
             </div>
 
@@ -180,7 +153,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- Lazy load images and fade-in sections (duplicate from site.js? but we keep in site.js) -->
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
