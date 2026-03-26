@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SpaN5.Models.SpaN5.Models;
+using SpaN5.Models;
 
 namespace SpaN5.Models
 {

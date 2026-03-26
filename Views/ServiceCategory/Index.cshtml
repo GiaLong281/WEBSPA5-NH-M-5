@@ -1,0 +1,76 @@
+@model IEnumerable<SpaN5.Models.ServiceCategory>
+@{
+    ViewData["Title"] = "Quản lý loại dịch vụ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h1>Quản lý loại dịch vụ</h1>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Thêm loại dịch vụ mới
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên loại dịch vụ</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var category in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@category.Id</td>
+                            <td>
+                                <strong>@category.Name</strong>
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center py-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i> Chưa có loại dịch vụ nào. 
+                                <a asp-action="Create">Thêm loại dịch vụ mới</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

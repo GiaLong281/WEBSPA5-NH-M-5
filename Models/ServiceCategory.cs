@@ -1,5 +1,5 @@
-﻿namespace SpaN5.Models
-{
+﻿using System.Collections.Generic;
+
     namespace SpaN5.Models
     {
         public class ServiceCategory
@@ -9,5 +9,4 @@
 
             public ICollection<Service> Services { get; set; } = new List<Service>();
         }
-    }
 }
