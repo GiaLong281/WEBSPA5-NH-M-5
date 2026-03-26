@@ -509,3 +509,16 @@ C:\Users\pc\OneDrive\Documents\GitHub\WEBSPA5-NH-M-5\obj\Debug\net8.0\refint\Spa
 C:\Users\pc\OneDrive\Documents\GitHub\WEBSPA5-NH-M-5\obj\Debug\net8.0\SpaN5.pdb
 C:\Users\pc\OneDrive\Documents\GitHub\WEBSPA5-NH-M-5\obj\Debug\net8.0\SpaN5.genruntimeconfig.cache
 C:\Users\pc\OneDrive\Documents\GitHub\WEBSPA5-NH-M-5\obj\Debug\net8.0\ref\SpaN5.dll
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.csproj.AssemblyReference.cache
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.AssemblyInfoInputs.cache
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.AssemblyInfo.cs
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.csproj.CoreCompileInputs.cache
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.RazorAssemblyInfo.cache
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.RazorAssemblyInfo.cs
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.sourcelink.json
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.dll
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\refint\SpaN5.dll
+C:\Users\DELL\OneDrive\Desktop\Web spa\Long(ThanhToan_DatLich\obj\Debug\net8.0\SpaN5.pdb
