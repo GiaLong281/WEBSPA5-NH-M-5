@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using SpaN5.Models.SpaN5.Models;
 
 namespace SpaN5.Models
@@ -19,6 +19,8 @@ namespace SpaN5.Models
 
         public bool IsActive { get; set; } = true;
         public bool IsPopular { get; set; } = false;
+        public string? VideoUrl { get; set; }
+
 
         public int CategoryId { get; set; }
         public ServiceCategory Category { get; set; }

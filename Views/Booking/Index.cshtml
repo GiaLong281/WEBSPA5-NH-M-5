@@ -175,6 +175,26 @@
         border-color: #eee;
     }
 
+    .time-slot.booked {
+        background: #ffebee;
+        color: #d32f2f;
+        border-color: #ffcdd2;
+        cursor: not-allowed;
+        position: relative;
+    }
+
+    .time-slot.booked::after {
+        content: 'Đã đặt';
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        width: 100%;
+        font-size: 0.65rem;
+        color: #d32f2f;
+        font-weight: bold;
+    }
+
+
     /* Buttons */
     .btn-gold {
         background-color: var(--gold);
@@ -197,34 +217,31 @@
         color: white;
     }
 
-    /* Detail Button */
-    .btn-detail {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.8);
-        color: var(--navy);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-        z-index: 10;
-        border: none;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    .hover-opacity-100:hover {
+        opacity: 1 !important;
     }
-
-    .btn-detail:hover {
-        background: var(--gold);
-        color: white;
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+    .service-image-container:hover img {
         transform: scale(1.1);
     }
-
-    .service-card.selected .btn-detail {
-        left: 45px; /* Adjust if checkmark is on right */
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 */
+        height: 0;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #000;
     }
+    .video-container iframe, .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
 
     .material-item {
         background: #fdfaf0;
@@ -279,14 +296,19 @@
                         var isSelected = Model?.ServiceId == service.ServiceId ? "selected" : "";
                         <div class="col-md-6 col-lg-4">
                             <div class="service-card @isSelected" onclick="selectService(@service.ServiceId, this)" data-service-id="@service.ServiceId">
-                                <button type="button" class="btn-detail" onclick="event.stopPropagation(); showServiceDetails(@service.ServiceId)" title="Xem chi tiết">
-                                    <i class="fas fa-info"></i>
-                                </button>
-
                                 @if (!string.IsNullOrEmpty(service.Image))
                                 {
-                                    <img src="@service.Image" style="height:120px; object-fit:cover; width: 100%; border-radius: 8px; margin-bottom: 10px;" />
+                                    <div class="service-image-container position-relative overflow-hidden rounded-3 mb-3" style="height: 140px; cursor: pointer;" onclick="event.stopPropagation(); showServiceDetails(@service.ServiceId)">
+                                        <img src="@service.Image" class="w-100 h-100 object-fit-cover transition-all" alt="@service.ServiceName" />
+                                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25 opacity-0 hover-opacity-100 transition-all">
+                                            <div class="text-white text-center">
+                                                <i class="fas fa-play-circle fs-2 mb-1"></i>
+                                                <div class="small fw-bold">Chi Tiết & Video</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 }
+
                                 <h5 class="font-playfair mb-2">@service.ServiceName</h5>
                                 <div class="d-flex justify-content-between text-muted small mb-2">
                                     <span><i class="far fa-clock me-1"></i> @service.Duration phút</span>
@@ -384,12 +406,18 @@
                 <h5 class="modal-title font-playfair" id="modalServiceName">Chi Tiết Dịch Vụ</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-0">
-                <div class="row g-0">
-                    <div class="col-md-5">
-                        <img id="modalServiceImage" src="" class="img-fluid h-100 object-fit-cover" style="min-height: 250px;" alt="">
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div id="videoContainer" class="mb-3 d-none">
+                            <h6 class="fw-bold text-navy mb-2"><i class="fas fa-video me-2 text-gold"></i>Video Liệu Trình:</h6>
+                            <div class="video-container">
+                                <div id="videoPlayer"></div>
+                            </div>
+                        </div>
+                        <img id="modalServiceImage" src="" class="img-fluid rounded-3 shadow-sm w-100 object-fit-cover" style="max-height: 300px;" alt="">
                     </div>
-                    <div class="col-md-7 p-4">
+                    <div class="col-lg-6">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="badge bg-gold text-dark p-2" id="modalServiceDuration"></span>
                             <span class="h4 text-gold mb-0 fw-bold" id="modalServicePrice"></span>
@@ -397,7 +425,7 @@
                         <h4 class="font-playfair text-navy mb-3" id="modalServiceTitle"></h4>
                         <p class="text-muted mb-4" id="modalServiceDesc"></p>
                         
-                        <div class="mb-4">
+                        <div>
                             <h6 class="fw-bold text-navy mb-3"><i class="fas fa-leaf me-2 text-success"></i>Thành phần nguyên liệu:</h6>
                             <div id="modalMaterialsList">
                                 <!-- Materials will be loaded here -->
@@ -406,6 +434,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="modal-footer border-0 p-3">
                 <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-gold rounded-pill px-4 fw-bold" id="btnSelectFromModal">Chọn Dịch Vụ Này</button>
@@ -508,14 +537,20 @@
                 .then(data => {
                     grid.innerHTML = '';
                     if (data.success && data.times.length > 0) {
-                        data.times.forEach(time => {
+                        data.times.forEach(item => {
+                            const isBooked = item.isBooked;
+                            const bookedClass = isBooked ? 'booked' : '';
+                            const clickAttr = isBooked ? '' : `onclick="selectTime('${item.time}', this)"`;
+                            const titleAttr = isBooked ? 'title="Khung giờ đã có người chọn"' : '';
+                            
                             grid.innerHTML += `
                                 <div class="col-4 col-md-3 col-lg-2">
-                                    <div class="time-slot" onclick="selectTime('${time}', this)">${time}</div>
+                                    <div class="time-slot ${bookedClass}" ${clickAttr} ${titleAttr}>${item.time}</div>
                                 </div>
                             `;
                         });
-                    } else {
+                    }
+ else {
                         grid.innerHTML = '<div class="text-danger px-3">Không có khung giờ nào trống trong ngày này.</div>';
                     }
                 })
@@ -547,12 +582,22 @@
 
         // Service Details Logic
         function showServiceDetails(id) {
-            const modal = new bootstrap.Modal(document.getElementById('serviceDetailModal'));
+            const modalElement = document.getElementById('serviceDetailModal');
+            const modal = new bootstrap.Modal(modalElement);
             const materialsList = document.getElementById('modalMaterialsList');
+            const videoContainer = document.getElementById('videoContainer');
+            const videoPlayer = document.getElementById('videoPlayer');
             
             // Loading state
             materialsList.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-gold"></i> Đang tải...</div>';
+            videoContainer.classList.add('d-none');
+            videoPlayer.innerHTML = '';
             modal.show();
+
+            // Clear video on close
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                videoPlayer.innerHTML = '';
+            }, { once: true });
 
             fetch(`/Booking/GetServiceDetails/${id}`)
                 .then(res => res.json())
@@ -565,6 +610,24 @@
                         document.getElementById('modalServiceDuration').innerHTML = `<i class="far fa-clock me-1"></i> ${data.duration} phút`;
                         document.getElementById('modalServiceImage').src = data.image || '/images/default-spa.jpg';
                         
+                        // Handle Video
+                        if (data.videoUrl) {
+                            videoContainer.classList.remove('d-none');
+                            if (data.videoUrl.includes('youtube.com') || data.videoUrl.includes('youtu.be')) {
+                                // Simple YouTube embed logic
+                                let videoId = '';
+                                if (data.videoUrl.includes('v=')) videoId = data.videoUrl.split('v=')[1].split('&')[0];
+                                else videoId = data.videoUrl.split('/').pop();
+                                videoPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+                            } else if (data.videoUrl.includes('vimeo.com')) {
+                                let videoId = data.videoUrl.split('/').pop();
+                                videoPlayer.innerHTML = `<iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+                            } else {
+                                // Local or direct video link
+                                videoPlayer.innerHTML = `<video controls class="w-100"><source src="${data.videoUrl}" type="video/mp4">Trình duyệt không hỗ trợ video.</video>`;
+                            }
+                        }
+
                         materialsList.innerHTML = '';
                         if (data.materials && data.materials.length > 0) {
                             data.materials.forEach(m => {
@@ -592,5 +655,6 @@
                     materialsList.innerHTML = '<div class="text-danger">Lỗi tải dữ liệu.</div>';
                 });
         }
+
     </script>
 }

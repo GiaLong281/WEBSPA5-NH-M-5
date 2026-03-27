@@ -41,7 +41,7 @@ namespace SpaN5.Controllers
                 .ThenInclude(sm => sm.Material)
                 .FirstOrDefaultAsync(s => s.ServiceId == id);
 
-            if (service == null) return NotFound();
+            if (service == null) return Json(new { success = false, message = "Không tìm thấy dịch vụ" });
 
             var result = new
             {
@@ -51,6 +51,7 @@ namespace SpaN5.Controllers
                 service.Price,
                 service.Duration,
                 service.Image,
+                service.VideoUrl,
                 Materials = service.ServiceMaterials.Select(sm => new
                 {
                     sm.Material?.MaterialName,
@@ -66,28 +67,47 @@ namespace SpaN5.Controllers
         [HttpGet]
         public IActionResult GetAvailableTimes(string date, int serviceId)
         {
-            // Lấy ra các khung giờ hoạt động tiêu chuẩn (Ví dụ từ 09:00 đến 19:00, mỗi giờ 1 slot)
-            var allTimeSlots = new List<string>
+            // Lấy ra các khung giờ hoạt động tiêu chuẩn
+            var standardSlots = new List<string>
             {
                 "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
                 "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
                 "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00"
             };
 
+            var timeSlotsResponse = new List<object>();
+
             if (DateTime.TryParse(date, out DateTime selectedDate))
             {
                 // Find start times that are booked on that day
-                var bookedTimes = _context.Bookings
+                var bookedBookings = _context.Bookings
                     .Where(b => b.BookingDate.Date == selectedDate.Date && b.Status != BookingStatus.Cancelled)
-                    .Select(b => b.StartTime.ToString("HH:mm"))
+                    .Select(b => new { b.StartTime, b.EndTime })
                     .ToList();
                 
-                // Remove booked times
-                allTimeSlots.RemoveAll(t => bookedTimes.Contains(t));
+                foreach (var slot in standardSlots)
+                {
+                    DateTime slotTime = DateTime.Parse($"{date} {slot}");
+                    bool isBooked = bookedBookings.Any(b => slotTime >= b.StartTime && slotTime < b.EndTime);
+                    
+                    timeSlotsResponse.Add(new
+                    {
+                        time = slot,
+                        isBooked = isBooked
+                    });
+                }
+            }
+            else
+            {
+                foreach (var slot in standardSlots)
+                {
+                    timeSlotsResponse.Add(new { time = slot, isBooked = false });
+                }
             }
 
-            return Json(new { success = true, times = allTimeSlots });
+            return Json(new { success = true, times = timeSlotsResponse });
         }
+
 
         // POST: Booking/SubmitBooking
         [HttpPost]
