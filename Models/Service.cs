@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using SpaN5.Models;
 
 namespace SpaN5.Models
@@ -7,7 +7,7 @@ namespace SpaN5.Models
     {
         public int ServiceId { get; set; }
 
-        public string ServiceName { get; set; }
+        public string ServiceName { get; set; } = null!;
         public string? Description { get; set; }
 
         public int Duration { get; set; } // phút
@@ -21,7 +21,7 @@ namespace SpaN5.Models
         public bool IsPopular { get; set; } = false;
 
         public int CategoryId { get; set; }
-        public ServiceCategory Category { get; set; }
+        public ServiceCategory Category { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

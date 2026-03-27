@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpaN5.Models
 {
@@ -6,13 +6,13 @@ namespace SpaN5.Models
     {
         public int BookingId { get; set; }
 
-        public string BookingCode { get; set; }
+        public string BookingCode { get; set; } = null!;
 
         public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        public Customer Customer { get; set; } = null!;
 
         public int BranchId { get; set; }
-        public Branch Branch { get; set; }
+        public Branch Branch { get; set; } = null!;
 
         public DateTime BookingDate { get; set; }
         public DateTime StartTime { get; set; }
