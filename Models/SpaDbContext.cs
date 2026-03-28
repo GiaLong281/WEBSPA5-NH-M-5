@@ -24,6 +24,8 @@ namespace SpaN5.Models
         public DbSet<ServiceMaterial> ServiceMaterials { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
 
+        public DbSet<Feedback> Feedbacks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Cấu hình quan hệ ServiceMaterial

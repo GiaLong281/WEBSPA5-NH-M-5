@@ -2,144 +2,198 @@
     ViewData["Title"] = "Trang Chủ";
 }
 
-<!-- Hero Section -->
-<section class="hero-section position-relative vh-100 d-flex align-items-center" style="background: url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; margin-top: -76px;">
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(26, 43, 60, 0.4);"></div>
-    <div class="container position-relative z-index-1 text-center text-white">
-        <h1 class="display-3 font-playfair mb-4 animate-fade-up fw-bold">Nuông Chiều Bản Thân<br>Đánh Thức Vẻ Đẹp</h1>
-        <p class="lead mb-5 fw-light mx-auto" style="max-width: 600px; animation-delay: 0.2s;">Trải nghiệm không gian thư giãn tuyệt đối và những liệu pháp tái tạo năng lượng hàng đầu tại SpaN5.</p>
-        <a href="/Booking" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1" style="animation-delay: 0.4s;">Đặt Lịch Ngay</a>
+<!-- Hero Section: Premium Dynamic Aesthetic -->
+<section class="hero-section position-relative vh-100 d-flex align-items-center overflow-hidden" style="margin-top: -76px;">
+    
+    <!-- YouTube Background Video -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden" style="z-index: 0; pointer-events: none;">
+        <iframe src="https://www.youtube.com/embed/VCQrC5IaboA?autoplay=1&mute=1&loop=1&playlist=VCQrC5IaboA&controls=0&showinfo=0&rel=0" 
+                frameborder="0" 
+                allow="autoplay; encrypted-media" 
+                style="width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        </iframe>
+    </div>
+
+    <!-- Sophisticated Overlay for Readability -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(90deg, rgba(26, 43, 60, 0.8) 0%, rgba(26, 43, 60, 0.5) 50%, rgba(26,43,60,0.2) 100%); z-index: 1;"></div>
+    
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row">
+            <div class="col-lg-7 text-white text-start">
+                <span class="text-gold fw-bold text-uppercase letter-spacing-2 mb-3 d-inline-block" data-aos="fade-right" data-aos-delay="200">Chào mừng bạn đến với SpaN5</span>
+                <h1 class="display-2 font-playfair mb-4 fw-bold lh-sm" data-aos="fade-right" data-aos-duration="1200">Nuông Chiều Bản Thân<br>Đánh Thức Vẻ Đẹp</h1>
+                <p class="lead mb-5 fw-light" style="max-width: 550px; line-height: 1.8;" data-aos="fade-right" data-aos-delay="400">Trải nghiệm không gian thư giãn tuyệt đối và những liệu pháp tái tạo năng lượng hàng đầu. Nơi vẻ đẹp tự nhiên của bạn được tôn vinh một cách tinh tế nhất.</p>
+                <div data-aos="fade-right" data-aos-delay="600">
+                    <a href="/Booking" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1 shadow-lg me-3">Đặt Lịch Ngay</a>
+                    <a href="#about" class="btn btn-glass btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1">Khám Phá</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Down Indicator -->
+    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4 text-white opacity-75" data-aos="fade-in" data-aos-delay="1000">
+        <div class="d-flex flex-column align-items-center">
+            <span class="small text-uppercase letter-spacing-2 mb-2">Cuộn xuống</span>
+            <i class="fas fa-chevron-down animate-bounce"></i>
+        </div>
     </div>
 </section>
 
-
 <!-- About Section -->
-<section id="about" class="py-5 my-5">
+<section id="about" class="py-5 my-5 overflow-hidden">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
                 <div class="position-relative">
-                    <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Spa interior" class="img-fluid rounded-3 shadow-lg" style="object-fit: cover; height: 500px; width: 100%;">
-                    <div class="position-absolute bottom-0 end-0 bg-white p-4 shadow-lg rounded-top-start-3 m-0" style="right: -20px !important; bottom: -20px !important;">
-                        <h3 class="font-playfair text-gold mb-0">10+ Năm</h3>
-                        <p class="mb-0 text-muted">Kinh nghiệm chăm sóc</p>
+                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Spa interior" class="img-fluid rounded-4 shadow-lg" style="object-fit: cover; height: 550px; width: 100%;">
+                    <div class="position-absolute bottom-0 end-0 bg-white p-4 shadow-lg rounded-top-start-4 m-0 translate-middle-y me-n3 mb-n3" data-aos="zoom-in" data-aos-delay="500">
+                        <h3 class="font-playfair text-gold mb-0 fs-1">10+ Năm</h3>
+                        <p class="mb-0 text-muted fw-medium text-uppercase small letter-spacing-1">Kinh nghiệm chăm sóc</p>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5 offset-lg-1">
+            <div class="col-lg-5 offset-lg-1" data-aos="fade-left">
                 <span class="text-gold fw-bold text-uppercase letter-spacing-2">Về SpaN5</span>
-                <h2 class="font-playfair display-5 my-3 text-dark">Nơi Cân Bằng<br>Thân & Tâm.</h2>
-                <p class="text-muted mb-4" style="line-height: 1.8;">Chúng tôi tin rằng sự thư giãn thực sự đến từ sự hòa hợp giữa cơ thể khỏe mạnh và tinh thần an yên. Với không gian thiên nhiên tĩnh lặng và các liệu pháp y học cổ truyền kết hợp hiện đại, SpaN5 mong muốn mang đến cho bạn những trải nghiệm đáng nhớ nhất.</p>
-                <ul class="list-unstyled mb-4">
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> Kỹ thuật viên chuyên nghiệp, tận tâm</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> Sản phẩm hữu cơ organic 100%</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> Không gian tĩnh lặng, riêng tư</li>
-                </ul>
-                <a href="#services" class="btn btn-outline-gold rounded-pill px-4 py-2">Khám phá dịch vụ</a>
+                <h2 class="font-playfair display-4 my-3 text-dark fw-bold">Nơi Cân Bằng<br>Thân & Tâm.</h2>
+                <p class="text-muted mb-4 fs-5" style="line-height: 1.8;">Chúng tôi tin rằng sự thư giãn thực sự đến từ sự hòa hợp giữa cơ thể khỏe mạnh và tinh thần an yên. Với không gian thiên nhiên tĩnh lặng và các liệu pháp y học cổ truyền kết hợp hiện đại, SpaN5 mong muốn mang đến cho bạn những trải nghiệm đáng nhớ nhất.</p>
+                <div class="row g-4 mb-4">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-check-circle text-gold me-2"></i>
+                            <span class="fw-medium">Chuyên gia tận tâm</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-gold me-2"></i>
+                            <span class="fw-medium">100% Organic</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-check-circle text-gold me-2"></i>
+                            <span class="fw-medium">Không gian riêng tư</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-gold me-2"></i>
+                            <span class="fw-medium">Kỹ thuật hiện đại</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="#services" class="btn btn-outline-gold rounded-pill px-5 py-3 fw-bold text-uppercase">Khám phá dịch vụ</a>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Services Section -->
-<section id="services" class="py-5 bg-white">
-    <div class="container py-4">
-        <div class="text-center mb-5">
+<section id="services" class="py-5 bg-white position-relative overflow-hidden">
+    <div class="container py-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <span class="text-gold fw-bold text-uppercase letter-spacing-2">Dịch Vụ Nổi Bật</span>
-            <h2 class="font-playfair display-5 mt-2 mb-3">Những Liệu Trình Tái Tạo</h2>
-            <div class="mx-auto bg-gold" style="height: 2px; width: 60px;"></div>
+            <h2 class="font-playfair display-5 mt-2 mb-3 fw-bold">Những Liệu Trình Tái Tạo</h2>
+            <div class="mx-auto bg-gold" style="height: 3px; width: 80px; border-radius: 2px;"></div>
         </div>
         
         <div class="row g-4">
-            <!-- Service 1 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 border-0 shadow-sm service-card transition-all">
-                    <a href="/Home/Details/1" class="card-img-top d-block overflow-hidden" style="height: 250px;">
+            <!-- Service 1: Massage -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 border-0 shadow-sm service-card">
+                    <div class="card-video-wrapper overflow-hidden" style="height: 250px;">
                         <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-100 h-100 transition-all" alt="Massage" style="object-fit: cover;">
-                    </a>
+                        <div class="position-absolute top-0 end-0 p-3 z-index-3">
+                            <span class="badge bg-gold rounded-pill px-3 py-2 fw-bold shadow">Hot</span>
+                        </div>
+                    </div>
                     <div class="card-body p-4 text-center">
-                        <i class="fas fa-hands text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">Massage Thư Giãn</h4>
-                        <p class="text-muted mb-4">Xua tan căng thẳng cơ bắp bằng liệu pháp massage Thụy Điển kết hợp đá nóng thiên nhiên.</p>
-                        <a href="/Home/Details/1" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">Xem chi tiết</a>
+                        <div class="service-icon-box mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; border-radius: 50%; background: var(--beige);">
+                            <i class="fas fa-hands text-gold fs-2"></i>
+                        </div>
+                        <h4 class="font-playfair mb-3 fw-bold">Massage Thư Giãn</h4>
+                        <p class="text-muted mb-4 px-2">Xua tan căng thẳng cơ bắp bằng liệu pháp massage Thụy Điển kết hợp đá nóng thiên nhiên.</p>
+                        <a href="/Home/Details/1" class="btn btn-link text-gold fw-bold text-decoration-none border-bottom border-gold pb-1 text-uppercase small letter-spacing-1">Xem chi tiết</a>
                     </div>
                 </div>
             </div>
-            <!-- Service 2 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 border-0 shadow-sm service-card transition-all">
-                    <a href="/Home/Details/2" class="card-img-top d-block overflow-hidden" style="height: 250px;">
+            
+            <!-- Service 2: Facial -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 border-0 shadow-sm service-card">
+                    <div class="card-video-wrapper overflow-hidden" style="height: 250px;">
                         <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-100 h-100 transition-all" alt="Facial" style="object-fit: cover;">
-                    </a>
+                    </div>
                     <div class="card-body p-4 text-center">
-                        <i class="fas fa-spa text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">Chăm Sóc Da Mặt</h4>
-                        <p class="text-muted mb-4">Thanh lọc và trẻ hóa làn da với tinh chất hoa cúc và serum hữu cơ nhập khẩu từ Pháp.</p>
-                        <a href="/Home/Details/2" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">Xem chi tiết</a>
+                        <div class="service-icon-box mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; border-radius: 50%; background: var(--beige);">
+                            <i class="fas fa-spa text-gold fs-2"></i>
+                        </div>
+                        <h4 class="font-playfair mb-3 fw-bold">Chăm Sóc Da Mặt</h4>
+                        <p class="text-muted mb-4 px-2">Thanh lọc và trẻ hóa làn da với tinh chất hoa cúc và serum hữu cơ nhập khẩu từ Pháp.</p>
+                        <a href="/Home/Details/2" class="btn btn-link text-gold fw-bold text-decoration-none border-bottom border-gold pb-1 text-uppercase small letter-spacing-1">Xem chi tiết</a>
                     </div>
                 </div>
             </div>
-            <!-- Service 3 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 border-0 shadow-sm service-card transition-all">
-                    <a href="/Home/Details/3" class="card-img-top d-block overflow-hidden" style="height: 250px;">
+            
+            <!-- Service 3: Herbal -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="card h-100 border-0 shadow-sm service-card">
+                    <div class="card-video-wrapper overflow-hidden" style="height: 250px;">
                         <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-100 h-100 transition-all" alt="Body Treatment" style="object-fit: cover;">
-                    </a>
+                    </div>
                     <div class="card-body p-4 text-center">
-                        <i class="fas fa-leaf text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">Tắm Thảo Dược</h4>
-                        <p class="text-muted mb-4">Đào thải độc tố, kích thích tuần hoàn máu qua liệu trình ngâm mình với 15 loại thảo mộc quý.</p>
-                        <a href="/Home/Details/3" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">Xem chi tiết</a>
+                        <div class="service-icon-box mb-3 mx-auto shadow-sm d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; border-radius: 50%; background: var(--beige);">
+                            <i class="fas fa-leaf text-gold fs-2"></i>
+                        </div>
+                        <h4 class="font-playfair mb-3 fw-bold">Tắm Thảo Dược</h4>
+                        <p class="text-muted mb-4 px-2">Đào thải độc tố, kích thích tuần hoàn máu qua liệu trình ngâm mình với 15 loại thảo mộc quý.</p>
+                        <a href="/Home/Details/3" class="btn btn-link text-gold fw-bold text-decoration-none border-bottom border-gold pb-1 text-uppercase small letter-spacing-1">Xem chi tiết</a>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
 <!-- Testimonials -->
-<section id="testimonials" class="py-5" style="background-color: var(--beige);">
+<section id="testimonials" class="py-5 bg-light overflow-hidden">
     <div class="container py-5">
         <div class="row align-items-center">
-            <div class="col-md-5 mb-4 mb-md-0">
-                <h2 class="font-playfair display-5 mb-4">Khách Hàng<br>Nói Gì Về Chúng Tôi?</h2>
-                <p class="text-muted mb-4">Hơn 5000+ khách hàng đã trải nghiệm và hài lòng với dịch vụ tại SpaN5. Sự tin tưởng của quý khách là động lực to lớn nhất.</p>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-dark rounded-circle" style="width: 45px; height: 45px;"><i class="fas fa-arrow-left"></i></button>
-                    <button class="btn btn-dark rounded-circle bg-navy border-0" style="width: 45px; height: 45px;"><i class="fas fa-arrow-right"></i></button>
+            <div class="col-md-5 mb-5 mb-md-0" data-aos="fade-right">
+                <h2 class="font-playfair display-5 mb-4 fw-bold">Khách Hàng<br>Nói Gì Về Chúng Tôi?</h2>
+                <p class="lead text-muted mb-4">Hơn 5000+ khách hàng đã trải nghiệm và hài lòng với dịch vụ tại SpaN5. Sự tin tưởng của quý khách là động lực to lớn nhất.</p>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-dark rounded-circle shadow" style="width: 55px; height: 55px;"><i class="fas fa-arrow-left"></i></button>
+                    <button class="btn btn-gold rounded-circle shadow" style="width: 55px; height: 55px;"><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
-            <div class="col-md-7">
-                <div class="bg-white p-5 rounded-3 shadow-sm position-relative">
+            <div class="col-md-7" data-aos="fade-left">
+                <div class="bg-white p-5 rounded-4 shadow-lg position-relative border-start border-gold border-5">
                     <i class="fas fa-quote-left fs-1 text-gold opacity-25 position-absolute top-0 start-0 ms-4 mt-4"></i>
-                    <p class="fs-5 fst-italic mb-4 text-dark position-relative z-index-1" style="line-height: 1.8;">"Sau một tuần làm việc căng thẳng, đến SpaN5 giống như bước vào một thế giới khác. Không gian tuyệt vời, mùi hương tinh dầu dịu nhẹ và kỹ thuật massage thì điêu luyện. Chắc chắn tôi sẽ quay lại thường xuyên."</p>
+                    <p class="fs-4 fst-italic mb-5 text-dark position-relative z-index-1" style="line-height: 1.7;">"Sau một tuần làm việc căng thẳng, đến SpaN5 giống như bước vào một thế giới khác. Không gian tuyệt vời, mùi hương tinh dầu dịu nhẹ và kỹ thuật massage thì điêu luyện. Chắc chắn tôi sẽ quay lại thường xuyên."</p>
                     <div class="d-flex align-items-center">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Customer" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                        <div class="position-relative me-3">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Customer" class="rounded-circle border border-3 border-gold p-1" style="width: 75px; height: 75px; object-fit: cover;">
+                        </div>
                         <div>
-                            <h6 class="mb-0 fw-bold">Nguyễn Phương My</h6>
-                            <small class="text-muted">Doanh nhân</small>
+                            <h5 class="mb-1 fw-bold">Nguyễn Phương My</h5>
+                            <small class="text-gold fw-bold text-uppercase letter-spacing-1">Doanh nhân</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </section>
 
-<!-- Additional CSS for this page -->
 <style>
     .letter-spacing-1 { letter-spacing: 1px; }
     .letter-spacing-2 { letter-spacing: 2px; }
-    .bg-navy { background-color: var(--navy) !important; }
-    .bg-gold { background-color: var(--gold) !important; }
-    .text-sm { font-size: 0.875rem; }
-    
-    .service-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    .animate-bounce {
+        animation: bounce 2s infinite;
     }
-    .service-card:hover img {
-        transform: scale(1.05);
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-10px);}
+        60% {transform: translateY(-5px);}
     }
+    .z-index-3 { z-index: 3; }
 </style>

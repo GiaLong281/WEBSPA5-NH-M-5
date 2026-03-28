@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SpaN5.styles.css" asp-append-version="true" />
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
     <!-- Preloader -->
@@ -46,7 +47,10 @@
                             <a class="nav-link" href="#services">Dịch vụ</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#about">Về chúng tôi</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">Về chúng tôi</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Feedback" asp-action="Index">Đánh giá</a>
                         </li>
                         <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
                             <a class="btn btn-gold rounded-pill px-4 py-2" href="#booking">Đặt lịch ngay</a>
@@ -78,7 +82,7 @@
                     <ul class="list-unstyled footer-links">
                         <li><a href="#">Trang chủ</a></li>
                         <li><a href="#services">Dịch vụ</a></li>
-                        <li><a href="#about">Giới thiệu</a></li>
+                        <li><a href="/Home/About">Giới thiệu</a></li>
                         <li><a href="#testimonials">Khách hàng</a></li>
                     </ul>
                 </div>
@@ -111,7 +115,20 @@
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Global AOS Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                offset: 100,
+                once: true,
+                easing: 'ease-in-out'
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

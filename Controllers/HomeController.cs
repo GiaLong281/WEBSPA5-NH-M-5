@@ -21,6 +21,11 @@ namespace SpaN5.Controllers
             return View();
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Details(int id)
         {
             var service = await _context.Services
