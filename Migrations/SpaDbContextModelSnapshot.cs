@@ -202,9 +202,6 @@ namespace SpaN5.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("TEXT");
 
@@ -221,6 +218,9 @@ namespace SpaN5.Migrations
                     b.Property<int>("LoyaltyPoints")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("MaDiaChi")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -230,7 +230,31 @@ namespace SpaN5.Migrations
 
                     b.HasKey("CustomerId");
 
+                    b.HasIndex("MaDiaChi");
+
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("SpaN5.Models.DiaChi", b =>
+                {
+                    b.Property<int>("MaDiaChi")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Duong")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaQuan")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SoNha")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MaDiaChi");
+
+                    b.HasIndex("MaQuan");
+
+                    b.ToTable("DiaChis");
                 });
 
             modelBuilder.Entity("SpaN5.Models.Material", b =>
@@ -295,6 +319,26 @@ namespace SpaN5.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("SpaN5.Models.Quan", b =>
+                {
+                    b.Property<int>("MaQuan")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaThanhPho")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TenQuan")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MaQuan");
+
+                    b.HasIndex("MaThanhPho");
+
+                    b.ToTable("Quans");
+                });
+
             modelBuilder.Entity("SpaN5.Models.Service", b =>
                 {
                     b.Property<int>("ServiceId")
@@ -336,6 +380,21 @@ namespace SpaN5.Migrations
                     b.ToTable("Services");
                 });
 
+            modelBuilder.Entity("SpaN5.Models.ServiceCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceCategories");
+                });
+
             modelBuilder.Entity("SpaN5.Models.ServiceMaterial", b =>
                 {
                     b.Property<int>("Id")
@@ -359,21 +418,6 @@ namespace SpaN5.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("ServiceMaterials");
-                });
-
-            modelBuilder.Entity("SpaN5.Models.SpaN5.Models.ServiceCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ServiceCategories");
                 });
 
             modelBuilder.Entity("SpaN5.Models.Staff", b =>
@@ -445,6 +489,21 @@ namespace SpaN5.Migrations
                     b.HasIndex("MaterialId");
 
                     b.ToTable("StockTransactions");
+                });
+
+            modelBuilder.Entity("SpaN5.Models.ThanhPho", b =>
+                {
+                    b.Property<int>("MaThanhPho")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TenThanhPho")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MaThanhPho");
+
+                    b.ToTable("ThanhPhos");
                 });
 
             modelBuilder.Entity("SpaN5.Models.User", b =>
@@ -535,6 +594,26 @@ namespace SpaN5.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("SpaN5.Models.Customer", b =>
+                {
+                    b.HasOne("SpaN5.Models.DiaChi", "DiaChi")
+                        .WithMany("Customers")
+                        .HasForeignKey("MaDiaChi");
+
+                    b.Navigation("DiaChi");
+                });
+
+            modelBuilder.Entity("SpaN5.Models.DiaChi", b =>
+                {
+                    b.HasOne("SpaN5.Models.Quan", "Quan")
+                        .WithMany("DiaChis")
+                        .HasForeignKey("MaQuan")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quan");
+                });
+
             modelBuilder.Entity("SpaN5.Models.Payment", b =>
                 {
                     b.HasOne("SpaN5.Models.Booking", "Booking")
@@ -546,9 +625,20 @@ namespace SpaN5.Migrations
                     b.Navigation("Booking");
                 });
 
+            modelBuilder.Entity("SpaN5.Models.Quan", b =>
+                {
+                    b.HasOne("SpaN5.Models.ThanhPho", "ThanhPho")
+                        .WithMany("Quans")
+                        .HasForeignKey("MaThanhPho")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ThanhPho");
+                });
+
             modelBuilder.Entity("SpaN5.Models.Service", b =>
                 {
-                    b.HasOne("SpaN5.Models.SpaN5.Models.ServiceCategory", "Category")
+                    b.HasOne("SpaN5.Models.ServiceCategory", "Category")
                         .WithMany("Services")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -632,9 +722,19 @@ namespace SpaN5.Migrations
                     b.Navigation("Bookings");
                 });
 
+            modelBuilder.Entity("SpaN5.Models.DiaChi", b =>
+                {
+                    b.Navigation("Customers");
+                });
+
             modelBuilder.Entity("SpaN5.Models.Material", b =>
                 {
                     b.Navigation("ServiceMaterials");
+                });
+
+            modelBuilder.Entity("SpaN5.Models.Quan", b =>
+                {
+                    b.Navigation("DiaChis");
                 });
 
             modelBuilder.Entity("SpaN5.Models.Service", b =>
@@ -644,9 +744,14 @@ namespace SpaN5.Migrations
                     b.Navigation("ServiceMaterials");
                 });
 
-            modelBuilder.Entity("SpaN5.Models.SpaN5.Models.ServiceCategory", b =>
+            modelBuilder.Entity("SpaN5.Models.ServiceCategory", b =>
                 {
                     b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("SpaN5.Models.ThanhPho", b =>
+                {
+                    b.Navigation("Quans");
                 });
 #pragma warning restore 612, 618
         }

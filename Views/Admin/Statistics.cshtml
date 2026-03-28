@@ -1,33 +1,18 @@
-@{
-    ViewData["Title"] = "Thống kê";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var monthlyRevenue = ViewBag.MonthlyRevenue as IEnumerable<dynamic> ?? new List<dynamic>();
-}
-<div class="container py-5">
-    <h1>Thống kê doanh thu</h1>
-    <p>Tổng doanh thu: @ViewBag.TotalRevenue.ToString("N0") VNĐ</p>
-    <h3>Doanh thu 12 tháng gần nhất</h3>
-    <canvas id="revenueChart" style="max-width:800px; max-height:400px;"></canvas>
-</div>
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const monthlyRevenue = @Html.Raw(Json.Serialize(monthlyRevenue));
-        const labels = monthlyRevenue.map(m => m.Month + "/" + m.Year);
-        const data = monthlyRevenue.map(m => m.Total);
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Doanh thu (VNĐ)',
-                    data: data,
-                    borderColor: 'rgb(198, 164, 59)',
-                    backgroundColor: 'rgba(198, 164, 59, 0.2)',
-                    tension: 0.1
-                }]
-            }
-        });
-    </script>
+public async Task<IActionResult> Statistics()
+{
+    var payments = await _context.Payments
+        .Where(p => p.Status == PaymentStatus.Paid)
+        .ToListAsync();
+    var totalRevenue = payments.Sum(p => p.Amount);
+
+    var monthlyRevenue = payments
+        .GroupBy(p => new { p.CreatedAt.Year, p.CreatedAt.Month })
+        .Select(g => new { g.Key.Year, g.Key.Month, Total = g.Sum(p => p.Amount) })
+        .OrderByDescending(x => x.Year).ThenByDescending(x => x.Month)
+        .Take(12)
+        .ToList();
+
+    ViewBag.TotalRevenue = totalRevenue;
+    ViewBag.MonthlyRevenue = monthlyRevenue ?? new List<object>();
+    return View();
 }

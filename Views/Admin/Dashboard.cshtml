@@ -6,36 +6,44 @@
     <h1 class="font-playfair text-gold">Dashboard Admin</h1>
     <div class="row mt-4">
         <div class="col-md-3">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Khách hàng</h5>
-                    <p class="card-text display-4">@ViewBag.TotalCustomers</p>
+            <a asp-action="ManageCustomers" class="text-decoration-none">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Khách hàng</h5>
+                        <p class="card-text display-4">@ViewBag.TotalCustomers</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Lịch hẹn</h5>
-                    <p class="card-text display-4">@ViewBag.TotalBookings</p>
+            <a asp-action="ManageBookings" class="text-decoration-none">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Lịch hẹn</h5>
+                        <p class="card-text display-4">@ViewBag.TotalBookings</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Dịch vụ</h5>
-                    <p class="card-text display-4">@ViewBag.TotalServices</p>
+            <a asp-action="ManageServices" class="text-decoration-none">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Dịch vụ</h5>
+                        <p class="card-text display-4">@ViewBag.TotalServices</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Nhân viên</h5>
-                    <p class="card-text display-4">@ViewBag.TotalStaff</p>
+            <a asp-action="ManageStaff" class="text-decoration-none">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Nhân viên</h5>
+                        <p class="card-text display-4">@ViewBag.TotalStaff</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
     <div class="row mt-4">
@@ -44,6 +52,8 @@
                 <div class="card-header">Quản lý nhanh</div>
                 <div class="card-body">
                     <a asp-action="ManageStaff" class="btn btn-outline-primary m-1">Quản lý nhân viên</a>
+                    <a asp-controller="ServiceCategory" asp-action="Index" class="btn btn-outline-primary m-1">
+                    <i class="fas fa-tags"></i> Quản lý loại dịch vụ </a>
                     <a asp-action="ManageServices" class="btn btn-outline-primary m-1">Quản lý dịch vụ</a>
                     <a asp-action="ManageBookings" class="btn btn-outline-primary m-1">Quản lý lịch hẹn</a>
                     <a asp-action="Statistics" class="btn btn-outline-primary m-1">Thống kê</a>

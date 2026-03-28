@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "iisSettings": {
@@ -23,6 +24,15 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7175;http://localhost:5001",
+=======
+{
+  "profiles": {
+    "SpaN5": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+>>>>>>> de3fc89769173ebda04ce1c514853107352ddc9f
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

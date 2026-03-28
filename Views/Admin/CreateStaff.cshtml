@@ -8,23 +8,37 @@
     <form asp-action="CreateStaff" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3">
-            <label asp-for="FullName" class="form-label"></label>
+            <label asp-for="FullName" class="form-label">Họ tên</label>
             <input asp-for="FullName" class="form-control" />
             <span asp-validation-for="FullName" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Phone" class="form-label"></label>
+            <label asp-for="Phone" class="form-label">Điện thoại</label>
             <input asp-for="Phone" class="form-control" />
         </div>
         <div class="mb-3">
-            <label asp-for="Email" class="form-label"></label>
+            <label asp-for="Email" class="form-label">Email</label>
             <input asp-for="Email" class="form-control" />
         </div>
         <div class="mb-3">
-            <label asp-for="Position" class="form-label"></label>
+            <label asp-for="Position" class="form-label">Chức vụ</label>
             <input asp-for="Position" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="BranchId" class="form-label">Chi nhánh</label>
+            <select asp-for="BranchId" class="form-control" asp-items="ViewBag.Branches"></select>
+        </div>
+        <div class="mb-3">
+            <label>Mật khẩu đăng nhập</label>
+            <input type="password" name="Password" class="form-control" required />
         </div>
         <button type="submit" class="btn btn-primary">Lưu</button>
         <a asp-action="ManageStaff" class="btn btn-secondary">Hủy</a>
     </form>
+    [HttpGet]
+public IActionResult CreateStaff()
+{
+    ViewBag.Branches = new SelectList(_context.Branches, "BranchId", "BranchName");
+    return View();
+}
 </div>

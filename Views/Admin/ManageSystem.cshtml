@@ -4,54 +4,64 @@
 }
 <div class="container py-5">
     <h1>Quản lý hệ thống</h1>
-    <p>Chức năng đang được phát triển.</p>
-    <!-- Có thể thêm cài đặt thông số, backup, v.v -->
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Cài đặt thông số</h5>
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info">@TempData["Message"]</div>
+    }
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-gold text-white">
+                    <h5>Cài đặt thông số</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Settings" method="get">
+                        <button type="submit" class="btn btn-primary">Cấu hình hệ thống</button>
+                    </form>
+                    <a asp-action="ManageCustomers" class="btn btn-info mt-2">Quản lý người dùng</a>
+                </div>
             </div>
-            <div class="card-body">
-                <button class="btn btn-primary" asp-action="Settings">Cấu hình hệ thống</button>
-                <button class="btn btn-info">Quản lý người dùng</button>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-gold text-white">
+                    <h5>Backup & Restore</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="BackupDatabase" method="post">
+                        <button type="submit" class="btn btn-success">Backup dữ liệu</button>
+                    </form>
+                    <form asp-action="RestoreDatabase" method="post" class="mt-2">
+                        <button type="submit" class="btn btn-warning">Khôi phục dữ liệu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-gold text-white">
+                    <h5>Logs & Monitoring</h5>
+                </div>
+                <div class="card-body">
+                    <a asp-action="AuditLog" class="btn btn-secondary">Xem nhật ký hệ thống</a>
+                    <button class="btn btn-secondary mt-2" onclick="alert('Tình trạng hệ thống: OK')">Kiểm tra tình trạng</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-gold text-white">
+                    <h5>Bảo trì</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ClearTempData" method="post">
+                        <button type="submit" class="btn btn-danger">Dọn dẹp dữ liệu tạm</button>
+                    </form>
+                    <form asp-action="OptimizeDatabase" method="post" class="mt-2">
+                        <button type="submit" class="btn btn-danger">Tối ưu hóa cơ sở dữ liệu</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Backup & Restore</h5>
-            </div>
-            <div class="card-body">
-                <button class="btn btn-success" asp-action="BackupDatabase">Backup dữ liệu</button>
-                <button class="btn btn-warning">Khôi phục dữ liệu</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Logs & Monitoring</h5>
-            </div>
-            <div class="card-body">
-                <button class="btn btn-secondary">Xem nhật ký hệ thống</button>
-                <button class="btn btn-secondary">Kiểm tra tình trạng</button>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Bảo trì</h5>
-            </div>
-            <div class="card-body">
-                <button class="btn btn-danger">Dọn dẹp dữ liệu tạm</button>
-                <button class="btn btn-danger">Tối ưu hóa cơ sở dữ liệu</button>
-            </div>
-        </div>
-    </div>
-</div>
 </div>
