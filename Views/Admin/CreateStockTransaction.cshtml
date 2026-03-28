@@ -1,0 +1,39 @@
+@model SpaN5.Models.StockTransaction
+@{
+    ViewData["Title"] = "Nhập/xuất kho";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var materials = ViewBag.Materials as IEnumerable<SpaN5.Models.Material>;
+}
+<div class="container py-5">
+    <h1>Nhập/xuất kho</h1>
+    <form asp-action="CreateStockTransaction" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="MaterialId" class="form-label">Vật tư</label>
+            <select asp-for="MaterialId" class="form-control" required>
+                <option value="">-- Chọn --</option>
+                @foreach (var m in materials)
+                {
+                    <option value="@m.MaterialId">@m.MaterialName</option>
+                }
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Type" class="form-label">Loại giao dịch</label>
+            <select asp-for="Type" class="form-control" required>
+                <option value="import">Nhập kho</option>
+                <option value="export">Xuất kho</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Quantity" class="form-label">Số lượng</label>
+            <input asp-for="Quantity" class="form-control" type="number" required />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Reason" class="form-label">Lý do</label>
+            <input asp-for="Reason" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a asp-action="ManageStockTransactions" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>

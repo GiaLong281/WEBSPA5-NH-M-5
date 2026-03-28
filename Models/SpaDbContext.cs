@@ -68,7 +68,38 @@ namespace SpaN5.Models
                       .HasForeignKey(e => e.MaterialId)
                       .OnDelete(DeleteBehavior.Restrict); // hoặc Cascade tùy logic
             });
-        }
+                modelBuilder.Entity<ThanhPho>(entity =>
+    {
+        entity.HasKey(tp => tp.MaThanhPho);
+    });
+
+    modelBuilder.Entity<Quan>(entity =>
+    {
+        entity.HasKey(q => q.MaQuan);
+        entity.HasOne(q => q.ThanhPho)
+            .WithMany(tp => tp.Quans)
+            .HasForeignKey(q => q.MaThanhPho);
+    });
+
+    modelBuilder.Entity<DiaChi>(entity =>
+    {
+        entity.HasKey(d => d.MaDiaChi);
+        entity.HasOne(d => d.Quan)
+            .WithMany(q => q.DiaChis)
+            .HasForeignKey(d => d.MaQuan);
+    });
+
+    modelBuilder.Entity<Customer>(entity =>
+    {
+        entity.HasOne(c => c.DiaChi)
+            .WithMany(d => d.Customers)
+            .HasForeignKey(c => c.MaDiaChi);
+    });
+}
+        
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<ThanhPho> ThanhPhos { get; set; }
+public DbSet<Quan> Quans { get; set; }
+public DbSet<DiaChi> DiaChis { get; set; }
     }
 }

@@ -1,0 +1,84 @@
+﻿@model SpaN5.Models.Branch
+@{
+    ViewData["Title"] = "Sửa chi nhánh";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5" style="margin-top: 80px;">
+    <h1>Sửa chi nhánh</h1>
+    <form asp-action="EditBranch" method="post">
+        <input asp-for="BranchId" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="BranchName" class="form-label"></label>
+            <input asp-for="BranchName" class="form-control" />
+            <span asp-validation-for="BranchName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="BranchCode" class="form-label"></label>
+            <input asp-for="BranchCode" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="District" class="form-label"></label>
+            <input asp-for="District" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="City" class="form-label"></label>
+            <input asp-for="City" class="form-control" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="GoogleMapLink" class="form-label"></label>
+            <input asp-for="GoogleMapLink" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="FacebookLink" class="form-label"></label>
+            <input asp-for="FacebookLink" class="form-control" />
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="OpeningTime" class="form-label"></label>
+                <input asp-for="OpeningTime" type="time" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="ClosingTime" class="form-label"></label>
+                <input asp-for="ClosingTime" type="time" class="form-control" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Workday" class="form-label"></label>
+            <input asp-for="Workday" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Image" class="form-label"></label>
+            <input asp-for="Image" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a asp-action="ManageBranches" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>

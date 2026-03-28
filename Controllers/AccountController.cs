@@ -1,12 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
 using SpaN5.Models.ViewModels;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+
 
 namespace SpaN5.Controllers
 {
@@ -149,5 +150,100 @@ namespace SpaN5.Controllers
         {
             return View();
         }
+        [HttpGet]
+[Authorize]
+public async Task<IActionResult> Profile()
+{
+    var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+    var user = await _context.Users
+        .Include(u => u.Customer)
+        .Include(u => u.Staff)
+        .FirstOrDefaultAsync(u => u.Id == userId);
+    if (user == null) return NotFound();
+
+    var model = new ProfileViewModel
+    {
+        Id = user.Id,
+        Username = user.Username,
+        Role = user.Role,
+        FullName = user.FullName ?? "",
+        Email = user.Email,
+        Phone = user.Role == "Customer" ? user.Customer?.Phone : user.Staff?.Phone
+    };
+    return View(model);
+}
+
+[HttpPost]
+[Authorize]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Profile(ProfileViewModel model)
+{
+    if (!ModelState.IsValid) return View(model);
+
+    var user = await _context.Users.FindAsync(model.Id);
+    if (user == null) return NotFound();
+
+    // Cập nhật thông tin chung
+    user.FullName = model.FullName;
+    user.Email = model.Email;
+
+    if (user.Role == "Customer" && user.CustomerId.HasValue)
+    {
+        var customer = await _context.Customers.FindAsync(user.CustomerId.Value);
+        if (customer != null)
+        {
+            customer.FullName = model.FullName;
+            customer.Email = model.Email;
+            customer.Phone = model.Phone;
+        }
+    }
+    else if (user.Role == "Staff" && user.StaffId.HasValue)
+    {
+        var staff = await _context.Staffs.FindAsync(user.StaffId.Value);
+        if (staff != null)
+        {
+            staff.FullName = model.FullName;
+            staff.Email = model.Email;
+            staff.Phone = model.Phone;
+        }
+    }
+
+    await _context.SaveChangesAsync();
+    TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+    return RedirectToAction(nameof(Profile));
+}
+
+[HttpGet]
+[Authorize]
+public IActionResult ChangePassword()
+{
+    return View();
+}
+
+[HttpPost]
+[Authorize]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+{
+    if (!ModelState.IsValid) return View(model);
+
+    var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+    var user = await _context.Users.FindAsync(userId);
+    if (user == null) return NotFound();
+
+    var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.CurrentPassword);
+    if (result != PasswordVerificationResult.Success)
+    {
+        ModelState.AddModelError("CurrentPassword", "Mật khẩu hiện tại không đúng.");
+        return View(model);
+    }
+
+    user.PasswordHash = _passwordHasher.HashPassword(user, model.NewPassword);
+    await _context.SaveChangesAsync();
+
+    TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+    return RedirectToAction("Profile");
+}
+
     }
 }

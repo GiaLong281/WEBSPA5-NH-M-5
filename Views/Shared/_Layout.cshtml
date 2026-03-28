@@ -11,8 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -23,13 +22,9 @@
 </head>
 <body>
 
-    <!-- Preloader -->
-    <div id="spa-preloader" class="d-flex justify-content-center align-items-center"
-         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #fff; z-index: 9999;">
+    <div id="spa-preloader" class="d-flex justify-content-center align-items-center" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #fff; z-index: 9999;">
         <div class="text-center">
-            <h1 class="font-playfair text-gold display-3 fw-bold mb-3 animate-pulse">
-                Spa<span class="text-dark">N5</span>
-            </h1>
+            <h1 class="font-playfair text-gold display-3 fw-bold mb-3 animate-pulse">Spa<span class="text-dark">N5</span></h1>
             <div class="spinner-grow text-gold" style="width: 2rem; height: 2rem;" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
@@ -43,19 +38,14 @@
                     <span class="fs-4">Spa<span class="text-gold">N5</span></span>
                 </a>
 
-                <button class="navbar-toggler border-0" type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#spaNav"
-                        aria-controls="spaNav"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#spaNav" aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse justify-content-between" id="spaNav">
-                    <ul class="navbar-nav mb-2 mb-lg-0">
+                <div class="collapse navbar-collapse justify-content-end" id="spaNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
                         <li class="nav-item">
-                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                            <a class="nav-link active" asp-controller="Home" asp-action="Index">Trang chủ</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#services">Dịch vụ</a>
@@ -63,60 +53,58 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#about">Về chúng tôi</a>
                         </li>
-                    </ul>
 
-                    <div class="d-flex align-items-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <div class="dropdown me-3">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-globe"></i> VI
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                                    <li><a class="dropdown-item" href="?culture=vi">VI</a></li>
-                                    <li><a class="dropdown-item" href="?culture=en">EN</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <li class="nav-item dropdown ms-lg-3">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-user-circle"></i> @User.FindFirst("FullName")?.Value
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     @if (User.IsInRole("Admin"))
                                     {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
-                                                <i class="fas fa-tachometer-alt"></i> Dashboard Admin
-                                            </a>
-                                        </li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard Admin</a></li>
+                                    }
+                                    @if (User.IsInRole("Staff"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Staff" asp-action="Dashboard"><i class="fas fa-calendar-alt"></i> Dashboard Staff</a></li>
+                                    }
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fas fa-user"></i> Hồ sơ cá nhân</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword"><i class="fas fa-key"></i> Đổi mật khẩu</a></li>
+                                    @if (User.IsInRole("Customer"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings"><i class="fas fa-book"></i> Lịch sử đặt lịch</a></li>
                                     }
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" method="post">
-                                            <button type="submit" class="dropdown-item">
-                                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                                            </button>
+                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
                                         </form>
                                     </li>
                                 </ul>
-                            </div>
+                            </li>
                         }
                         else
                         {
-                            <div class="dropdown me-3">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-globe"></i> VI
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                                    <li><a class="dropdown-item" href="?culture=vi">VI</a></li>
-                                    <li><a class="dropdown-item" href="?culture=en">EN</a></li>
-                                </ul>
-                            </div>
-                            <a class="btn btn-outline-gold rounded-pill px-4 py-2 me-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
-                            <a class="btn btn-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                            <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                                <a class="btn btn-outline-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                            </li>
+                            <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
+                                <a class="btn btn-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                            </li>
                         }
-                    </div>
+
+                        <!-- Ngôn ngữ -->
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-globe"></i> VI
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" onclick="setLanguage('vi')">Tiếng Việt</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">English</a></li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>
@@ -131,29 +119,51 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="text-gold mb-3 font-playfair fs-4">SpaN5</h5>
-                    <p class="text-white-50">
-                        Nơi mang lại sự thư giãn tuyệt đối cho tâm hồn và cơ thể bạn.
-                    </p>
-                    <ul class="list-unstyled mt-3">
-                        <li><a asp-controller="Home" asp-action="Terms" class="text-white-50 text-decoration-none">Điều khoản sử dụng</a></li>
+                    <p class="text-white-50">Nơi mang lại sự thư giãn tuyệt đối cho tâm hồn và cơ thể bạn.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-white mb-3">Liên kết</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms">Điều khoản sử dụng</a></li>
                     </ul>
                 </div>
             </div>
-
             <hr class="border-secondary mt-4 mb-4">
-
             <div class="text-center text-white-50">
                 <small>&copy; 2026 SpaN5 - Bản quyền thuộc hệ thống Spa chuyên nghiệp N5.</small>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('spa-preloader');
+            if (preloader) {
+                preloader.style.transition = 'opacity 0.5s ease';
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
+        });
 
+        function setLanguage(lang) {
+            // Lưu ngôn ngữ vào cookie hoặc localStorage và reload trang
+            localStorage.setItem('lang', lang);
+            location.reload();
+        }
+
+        // Đọc ngôn ngữ đã lưu (có thể tích hợp resource file)
+        const savedLang = localStorage.getItem('lang');
+        if (savedLang) {
+            // Cập nhật hiển thị ngôn ngữ trên dropdown
+            document.querySelector('#langDropdown .fa-globe').nextSibling.textContent = savedLang.toUpperCase();
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

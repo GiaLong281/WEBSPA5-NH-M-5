@@ -3,18 +3,13 @@
     ViewData["Title"] = "Quản lý khách hàng";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container py-5" style="margin-top: 80px;">
+<div class="container py-5">
     <h1>Quản lý khách hàng</h1>
-    <table class="table table-bordered">
+    <a asp-action="CreateCustomer" class="btn btn-success mb-3">Thêm khách hàng</a>
+    <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Họ tên</th>
-                <th>Điện thoại</th>
-                <th>Email</th>
-                <th>Điểm tích lũy</th>
-                <th>Ngày tạo</th>
-                <th>Số lần đặt</th>
+                <th>ID</th><th>Họ tên</th><th>Điện thoại</th><th>Email</th><th>Địa chỉ</th><th>Hành động</th>
             </tr>
         </thead>
         <tbody>
@@ -25,9 +20,19 @@
                     <td>@c.FullName</td>
                     <td>@c.Phone</td>
                     <td>@c.Email</td>
-                    <td>@c.LoyaltyPoints</td>
-                    <td>@c.CreatedAt.ToString("dd/MM/yyyy")</td>
-                    <td>@c.Bookings?.Count()</td>
+                    <td>
+                        @if (c.DiaChi != null)
+                        {
+                            @($"{c.DiaChi.SoNha} {c.DiaChi.Duong}, {c.DiaChi.Quan?.TenQuan}, {c.DiaChi.Quan?.ThanhPho?.TenThanhPho}")
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="EditCustomer" asp-route-id="@c.CustomerId" class="btn btn-warning">Sửa</a>
+                        <form asp-action="DeleteCustomer" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@c.CustomerId" />
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
