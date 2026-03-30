@@ -2,102 +2,55 @@
     ViewData["Title"] = "Về Chúng Tôi";
 }
 
-<!-- Hero About Section -->
-<section class="about-hero-section position-relative pb-5" style="margin-top: 80px;">
-    <div class="container py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-12 text-center" data-aos="fade-up">
-                <span class="text-gold fw-bold text-uppercase letter-spacing-2 mb-3 d-inline-block">Câu Chuyện Của SpaN5</span>
-                <h1 class="display-3 font-playfair mb-4 fw-bold lh-sm text-dark">Khát Vọng Nâng Tầm<br>Vẻ Đẹp Việt</h1>
-            </div>
-        </div>
+<!-- Hero Section for About Page -->
+<section class="hero-section position-relative d-flex align-items-center justify-content-center overflow-hidden" style="height: 60vh; margin-top: -76px;">
+    <!-- Background Image -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0;">
+        <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Spa Atmosphere" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.6);">
+    </div>
+    
+    <!-- Overlay Gradient -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(26,43,60,0.8) 0%, rgba(26,43,60,0.3) 100%); z-index: 1;"></div>
+    
+    <div class="container position-relative text-center text-white" style="z-index: 2; margin-top: 50px;">
+        <span class="text-gold fw-bold text-uppercase letter-spacing-2 mb-3 d-inline-block" data-aos="fade-down" data-aos-duration="800">Câu Chuyện Của SpaN5</span>
+        <h1 class="display-3 font-playfair mb-4 fw-bold" data-aos="fade-up" data-aos-duration="1000">Nơi Thời Gian Lắng Đọng</h1>
+        <p class="lead fw-light mx-auto" style="max-width: 600px; line-height: 1.8;" data-aos="fade-up" data-aos-delay="200">
+            Nâng niu vẻ đẹp tự nhiên và mang lại sự bình yên tuyệt đối trong tâm hồn bạn.
+        </p>
     </div>
 </section>
 
-<!-- Introduction Section -->
-<section class="py-5 bg-light overflow-hidden">
-    <div class="container pb-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
-                <div class="position-relative p-4 rounded-4 shadow-sm bg-white border-start border-gold border-5">
-                    <p class="fs-5 text-muted mb-4" style="line-height: 1.8; text-align: justify;">
-                        Thị trường ngành làm đẹp ngày càng phát triển mạnh mẽ. Đây là tín hiệu đáng mừng nhưng vẫn còn tồn đọng hàng loạt vấn đề phát sinh. Khách hàng đi làm đẹp gặp phải không ít rắc rối khi thị trường hỗn loạn, không dễ để lựa chọn nơi làm đẹp uy tín và an toàn; chất lượng dịch vụ kém, sản phẩm không rõ nguồn gốc gây ảnh hưởng sức khỏe.
-                    </p>
-                    <p class="fs-5 text-muted mb-4" style="line-height: 1.8; text-align: justify;">
-                        Vì thế, <strong>SpaN5</strong> ra đời với sứ mệnh giúp kết nối người dùng với các dịch vụ làm đẹp uy tín nhất. SpaN5 xây dựng không gian giúp khách hàng khai phá vẻ đẹp tinh thần và thể chất một cách toàn diện. Chúng tôi mang đến trải nghiệm làm đẹp phù hợp, an toàn, và bền vững, hướng tới xây dựng một cộng đồng làm đẹp lành mạnh.
-                    </p>
-                    <div class="mt-4 p-4 rounded-3" style="background-color: var(--beige);">
-                        <p class="fst-italic mb-0 text-dark fw-bold fs-5 text-center">
-                            "Khát vọng lớn nhất của chúng tôi là mang SpaN5 giúp hàng triệu người tiếp cận dịch vụ làm đẹp dễ dàng, trải nghiệm hành trình làm đẹp tiện lợi, an tâm."
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-5 offset-lg-1" data-aos="fade-left">
-                <div class="position-relative">
-                    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="SpaN5 Mission" class="img-fluid rounded-4 shadow-lg" style="object-fit: cover; height: 600px; width: 100%;">
-                    <div class="position-absolute top-50 start-0 translate-middle p-4 bg-white shadow-lg rounded-circle text-center border border-gold" style="width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-                        <i class="fas fa-heart text-gold fs-1 mb-2"></i>
-                        <span class="fw-bold text-uppercase small">Tận Tâm</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Giá Trị Mang Lại Section -->
+<!-- Our Story Section -->
 <section class="py-5 my-5">
     <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <span class="text-gold fw-bold text-uppercase letter-spacing-2">Lợi ích vượt trội</span>
-            <h2 class="font-playfair display-5 mt-2 mb-3 fw-bold text-dark">Giá Trị Mang Lại</h2>
-            <div class="mx-auto bg-gold" style="height: 3px; width: 80px; border-radius: 2px;"></div>
-        </div>
-        
-        <div class="row g-5 align-items-center mt-4">
-            <div class="col-lg-4" data-aos="fade-right">
-                <div class="position-relative text-center">
-                    <img src="https://images.unsplash.com/photo-1629904853716-f0bc54eea481?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="App interface mock" class="img-fluid rounded-4 shadow-lg" style="max-height: 500px; border: 10px solid #EFEBE4;">
-                </div>
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-5 mb-lg-0" data-aos="fade-right">
+                <span class="text-gold fw-bold text-uppercase letter-spacing-2">Sứ Mệnh</span>
+                <h2 class="font-playfair display-5 my-3 text-dark fw-bold">Khởi Nguồn Của<br>Sự Thư Thái</h2>
+                <div class="bg-gold mb-4" style="height: 3px; width: 60px; border-radius: 2px;"></div>
+                <p class="text-muted fs-5 mb-4" style="line-height: 1.8;">
+                    Giữa nhịp sống thị thành hối hả và đầy áp lực, SpaN5 ra đời với mong muốn trở thành một "trạm sạc năng lượng" yên bình. 
+                </p>
+                <p class="text-muted" style="line-height: 1.8;">
+                    Chúng tôi tin rằng vẻ đẹp tỏa sáng nhất khi cả cơ thể và tinh thần đều được nâng niu. Không chỉ là nơi cung cấp các liệu trình chăm sóc sắc đẹp, SpaN5 mang đến một trải nghiệm chữa lành toàn diện. Tại đây, mọi muộn phiền đều dừng lại sau cánh cửa.
+                </p>
             </div>
-            <div class="col-lg-8" data-aos="fade-left">
-                <div class="pe-lg-5">
-                    <!-- Value 1 -->
-                    <div class="d-flex mb-5 align-items-start value-item p-4 rounded-4 transition-all hover-shadow">
-                        <div class="flex-shrink-0 bg-gold-light rounded-circle p-3 shadow-sm text-gold me-4">
-                            <i class="fas fa-mobile-alt fs-2"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-3 font-playfair" style="color: #6C5CE7;">Kết nối</h4>
-                            <p class="text-muted fs-6" style="line-height: 1.7;">
-                                SpaN5 tạo cơ hội kết nối hoàn hảo. Giúp khách hàng dễ dàng tìm kiếm dịch vụ làm đẹp gần nhất, đặt lịch hẹn nhanh chóng và thanh toán tiện lợi, bảo mật tuyệt đối.
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Value 2 -->
-                    <div class="d-flex mb-5 align-items-start value-item p-4 rounded-4 transition-all hover-shadow">
-                        <div class="flex-shrink-0 bg-gold-light rounded-circle p-3 shadow-sm text-gold me-4">
-                            <i class="fas fa-chart-line fs-2"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-3 font-playfair" style="color: #00B894;">Chuyển đổi số</h4>
-                            <p class="text-muted fs-6" style="line-height: 1.7;">
-                                Khắc phục các nhược điểm của việc quản lý, đặt lịch thủ công. Mọi quy trình từ tiếp đón, liệu trình đến thanh toán đều được số hóa tinh gọn, nhanh chóng và chính xác.
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Value 3 -->
-                    <div class="d-flex align-items-start value-item p-4 rounded-4 transition-all hover-shadow">
-                        <div class="flex-shrink-0 bg-gold-light rounded-circle p-3 shadow-sm text-gold me-4">
-                            <i class="fas fa-bullhorn fs-2"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-3 font-playfair" style="color: #0984E3;">Tiện nghi vượt trội</h4>
-                            <p class="text-muted fs-6" style="line-height: 1.7;">
-                                Tiếp cận với các công nghệ và dịch vụ làm đẹp hàng đầu mà không phát sinh chi phí ẩn. Tối ưu hóa trải nghiệm khách hàng ở mọi điểm chạm.
-                            </p>
-                        </div>
+            <div class="col-lg-6 offset-lg-1 position-relative" data-aos="fade-left">
+                <div class="position-relative d-flex justify-content-end align-items-end h-100 w-100 my-4 my-lg-0" style="min-height: 450px;">
+                    <!-- Decor frame -->
+                    <div class="position-absolute border border-3 border-gold rounded-4" style="top: 5%; right: 5%; width: 75%; height: 85%; z-index: 0;"></div>
+                    
+                    <!-- Image 1: Main (larger) -->
+                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Spa Treatment" class="rounded-4 shadow-lg position-absolute overflow-hidden" style="width: 70%; height: 80%; object-fit: cover; top: 0; right: 0; z-index: 1; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                    
+                    <!-- Image 2: Secondary (overlapping bottom left) -->
+                    <img src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Spa Details" class="rounded-4 shadow-lg position-absolute border border-5 border-white" style="width: 55%; height: 60%; object-fit: cover; bottom: 0; left: 0; z-index: 2; transition: transform 0.5s ease;" onmouseover="this.style.transform='scale(1.05) translateY(-10px)'" onmouseout="this.style.transform='scale(1) translateY(0)'">
+                    
+                    <!-- Decorative element badge -->
+                    <div class="position-absolute bg-gold text-white rounded-circle shadow-lg d-flex flex-column align-items-center justify-content-center" style="width: 120px; height: 120px; z-index: 3; top: 40%; left: -5%; animation: floatBadge 3s ease-in-out infinite;">
+                        <span class="fs-2 fw-bold font-playfair">10+</span>
+                        <span class="small text-uppercase fw-bold letter-spacing-1 text-center" style="font-size: 0.7rem; line-height: 1.2;">Năm<br>Kinh Nghiệm</span>
                     </div>
                 </div>
             </div>
@@ -105,106 +58,370 @@
     </div>
 </section>
 
-<!-- Dịch Vụ Của SpaN5 Section -->
-<section class="py-5 bg-dark text-white position-relative overflow-hidden">
-    <div class="container py-5 z-index-1 position-relative">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <span class="text-gold fw-bold text-uppercase letter-spacing-2">Trải Nghiệm</span>
-            <h2 class="font-playfair display-5 mt-2 mb-3 fw-bold text-white">Những Dịch Vụ Tại SpaN5</h2>
-            <div class="mx-auto bg-gold" style="height: 3px; width: 80px; border-radius: 2px;"></div>
-        </div>
-        
-        <div class="row g-4 justify-content-center">
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="service-box bg-white bg-opacity-10 rounded-4 p-4 text-center h-100 transition-all border border-secondary border-opacity-25 hover-border-gold">
-                    <i class="fas fa-spa fs-1 text-gold mb-3"></i>
-                    <h5 class="fw-bold mb-3">Massage Trị Liệu</h5>
-                    <p class="text-white-50 small mb-0">Thư giãn cơ bắp, giải tỏa căng thẳng với công nghệ xoa bóp hiện đại kết hợp truyền thống.</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="service-box bg-white bg-opacity-10 rounded-4 p-4 text-center h-100 transition-all border border-secondary border-opacity-25 hover-border-gold">
-                    <i class="fas fa-magic fs-1 text-gold mb-3"></i>
-                    <h5 class="fw-bold mb-3">Chăm Sóc Da Chuyên Sâu</h5>
-                    <p class="text-white-50 small mb-0">Tái sinh làn da với các dòng mỹ phẩm cao cấp và quy trình đạt chuẩn y khoa.</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                <div class="service-box bg-white bg-opacity-10 rounded-4 p-4 text-center h-100 transition-all border border-secondary border-opacity-25 hover-border-gold">
-                    <i class="fas fa-leaf fs-1 text-gold mb-3"></i>
-                    <h5 class="fw-bold mb-3">Gội Đầu Dưỡng Sinh</h5>
-                    <p class="text-white-50 small mb-0">Cân bằng tinh thần, đả thông kinh lạc với thảo dược thiên nhiên 100%.</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                <div class="service-box bg-white bg-opacity-10 rounded-4 p-4 text-center h-100 transition-all border border-secondary border-opacity-25 hover-border-gold">
-                    <i class="fas fa-gem fs-1 text-gold mb-3"></i>
-                    <h5 class="fw-bold mb-3">Liệu Pháp Cung Đình</h5>
-                    <p class="text-white-50 small mb-0">Trải nghiệm dịch vụ chăm sóc cao cấp dành riêng cho hoàng gia ngày xưa.</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="text-center mt-5" data-aos="zoom-in" data-aos-delay="500">
-            <a href="/#services" class="btn btn-gold rounded-pill px-5 py-3 fw-bold text-uppercase">Khám Phá Tất Cả</a>
-        </div>
-    </div>
-</section>
-
-<!-- Đối tác / Khách hàng tiêu biểu Section -->
+<!-- Core Values Section -->
 <section class="py-5 bg-light">
     <div class="container py-5">
         <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="font-playfair display-6 mt-2 mb-3 fw-bold text-dark">Đối Tác & Khách Hàng Tiêu Biểu</h2>
-            <p class="text-muted">Được tin tưởng bởi hàng ngàn khách hàng và các thương hiệu uy tín</p>
+            <span class="text-gold fw-bold text-uppercase letter-spacing-2">Vì Sao Chọn Chúng Tôi</span>
+            <h2 class="font-playfair display-5 mt-2 mb-3 fw-bold">Giá Trị Cốt Lõi</h2>
+            <div class="mx-auto bg-gold" style="height: 3px; width: 80px; border-radius: 2px;"></div>
         </div>
         
-        <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4 align-items-center justify-content-center opacity-75 grayscale-hover-container" data-aos="fade-up" data-aos-delay="200">
-            <div class="col text-center p-3">
-                <i class="fab fa-aws fs-1 text-secondary mb-2 partner-icon transition-all"></i>
-                <h6 class="text-muted small">AWS Beauty</h6>
+        <div class="row g-5 mt-2">
+            <!-- Value 1 -->
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-leaf text-gold fs-1"></i>
+                </div>
+                <h4 class="font-playfair fw-bold mb-3">Thiên Nhiên Thuần Khiết</h4>
+                <p class="text-muted px-3" style="line-height: 1.7;">
+                    Cam kết sử dụng 100% thảo mộc và dược liệu thiên nhiên cao cấp, thân thiện và an toàn tuyệt đối với mọi làn da.
+                </p>
             </div>
-            <div class="col text-center p-3">
-                <i class="fab fa-shopify fs-1 text-secondary mb-2 partner-icon transition-all"></i>
-                <h6 class="text-muted small">Shopify Life</h6>
+            
+            <!-- Value 2 -->
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="300">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-spa text-gold fs-1"></i>
+                </div>
+                <h4 class="font-playfair fw-bold mb-3">Kỹ Thuật Điêu Luyện</h4>
+                <p class="text-muted px-3" style="line-height: 1.7;">
+                    Đội ngũ chuyên gia và kỹ thuật viên được đào tạo bài bản, sở hữu đôi tay điêu luyện cùng sự thấu cảm sâu sắc.
+                </p>
             </div>
-            <div class="col text-center p-3">
-                <i class="fab fa-apple fs-1 text-secondary mb-2 partner-icon transition-all"></i>
-                <h6 class="text-muted small">Apple Care+</h6>
+            
+            <!-- Value 3 -->
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="500">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-wind text-gold fs-1"></i>
+                </div>
+                <h4 class="font-playfair fw-bold mb-3">Không Gian An Tĩnh</h4>
+                <p class="text-muted px-3" style="line-height: 1.7;">
+                    Sự hòa quyện hoàn hảo giữa kiến trúc thiền định, ánh sáng dịu êm, âm nhạc và hương thơm tinh dầu độc bản.
+                </p>
             </div>
-            <div class="col text-center p-3">
-                <i class="fab fa-google fs-1 text-secondary mb-2 partner-icon transition-all"></i>
-                <h6 class="text-muted small">Google Health</h6>
+        </div>
+    </div>
+</section>
+
+<!-- Gallery Section -->
+<section class="py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <span class="text-gold fw-bold text-uppercase letter-spacing-2">Thư Viện Ảnh</span>
+            <h2 class="font-playfair display-5 mt-2 mb-3 fw-bold">Góc Bình Yên Của Chúng Tôi</h2>
+            <div class="mx-auto bg-gold" style="height: 3px; width: 80px; border-radius: 2px;"></div>
+        </div>
+        
+        <!-- CSS Grid layout for premium look -->
+        <div class="premium-gallery-grid">
+            <!-- Large Focus Image -->
+            <div class="gallery-item item-large" data-aos="zoom-in" data-aos-delay="100">
+                <div class="gallery-img-wrapper rounded-4 shadow-sm h-100 w-100 position-relative">
+                    <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Spa Room" class="img-fluid w-100 h-100">
+                    <div class="gallery-overlay d-flex align-items-center justify-content-center">
+                        <i class="fas fa-search-plus text-white fs-2"></i>
+                    </div>
+                </div>
             </div>
-            <div class="col text-center p-3">
-                <i class="fab fa-microsoft fs-1 text-secondary mb-2 partner-icon transition-all"></i>
-                <h6 class="text-muted small">M-Clinic</h6>
+            
+            <!-- Standard Image 1 -->
+            <div class="gallery-item item-standard" data-aos="zoom-in" data-aos-delay="200">
+                <div class="gallery-img-wrapper rounded-4 shadow-sm h-100 w-100 position-relative">
+                    <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Spa Detail" class="img-fluid w-100 h-100">
+                    <div class="gallery-overlay d-flex align-items-center justify-content-center">
+                        <i class="fas fa-search-plus text-white fs-2"></i>
+                    </div>
+                </div>
             </div>
+            
+            <!-- Tall Image -->
+            <div class="gallery-item item-tall" data-aos="zoom-in" data-aos-delay="300">
+                <div class="gallery-img-wrapper rounded-4 shadow-sm h-100 w-100 position-relative">
+                    <img src="https://images.unsplash.com/photo-1552693673-1bf958298935?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Spa Oils" class="img-fluid w-100 h-100">
+                    <div class="gallery-overlay d-flex align-items-center justify-content-center">
+                        <i class="fas fa-search-plus text-white fs-2"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wide Image -->
+            <div class="gallery-item item-wide" data-aos="zoom-in" data-aos-delay="400">
+                <div class="gallery-img-wrapper rounded-4 shadow-sm h-100 w-100 position-relative">
+                    <img src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Massage Therapy" class="img-fluid w-100 h-100">
+                    <div class="gallery-overlay d-flex align-items-center justify-content-center">
+                        <i class="fas fa-search-plus text-white fs-2"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Standard Image 2 -->
+            <div class="gallery-item item-standard" data-aos="zoom-in" data-aos-delay="500">
+                <div class="gallery-img-wrapper rounded-4 shadow-sm h-100 w-100 position-relative">
+                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Facial Therapy" class="img-fluid w-100 h-100">
+                    <div class="gallery-overlay d-flex align-items-center justify-content-center">
+                        <i class="fas fa-search-plus text-white fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Premium Testimonials Section -->
+<section id="about-testimonials" class="py-6 position-relative overflow-hidden" style="background-color: #faf9f7; padding-top: 5rem; padding-bottom: 5rem;">
+    <!-- Decorative background elements -->
+    <div class="position-absolute top-0 end-0 p-5 opacity-10" style="transform: translate(30%, -30%); pointer-events: none;">
+        <i class="fas fa-certificate text-gold" style="font-size: 30rem; animation: spin-slow 40s linear infinite;"></i>
+    </div>
+    <div class="position-absolute bottom-0 start-0 p-5 opacity-10" style="transform: translate(-30%, 30%); pointer-events: none;">
+        <i class="fas fa-fan text-gold" style="font-size: 30rem; animation: spin-slow-reverse 45s linear infinite;"></i>
+    </div>
+
+    <div class="container py-5 position-relative z-index-1">
+        <div class="row align-items-center">
+            <!-- Left Info Column -->
+            <div class="col-lg-5 mb-5 mb-lg-0" data-aos="fade-right" data-aos-duration="1000">
+                <span class="text-gold fw-bold text-uppercase letter-spacing-2 d-inline-block mb-3">Đánh Giá</span>
+                <h2 class="font-playfair display-4 mb-4 fw-bold text-dark">Khách Hàng Nói Gì Về SpaN5?</h2>
+                <div class="bg-gold mb-4" style="height: 4px; width: 60px; border-radius: 2px;"></div>
+                <p class="lead text-muted mb-5" style="line-height: 1.8;">
+                    Hơn 5000+ khách hàng đã trải nghiệm và hài lòng với chất lượng dịch vụ của chúng tôi. Mỗi đánh giá là một minh chứng cho sự nỗ lực không ngừng nghỉ và là nguồn động lực to lớn nhất của SpaN5.
+                </p>
+                
+                <!-- Custom Carousel Controls -->
+                <div class="d-flex gap-3">
+                    <button class="btn btn-outline-dark rounded-circle d-flex align-items-center justify-content-center testimonial-control" type="button" data-bs-target="#premiumTestimonialCarousel" data-bs-slide="prev" style="width: 55px; height: 55px; border-width: 2px; transition: all 0.3s ease;">
+                        <i class="fas fa-arrow-left fs-5"></i>
+                    </button>
+                    <button class="btn btn-gold rounded-circle d-flex align-items-center justify-content-center shadow-lg testimonial-control-next" type="button" data-bs-target="#premiumTestimonialCarousel" data-bs-slide="next" style="width: 55px; height: 55px; transition: all 0.3s ease;">
+                        <i class="fas fa-arrow-right fs-5 text-dark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Carousel Column -->
+            <div class="col-lg-7 position-relative" data-aos="fade-left" data-aos-duration="1200">
+                <!-- Large Background Quote Icon -->
+                <i class="fas fa-quote-right position-absolute text-gold opacity-10" style="font-size: 15rem; top: -50px; right: 20px; z-index: 0;"></i>
+
+                <div id="premiumTestimonialCarousel" class="carousel slide position-relative z-index-1" data-bs-ride="carousel" data-bs-interval="4000">
+                    <div class="carousel-inner rounded-4" style="box-shadow: 0 20px 40px rgba(0,0,0,0.06);">
+                        
+                        <!-- Testimonial 1 -->
+                        <div class="carousel-item active bg-white p-5 border-start border-gold border-5">
+                            <div class="d-flex mb-4">
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                            </div>
+                            <h4 class="font-playfair fw-bold mb-3 fs-3 text-dark">"Một thế giới khác hoàn toàn!"</h4>
+                            <p class="fs-5 fst-italic mb-5 text-secondary" style="line-height: 1.8;">
+                                "Sau một tuần làm việc căng thẳng, đến SpaN5 giống như bước vào một thế giới khác. Không gian tuyệt vời, mùi hương tinh dầu dịu nhẹ và kỷ thuật massage thì điêu luyện. Chắc chắn tôi sẽ quay lại thường xuyên."
+                            </p>
+                            <div class="d-flex align-items-center mt-4 pt-4 border-top">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Customer" class="rounded-circle border border-2 border-gold p-1 me-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                                <div>
+                                    <h5 class="mb-1 fw-bold text-dark">Nguyễn Phương My</h5>
+                                    <small class="text-gold fw-bold text-uppercase letter-spacing-1" style="font-size: 0.85rem;">Doanh nhân</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 2 -->
+                        <div class="carousel-item bg-white p-5 border-start border-gold border-5">
+                            <div class="d-flex mb-4">
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                            </div>
+                            <h4 class="font-playfair fw-bold mb-3 fs-3 text-dark">"Sự phục vụ chu đáo, tận tâm."</h4>
+                            <p class="fs-5 fst-italic mb-5 text-secondary" style="line-height: 1.8;">
+                                "Tôi đã thử nhiều dịch vụ spa nhưng SpaN5 thực sự ấn tượng. Sự tinh tế trong từng chi tiết nhỏ, từ tách trà chào đón đến kỹ thuật bấm huyệt. Một trải nghiệm chữa lành từ sâu bên trong."
+                            </p>
+                            <div class="d-flex align-items-center mt-4 pt-4 border-top">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Customer" class="rounded-circle border border-2 border-gold p-1 me-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                                <div>
+                                    <h5 class="mb-1 fw-bold text-dark">Trần Mai Anh</h5>
+                                    <small class="text-gold fw-bold text-uppercase letter-spacing-1" style="font-size: 0.85rem;">Quản lý Nhân sự</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial 3 -->
+                        <div class="carousel-item bg-white p-5 border-start border-gold border-5">
+                            <div class="d-flex mb-4">
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                                <i class="fas fa-star text-gold ms-1"></i>
+                            </div>
+                            <h4 class="font-playfair fw-bold mb-3 fs-3 text-dark">"Chất lượng vượt xa mong đợi."</h4>
+                            <p class="fs-5 fst-italic mb-5 text-secondary" style="line-height: 1.8;">
+                                "Không gian sang trọng, ấm cúng. Liệu trình chăm sóc da mặt sử dụng sản phẩm organic rất lành tính. Làn da của tôi đã cải thiện rõ rệt chỉ sau lần trải nghiệm đầu tiên. Rất xứng đáng!"
+                            </p>
+                            <div class="d-flex align-items-center mt-4 pt-4 border-top">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Customer" class="rounded-circle border border-2 border-gold p-1 me-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                                <div>
+                                    <h5 class="mb-1 fw-bold text-dark">Lê Hoàng Nam</h5>
+                                    <small class="text-gold fw-bold text-uppercase letter-spacing-1" style="font-size: 0.85rem;">Kiến trúc sư</small>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Carousel Indicators -->
+                    <div class="carousel-indicators position-relative mt-5 mb-0 justify-content-start z-index-1">
+                        <button type="button" data-bs-target="#premiumTestimonialCarousel" data-bs-slide-to="0" class="active bg-gold" aria-current="true" style="width: 30px; height: 4px; border-radius: 2px; margin-right: 8px; border: none;"></button>
+                        <button type="button" data-bs-target="#premiumTestimonialCarousel" data-bs-slide-to="1" class="bg-gold opacity-50 transition-all" style="width: 30px; height: 4px; border-radius: 2px; margin-right: 8px; border: none;"></button>
+                        <button type="button" data-bs-target="#premiumTestimonialCarousel" data-bs-slide-to="2" class="bg-gold opacity-50 transition-all" style="width: 30px; height: 4px; border-radius: 2px; border: none;"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Call to Action Footer -->
+<section class="py-5 bg-dark text-white text-center position-relative overflow-hidden">
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25" style="background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?ixlib=rb-4.0.3'); background-size: cover; background-position: center;"></div>
+    <div class="container position-relative py-5" style="z-index: 1;">
+        <h2 class="font-playfair display-5 mb-4 fw-bold" data-aos="fade-up">Dành Tặng Bản Thân Một Ngày Trọn Vẹn</h2>
+        <p class="lead fw-light mb-5 mx-auto" style="max-width: 600px;" data-aos="fade-up" data-aos-delay="100">Cơ thể bạn xứng đáng được lắng nghe và yêu thương. Đừng chờ đợi để được thư giãn.</p>
+        <div data-aos="fade-up" data-aos-delay="200">
+            <a href="/Booking" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1 shadow">
+                <i class="far fa-calendar-alt me-2"></i> Đặt Lịch Hẹn Ngay
+            </a>
         </div>
     </div>
 </section>
 
 <style>
-    .bg-gold-light {
-        background-color: rgba(212, 175, 55, 0.1);
+    .letter-spacing-1 { letter-spacing: 1px; }
+    .letter-spacing-2 { letter-spacing: 2px; }
+    
+    /* Removed old gallery-item CSS */
+    
+    /* Float Animation for Mission section */
+    @@keyframes floatBadge {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
     }
-    .hover-shadow:hover {
-        background-color: #fff;
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.05) !important;
-        transform: translateY(-5px);
+
+    /* Premium Gallery Grid Styles */
+    .premium-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 250px;
+        gap: 20px;
     }
-    .hover-border-gold:hover {
-        border-color: var(--gold) !important;
-        background-color: rgba(212, 175, 55, 0.05) !important;
+    
+    .gallery-item {
+        overflow: hidden;
+        cursor: pointer;
     }
-    .partner-icon {
-        color: #adb5bd !important;
+    
+    .item-large {
+        grid-column: span 2;
+        grid-row: span 2;
     }
-    .col:hover .partner-icon {
-        color: var(--gold) !important;
+    
+    .item-tall {
+        grid-row: span 2;
+    }
+    
+    .item-wide {
+        grid-column: span 2;
+    }
+    
+    .gallery-img-wrapper {
+        overflow: hidden;
+    }
+    
+    .gallery-img-wrapper img {
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(26, 43, 60, 0.4);
+        opacity: 0;
+        transition: all 0.4s ease;
+        z-index: 2;
+        border-radius: inherit;
+    }
+    
+    .gallery-overlay i {
+        transform: scale(0.5);
+        transition: transform 0.4s ease;
+    }
+    
+    .gallery-item:hover .gallery-img-wrapper img {
         transform: scale(1.1);
     }
-    .col:hover h6 {
-        color: var(--gold) !important;
+    
+    .gallery-item:hover .gallery-overlay {
+        opacity: 1;
     }
+    
+    .gallery-item:hover .gallery-overlay i {
+        transform: scale(1);
+    }
+    
+    /* Responsive adjustments for Gallery Grid */
+    @@media (max-width: 991px) {
+        .premium-gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @@media (max-width: 575px) {
+        .premium-gallery-grid {
+            display: flex;
+            flex-direction: column;
+        }
+        .premium-gallery-grid > div {
+            height: 250px;
+            margin-bottom: 15px;
+        }
+        .item-large { height: 350px !important; }
+    }
+    .z-index-1 { z-index: 1; }
+    
+    @@keyframes spin-slow {
+        100% { transform: rotate(360deg); }
+    }
+    @@keyframes spin-slow-reverse {
+        100% { transform: rotate(-360deg); }
+    }
+    .testimonial-control:hover, .testimonial-control-next:hover {
+        background-color: #D4AF37 !important;
+        border-color: #D4AF37 !important;
+        transform: translateY(-3px);
+    }
+    .testimonial-control:hover i {
+        color: white !important;
+    }
+    .testimonial-control-next:hover i {
+        color: white !important;
+    }
+    .shadow-xl {
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+    
+    .hover-gold-btn { transition: all 0.3s ease; }
+    .hover-gold-btn:hover { background-color: #D4AF37 !important; border-color: #D4AF37 !important; color: white !important; }
 </style>

@@ -41,6 +41,24 @@ namespace SpaN5.Controllers
             return View(service);
         }
 
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Contact(ContactViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // Here we would typically save to DB or send email
+                // For now, simple success message
+                TempData["SuccessMessage"] = "Cảm ơn quý khách đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất!";
+                return RedirectToAction("Contact");
+            }
+            return View(model);
+        }
+
         public IActionResult Privacy()
         {
             return View();

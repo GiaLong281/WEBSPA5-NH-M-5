@@ -43,14 +43,29 @@
                         <li class="nav-item">
                             <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#services">Dịch vụ</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Dịch vụ
+                            </a>
+                            <ul class="dropdown-menu shadow border-0 mt-2 rounded-3" aria-labelledby="servicesDropdown">
+                                <li><a class="dropdown-item py-2" href="/Home/Index#services">Tất cả dịch vụ</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2" href="/Home/Details/1">Massage Thư Giãn</a></li>
+                                <li><a class="dropdown-item py-2" href="/Home/Details/2">Chăm Sóc Da Mặt</a></li>
+                                <li><a class="dropdown-item py-2" href="/Home/Details/3">Tắm Thảo Dược</a></li>
+                                <li><a class="dropdown-item py-2 text-gold fw-bold" href="/Home/Details/4"><i class="fas fa-crown me-2"></i>VIP Chăm Sóc Toàn Tâm</a></li>
+                                <li><a class="dropdown-item py-2 text-gold fw-bold" href="/Home/Details/5"><i class="fas fa-star me-2"></i>VIP Phục Hồi Năng Lượng</a></li>
+                                <li><a class="dropdown-item py-2 text-gold fw-bold" href="/Home/Details/6"><i class="fas fa-gem me-2"></i>VIP Trẻ Hóa Hoàng Gia</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">Về chúng tôi</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Feedback" asp-action="Index">Đánh giá</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Liên hệ</a>
                         </li>
                         <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
                             <a class="btn btn-gold rounded-pill px-4 py-2" href="#booking">Đặt lịch ngay</a>
