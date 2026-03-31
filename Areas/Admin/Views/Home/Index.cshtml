@@ -1,0 +1,137 @@
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<div class="row g-4 mb-4">
+    <!-- Stat Card 1 -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card bg-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-2 font-weight-bold">Tổng Khách Hàng</h6>
+                        <h4 class="mb-0 fw-bold">1,245</h4>
+                    </div>
+                    <div class="p-3 bg-primary bg-opacity-10 text-primary rounded">
+                        <i class="bi bi-people-fill fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stat Card 2 -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card bg-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-2 font-weight-bold">Đơn Hàng Hôm Nay</h6>
+                        <h4 class="mb-0 fw-bold">42</h4>
+                    </div>
+                    <div class="p-3 bg-success bg-opacity-10 text-success rounded">
+                        <i class="bi bi-bag-check-fill fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stat Card 3 -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card bg-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-2 font-weight-bold">Lịch Hẹn & Spa</h6>
+                        <h4 class="mb-0 fw-bold">18</h4>
+                    </div>
+                    <div class="p-3 bg-warning bg-opacity-10 text-warning rounded">
+                        <i class="bi bi-calendar2-heart-fill fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stat Card 4 -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card bg-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-2 font-weight-bold">Doanh Thu (Ngày)</h6>
+                        <h4 class="mb-0 fw-bold text-danger">15,400K</h4>
+                    </div>
+                    <div class="p-3 bg-danger bg-opacity-10 text-danger rounded">
+                        <i class="bi bi-wallet2 fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header border-bottom">
+                <h5 class="card-title mb-0">Hoạt động gần đây</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#Mã GD</th>
+                                <th>Khách Hàng</th>
+                                <th>Dịch Vụ</th>
+                                <th>Tổng Tiền</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>GD-10492</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: bold;">N</div>
+                                        <div>
+                                            <h6 class="mb-0">Nguyễn Trần ABC</h6>
+                                            <small class="text-muted">nhanabc@gmail.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">VIP Phục Hồi Năng Lượng</span></td>
+                                <td class="fw-bold">1,500,000 đ</td>
+                                <td><span class="badge bg-success bg-opacity-10 text-success border border-success">Hoàn Thành</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-light btn-active-light-primary">Chi tiết</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>GD-10491</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-weight: bold;">H</div>
+                                        <div>
+                                            <h6 class="mb-0">Trương Quốc Huy</h6>
+                                            <small class="text-muted">huytq@gmail.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">Massage Thư Giãn</span></td>
+                                <td class="fw-bold">500,000 đ</td>
+                                <td><span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Đang Thực Hiện</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-light btn-active-light-primary">Chi tiết</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

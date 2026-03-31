@@ -1,10 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Admin/Auth/Login";
+        options.AccessDeniedPath = "/Admin/Auth/AccessDenied";
+        options.Cookie.Name = "SpaN5.Auth";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
 
 // === ĐĂNG KÝ DbContext - PHẦN QUAN TRỌNG NHẤT ===
 builder.Services.AddDbContext<SpaDbContext>(options =>
@@ -16,6 +27,41 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<SpaDbContext>();
     
+    // Seed default admin user for initial access
+    if (!context.Users.Any(u => u.Username == "admin"))
+    {
+        var staff = context.Staffs.FirstOrDefault(s => s.FullName == "System Admin");
+        if (staff == null)
+        {
+            staff = new Staff { FullName = "System Admin", Status = "active", Position = "Manager" };
+            context.Staffs.Add(staff);
+            context.SaveChanges();
+        }
+
+        context.Users.Add(new User 
+        { 
+            Username = "admin", 
+            Password = "123", 
+            Role = "Admin",
+            StaffId = staff.StaffId
+        });
+        context.SaveChanges();
+    }
+
+    // Seed default staff user for testing
+    if (!context.Users.Any(u => u.Username == "nhanvien"))
+    {
+        var staff = context.Staffs.FirstOrDefault(s => s.FullName == "System Admin"); // Dùng chung profile cho test
+        context.Users.Add(new User 
+        { 
+            Username = "nhanvien", 
+            Password = "123", 
+            Role = "Staff",
+            StaffId = staff?.StaffId
+        });
+        context.SaveChanges();
+    }
+
     if (!context.ServiceCategories.Any())
     {
         var cat = new SpaN5.Models.SpaN5.Models.ServiceCategory { Name = "Chăm sóc da & cơ thể" };
@@ -39,6 +85,38 @@ using (var scope = app.Services.CreateScope())
         context.Branches.Add(new Branch { BranchName = "SpaN5 Premium", Address = "123 Le Loi", City = "HCM", Phone = "012345678" });
         context.SaveChanges();
     }
+
+    // Seed mock booking data assigned to Staff for testing Schedule
+    if (!context.Bookings.Any() && context.Staffs.Any())
+    {
+        var branch = context.Branches.First();
+        var staff = context.Staffs.First(); // Admin/Staff user
+        var service = context.Services.Skip(1).First(); // Lấy dịch vụ số 2
+
+        var customer = new Customer { FullName = "Nguyễn Văn A", Phone = "0901234567" };
+        context.Customers.Add(customer);
+        context.SaveChanges();
+
+        var booking = new Booking 
+        { 
+            BookingCode = "BK-" + DateTime.Now.ToString("ddMMyyHHmm"),
+            CustomerId = customer.CustomerId,
+            BranchId = branch.BranchId,
+            BookingDate = DateTime.Now.Date,
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(1),
+            Status = BookingStatus.Confirmed, // Có thể phục vụ ngay
+            TotalAmount = service.Price,
+            Notes = "Khách hàng V.I.P cần phục vụ chu đáo"
+        };
+        context.Bookings.Add(booking);
+        context.SaveChanges();
+
+        context.BookingDetails.Add(
+            new BookingDetail { BookingId = booking.BookingId, ServiceId = service.ServiceId, StaffId = staff.StaffId, PriceAtTime = service.Price }
+        );
+        context.SaveChanges();
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -53,7 +131,23 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapAreaControllerRoute(
+    name: "staff",
+    areaName: "Staff",
+    pattern: "Staff/{controller=Home}/{action=Index}/{id?}");
+
+app.MapAreaControllerRoute(
+    name: "admin",
+    areaName: "Admin",
+    pattern: "Admin/{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "login",
+    pattern: "Login",
+    defaults: new { area = "Admin", controller = "Auth", action = "Login" });
 
 app.MapControllerRoute(
     name: "default",

@@ -1,0 +1,90 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Lịch Sử Phục Vụ";
+}
+
+<div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+        <div>
+            <h2 class="font-playfair fw-bold mb-1"><i class="fas fa-history text-gold me-2"></i>Lịch Sử Phục Vụ</h2>
+            <p class="text-muted small mb-0">Xem lại các yêu cầu đã hoàn tất hoặc đã hủy.</p>
+        </div>
+        
+        <form method="get" class="search-box-container" style="width: 350px;">
+            <div class="input-group bg-white rounded-pill shadow-sm overflow-hidden border">
+                <span class="input-group-text border-0 bg-transparent ps-3 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" name="searchTerm" class="form-control border-0 py-2 small shadow-none" placeholder="Mã booking, SĐT, tên khách..." value="@Context.Request.Query["searchTerm"]">
+                <button type="submit" class="btn btn-gold btn-sm px-3 m-1 rounded-pill">Tìm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="glass-card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-navy text-white">
+                <tr>
+                    <th class="ps-4 py-3">Mã Booking</th>
+                    <th>Ngày Phục Vụ</th>
+                    <th>Khách Hàng</th>
+                    <th>Dịch Vụ</th>
+                    <th>Tổng Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th class="pe-4 text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fas fa-folder-open fs-2 mb-3 d-block opacity-25"></i>
+                            Chưa có dữ liệu lịch sử phù hợp.
+                        </td>
+                    </tr>
+                }
+                @foreach (var booking in Model)
+                {
+                    <tr>
+                        <td class="ps-4 fw-bold">@booking.BookingCode</td>
+                        <td>
+                            <div class="fw-medium">@booking.BookingDate.ToString("dd/MM/yyyy")</div>
+                            <div class="small text-muted">@booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold">@booking.Customer?.FullName</div>
+                            <div class="small text-muted">@booking.Customer?.Phone</div>
+                        </td>
+                        <td>
+                            <div class="small" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                @string.Join(", ", booking.BookingDetails.Select(d => d.Service?.ServiceName))
+                            </div>
+                        </td>
+                        <td class="fw-bold text-success">@booking.TotalAmount.ToString("N0") đ</td>
+                        <td>
+                            @if (booking.Status == SpaN5.Models.BookingStatus.Completed)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Hoàn tất</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">Đã hủy</span>
+                            }
+                        </td>
+                        <td class="pe-4 text-end">
+                            <button class="btn btn-sm btn-outline-navy rounded-circle" disabled title="Xem chi tiết (Sắp ra mắt)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .bg-navy { background-color: #1a2b3c !important; }
+    .btn-outline-navy { border-color: #1a2b3c; color: #1a2b3c; }
+</style>

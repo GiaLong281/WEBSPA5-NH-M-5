@@ -126,88 +126,14 @@
                     </div>
                 </div>
 
-                <!-- PHƯƠNG THỨC THANH TOÁN -->
-                @if (!Model.Payments.Any(p => p.Status == SpaN5.Models.PaymentStatus.Paid))
-                {
-                    <div class="mt-5 px-4 text-center">
-                        <h5 class="mb-4 text-uppercase fw-bold" style="color: #d4af37; letter-spacing: 1px;">Chọn Phương Thức Thanh Toán</h5>
-                        <div class="d-flex justify-content-center gap-4">
-                            <form asp-action="ProcessPayment" method="post">
-                                <input type="hidden" name="bookingCode" value="@Model.BookingCode" />
-                                <input type="hidden" name="method" value="Cash" />
-                                <button type="submit" class="payment-btn border-0 bg-white shadow-sm p-4 rounded-3 d-flex flex-column align-items-center" style="width: 180px; transition: 0.3s; border: 2px solid transparent !important;">
-                                    <i class="fas fa-money-bill-wave fa-3x mb-3 text-success"></i>
-                                    <span class="fw-bold">Tiền mặt</span>
-                                </button>
-                            </form>
-                            <form asp-action="ProcessPayment" method="post">
-                                <input type="hidden" name="bookingCode" value="@Model.BookingCode" />
-                                <input type="hidden" name="method" value="BankTransfer" />
-                                <button type="submit" class="payment-btn border-0 bg-white shadow-sm p-4 rounded-3 d-flex flex-column align-items-center" style="width: 180px; transition: 0.3s; border: 2px solid transparent !important;">
-                                    <i class="fas fa-university fa-3x mb-3 text-primary"></i>
-                                    <span class="fw-bold">Chuyển khoản</span>
-                                </button>
-                            </form>
-                        </div>
+                <!-- THÔNG BÁO THANH TOÁN TẠI QUẦY -->
+                <div class="mt-5 px-4 text-center">
+                    <div class="p-4 rounded-4" style="background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2);">
+                        <i class="fas fa-info-circle fa-2x mb-3" style="color: #d4af37;"></i>
+                        <h5 class="fw-bold mb-2">Thanh toán tại quầy</h5>
+                        <p class="text-muted mb-0">Quý khách vui lòng thanh toán trực tiếp tại quầy lễ tân sau khi sử dụng dịch vụ. Chúng tôi chấp nhận cả Tiền mặt và Chuyển khoản.</p>
                     </div>
-                }
-
-                <!-- LỊCH SỬ THANH TOÁN -->
-                @if (Model.Payments != null && Model.Payments.Any())
-                {
-                    <div class="mt-5 px-4">
-                        <h5 class="mb-4 text-center text-uppercase fw-bold" style="color: #d4af37; letter-spacing: 1px;">Lịch Sử Thanh Toán</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover border">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Phương thức</th>
-                                        <th>Số tiền</th>
-                                        <th>Thời gian</th>
-                                        <th>Trạng thái</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var payment in Model.Payments.OrderByDescending(p => p.CreatedAt))
-                                    {
-                                        <tr>
-                                            <td>
-                                                @if (payment.Method == SpaN5.Models.PaymentMethod.BankTransfer)
-                                                {
-                                                    <span class="badge bg-primary">Chuyển khoản</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-secondary">Tiền mặt</span>
-                                                }
-                                            </td>
-                                            <td class="fw-bold">@payment.Amount.ToString("N0") VNĐ</td>
-                                            <td>@payment.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                            <td>
-                                                @if (payment.Status == SpaN5.Models.PaymentStatus.Paid)
-                                                {
-                                                    <span class="text-success"><i class="fas fa-check-circle me-1"></i> Thành công</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-warning"><i class="fas fa-clock me-1"></i> Chờ xác nhận</span>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                }
-
-                <style>
-                    .payment-btn:hover {
-                        transform: translateY(-10px);
-                        border-color: #d4af37 !important;
-                        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-                    }
-                </style>
+                </div>
 
                 <div class="text-center mt-5 mb-4">
                     <p class="text-muted small px-5">Chúng tôi đã gửi thông tin chi tiết qua email/SMS của bạn. Nhân viên sẽ liên hệ lại để xác nhận lịch hẹn trong ít phút.</p>

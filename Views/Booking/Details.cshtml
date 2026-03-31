@@ -91,36 +91,16 @@
                     </div>
                 </div>
 
-                <div class="info-card p-4">
-                    <h5 class="border-bottom pb-3 mb-4"><i class="fas fa-history me-2 text-gold"></i>Lịch Sử Thanh Toán</h5>
-                    @if (Model.Payments != null && Model.Payments.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>PTTT</th>
-                                        <th>Số tiền</th>
-                                        <th>Thời gian</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var p in Model.Payments)
-                                    {
-                                        <tr>
-                                            <td>@p.Method</td>
-                                            <td>@p.Amount.ToString("N0")</td>
-                                            <td>@p.CreatedAt.ToString("HH:mm dd/MM")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                <div class="info-card p-4 mt-4">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-info-circle fa-2x text-gold"></i>
                         </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted small">Chưa có dữ liệu thanh toán</p>
-                    }
+                        <div>
+                            <h6 class="fw-bold mb-1">Thanh toán tại quầy</h6>
+                            <p class="small text-muted mb-0">Vui lòng thanh toán trực tiếp tại spa sau khi hoàn thành dịch vụ.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

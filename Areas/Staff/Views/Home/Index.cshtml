@@ -1,0 +1,352 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Lịch Phục Vụ Chi Tiết";
+}
+
+<div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+        <div>
+            <h2 class="font-playfair fw-bold mb-1"><i class="fas fa-calendar-day text-gold me-2"></i>Lịch Trình Hôm Nay</h2>
+            <p class="text-muted small mb-0">Quản lý và thực hiện các bước phục vụ khách hàng chuyên nghiệp.</p>
+        </div>
+        
+        <div class="search-box-container" style="width: 350px;">
+            <div class="input-group bg-white rounded-pill shadow-sm overflow-hidden border">
+                <span class="input-group-text border-0 bg-transparent ps-3 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchBooking" onkeyup="filterBookings()" class="form-control border-0 py-2 small shadow-none" placeholder="Mã booking, SĐT, tên khách...">
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="glass-card p-5 text-center mt-5 shadow-sm border-0 rounded-4">
+        <div class="empty-state-icon mb-3">
+            <i class="bi bi-calendar-check fs-1 text-gold opacity-50"></i>
+        </div>
+        <h4 class="font-playfair fw-bold">Hiện không có lịch biểu!</h4>
+        <p class="text-muted">Tất cả các cuộc hẹn đã được hoàn thành hoặc bạn chưa được gán lịch nào.</p>
+        <a href="/Staff/Home/History" class="btn btn-outline-gold rounded-pill px-4 btn-sm mt-2">Xem lịch sử phục vụ</a>
+    </div>
+}
+else
+{
+    <div id="bookingList">
+        @foreach (var booking in Model)
+        {
+            var currentStep = 1;
+            @if (booking.Status == SpaN5.Models.BookingStatus.Pending) { currentStep = 1; }
+            else if (booking.Status == SpaN5.Models.BookingStatus.Confirmed) { currentStep = 2; }
+            else if (booking.Status == SpaN5.Models.BookingStatus.InProgress) { currentStep = 4; } 
+
+            <div class="glass-card mb-4 border-0 shadow-sm overflow-hidden booking-card-item rounded-4">
+                <!-- Premium Stepper -->
+                <div class="p-4 pb-2 border-bottom bg-light bg-opacity-50">
+                    <div class="stepper-modern d-flex align-items-center justify-content-between position-relative px-md-5">
+                        <div class="step-modern @(currentStep >= 1 ? "active" : "")" data-label="Xem">1</div>
+                        <div class="step-connector @(currentStep >= 2 ? "active" : "")"></div>
+                        <div class="step-modern @(currentStep >= 2 ? "active" : "")" data-label="Xác nhận">2</div>
+                        <div class="step-connector @(currentStep >= 3 ? "active" : "")"></div>
+                        <div class="step-modern @(currentStep >= 3 ? "active" : "")" data-label="Check-in">3</div>
+                        <div class="step-connector @(currentStep >= 4 ? "active" : "")"></div>
+                        <div class="step-modern @(currentStep >= 4 ? "active" : "")" data-label="Thực hiện">4</div>
+                        <div class="step-connector @(currentStep >= 5 ? "active" : "")"></div>
+                        <div class="step-modern @(currentStep >= 5 ? "active" : "")" data-label="Hóa đơn">5</div>
+                        <div class="step-connector @(currentStep >= 6 ? "active" : "")"></div>
+                        <div class="step-modern @(currentStep >= 6 ? "active" : "")" data-label="Thanh toán">6</div>
+                        <div class="step-connector @(currentStep >= 7 ? "active" : "")"></div>
+                        <div class="step-modern @(currentStep >= 7 ? "active" : "")" data-label="Hoàn tất">7</div>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-4">
+                            <span class="text-uppercase small fw-bold text-muted ls-1">Mã Booking</span>
+                            <div class="h3 font-playfair fw-bold text-navy mb-0">@booking.BookingCode</div>
+                        </div>
+                        <div class="col-md-4 text-md-center">
+                            <div class="detail-label"><i class="fas fa-clock text-gold me-2"></i>THỜI GIAN ĐẶT</div>
+                            <div class="fw-bold fs-5">@booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")</div>
+                            <div class="text-muted small">@booking.BookingDate.ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="detail-label">TRẠNG THÁI</div>
+                            <span class="badge @(booking.Status == SpaN5.Models.BookingStatus.InProgress ? "bg-success" : (booking.Status == SpaN5.Models.BookingStatus.Confirmed ? "bg-primary" : "bg-warning text-dark")) rounded-pill px-4 py-2">
+                                @(booking.Status == SpaN5.Models.BookingStatus.Pending ? "Chờ xác nhận" : (booking.Status == SpaN5.Models.BookingStatus.Confirmed ? "Đã xác nhận" : "Đang thực hiện"))
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-lg-7">
+                            <div class="bg-beige-light p-4 rounded-4 border">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar-bg bg-gold text-white rounded-circle me-3 ms-0" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">@booking.Customer?.FullName</div>
+                                        <div class="text-muted small">@booking.Customer?.Phone</div>
+                                    </div>
+                                </div>
+                                <div class="border-top pt-3">
+                                    <div class="detail-label text-gold mb-3">DỊCH VỤ ĐÃ ĐẶT</div>
+                                    @foreach (var detail in booking.BookingDetails)
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-medium">@detail.Service?.ServiceName</span>
+                                            <span class="fw-bold text-navy">@detail.PriceAtTime.ToString("N0") đ</span>
+                                        </div>
+                                    }
+                                    <div class="d-flex justify-content-between mt-3 pt-2 border-top fw-bold fs-5">
+                                        <span>TỔNG CỘNG</span>
+                                        <span class="text-gold">@booking.TotalAmount.ToString("N0") đ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 d-flex flex-column">
+                            <div class="flex-grow-1 p-4 rounded-4 border bg-white mb-3">
+                                <div class="detail-label"><i class="fas fa-comment-dots text-gold me-2"></i>GHI CHÚ KHÁCH HÀNG</div>
+                                <p class="small text-muted italic mb-0">@(string.IsNullOrEmpty(booking.Notes) ? "Không có ghi chú nào từ khách hàng." : booking.Notes)</p>
+                            </div>
+                            
+                            <!-- ACTIONS -->
+                            <div class="d-flex gap-2" id="actions-@booking.BookingId">
+                                @if (booking.Status == SpaN5.Models.BookingStatus.Pending)
+                                {
+                                    <button onclick="bookingAction(@booking.BookingId, 'ConfirmBooking')" class="btn btn-gold flex-fill py-3 rounded-pill fw-bold">
+                                        <i class="fas fa-check-circle me-2"></i> XÁC NHẬN LỊCH
+                                    </button>
+                                    <button onclick="bookingAction(@booking.BookingId, 'RejectBooking')" class="btn btn-outline-danger px-4 rounded-pill">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                }
+                                else if (booking.Status == SpaN5.Models.BookingStatus.Confirmed)
+                                {
+                                    <button onclick="bookingAction(@booking.BookingId, 'CheckIn')" class="btn btn-gold flex-fill py-3 rounded-pill fw-bold">
+                                        <i class="fas fa-user-check me-2"></i> KHÁCH ĐÃ ĐẾN (CHECK-IN)
+                                    </button>
+                                }
+                                else if (booking.Status == SpaN5.Models.BookingStatus.InProgress)
+                                {
+                                    <button onclick="showAddServiceModal(@booking.BookingId)" class="btn btn-outline-navy px-4 rounded-pill fw-bold">
+                                        <i class="fas fa-plus-circle me-2"></i> THÊM DỊCH VỤ
+                                    </button>
+                                    <button onclick="showPaymentModal(@booking.BookingId, @booking.TotalAmount)" class="btn btn-gold flex-fill py-3 rounded-pill fw-bold shadow">
+                                        <i class="fas fa-file-invoice-dollar me-2"></i> THANH TOÁN
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .bg-beige-light { background-color: #faf9f6; }
+    .text-navy { color: #1a2b3c; }
+    .btn-outline-navy { border-color: #1a2b3c; color: #1a2b3c; }
+    .btn-outline-navy:hover { background: #1a2b3c; color: white; }
+    .ls-1 { letter-spacing: 1px; }
+    .detail-label { font-size: 0.75rem; font-weight: 700; color: #adb5bd; margin-bottom: 0.5rem; letter-spacing: 0.5px; }
+
+    /* Modern Stepper */
+    .step-modern {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #dee2e6;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        z-index: 2;
+        position: relative;
+    }
+    .step-modern.active { background: var(--gold); box-shadow: 0 0 10px rgba(197, 168, 128, 0.4); }
+    .step-modern::after {
+        content: attr(data-label);
+        position: absolute;
+        top: 42px;
+        font-size: 10px;
+        color: #adb5bd;
+        white-space: nowrap;
+        font-weight: 500;
+    }
+    .step-modern.active::after { color: var(--gold); font-weight: 600; }
+    .step-connector { flex: 1; height: 3px; background: #dee2e6; margin: 0 5px; z-index: 1; }
+    .step-connector.active { background: var(--gold); }
+</style>
+
+<!-- Modal: Thêm dịch vụ -->
+<div class="modal fade glass-modal" id="addServiceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+            <div class="modal-header bg-navy text-white border-0 py-3">
+                <h5 class="modal-title fw-bold font-playfair"><i class="fas fa-plus-circle text-gold me-2"></i>Thêm Dịch Vụ Mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-white">
+                <div class="mb-4">
+                    <label class="detail-label text-gold">CHỌN DỊCH VỤ PHÁT SINH</label>
+                    <select id="serviceSelector" class="form-select border-0 bg-light py-3 rounded-3 shadow-none">
+                        <!-- Ajax populated -->
+                    </select>
+                </div>
+                <div class="d-grid">
+                    <button id="confirmAddService" class="btn btn-gold py-3 rounded-pill fw-bold shadow">
+                        <i class="fas fa-check-circle me-2"></i> THÊM VÀO HÓA ĐƠN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Thanh toán -->
+<div class="modal fade glass-modal" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+            <div class="modal-header bg-gold text-white border-0 py-3">
+                <h5 class="modal-title fw-bold font-playfair"><i class="fas fa-wallet me-2"></i>Quyết Toán & Thanh toán</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-white">
+                <div class="text-center mb-4">
+                    <div class="detail-label text-muted">TỔNG SỐ TIỀN CẦN THANH TOÁN</div>
+                    <h2 class="fw-bold text-navy font-playfair display-6" id="paymentTotal">0 đ</h2>
+                </div>
+                <hr class="border-light opacity-100 mb-4">
+                <label class="detail-label text-gold mb-3">PHƯƠNG THỨC THANH TOÁN</label>
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <input type="radio" class="btn-check" name="paymentOption" id="pay-cash" value="Cash" checked>
+                        <label class="btn btn-outline-navy w-100 py-3 rounded-4 fw-bold d-flex flex-column align-items-center gap-2" for="pay-cash">
+                            <i class="fas fa-money-bill-wave fs-4"></i>
+                            Tiền mặt
+                        </label>
+                    </div>
+                    <div class="col-6">
+                        <input type="radio" class="btn-check" name="paymentOption" id="pay-transfer" value="BankTransfer">
+                        <label class="btn btn-outline-gold w-100 py-3 rounded-4 fw-bold d-flex flex-column align-items-center gap-2" for="pay-transfer">
+                            <i class="fas fa-university fs-4"></i>
+                            Chuyển khoản
+                        </label>
+                    </div>
+                </div>
+                <div class="d-grid mt-2">
+                    <button id="finalPaymentBtn" class="btn btn-gold py-3 rounded-pill fw-bold shadow">
+                        <i class="fas fa-shield-check me-2"></i> HOÀN TẤT VÀ LƯU HÓA ĐƠN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentBookingId = 0;
+        let serviceModalInstance;
+        let paymentModalInstance;
+
+        $(document).ready(function() {
+            // "Teleport" modals to body to solve z-index/overflow issues once and for all
+            $('.glass-modal').appendTo('body');
+
+            // Initialize instances
+            serviceModalInstance = new bootstrap.Modal(document.getElementById('addServiceModal'), { backdrop: 'static' });
+            paymentModalInstance = new bootstrap.Modal(document.getElementById('paymentModal'), { backdrop: 'static' });
+        });
+
+        function cleanBackdrops() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css('overflow', '');
+        }
+
+        function filterBookings() {
+            let input = id('searchBooking').value.toLowerCase();
+            let cards = document.querySelectorAll('.booking-card-item');
+            cards.forEach(card => {
+                let text = card.innerText.toLowerCase();
+                card.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+        function id(el) { return document.getElementById(el); }
+
+        function bookingAction(bookingId, action) {
+            if (!confirm('Bạn chắc chắn muốn thực hiện thao tác này?')) return;
+            
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>...';
+
+            $.post(`/Staff/Home/${action}`, { bookingId: bookingId }, function(res) {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert(res.message || "Lỗi không xác định");
+                    btn.disabled = false;
+                    btn.innerHTML = 'Thử lại';
+                }
+            }).fail(function() {
+                alert("Lỗi kết nối máy chủ");
+                btn.disabled = false;
+            });
+        }
+
+        function showAddServiceModal(bookingId) {
+            currentBookingId = bookingId;
+            const selector = $('#serviceSelector');
+            selector.html('<option>Đang tải...</option>');
+            $.get('/Staff/Home/GetAllServices', function(services) {
+                let html = services.map(s => `<option value="${s.serviceId}">${s.serviceName} (${s.price.toLocaleString()}đ)</option>`).join('');
+                selector.html(html);
+                serviceModalInstance.show();
+            });
+        }
+
+        $('#confirmAddService').click(function() {
+            const serviceId = $('#serviceSelector').val();
+            const btn = $(this);
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Đang thêm...');
+            $.post('/Staff/Home/AddServiceDetail', { bookingId: currentBookingId, serviceId: serviceId }, function(res) {
+                if (res.success) {
+                    serviceModalInstance.hide();
+                    location.reload();
+                } else {
+                    alert(res.message);
+                    btn.prop('disabled', false).html('THÊM VÀO HÓA ĐƠN');
+                }
+            });
+        });
+
+        function showPaymentModal(bookingId, total) {
+            currentBookingId = bookingId;
+            $('#paymentTotal').text(total.toLocaleString() + ' đ');
+            paymentModalInstance.show();
+        }
+
+        $('#finalPaymentBtn').click(function() {
+            const method = $('input[name="paymentOption"]:checked').val();
+            const btn = $(this);
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Đang xử lý...');
+            $.post('/Staff/Home/CompleteBooking', { bookingId: currentBookingId, method: method }, function(res) {
+                if (res.success) {
+                    paymentModalInstance.hide();
+                    location.reload();
+                } else {
+                    alert(res.message);
+                    btn.prop('disabled', false).html('XÁC NHẬN HOÀN TẤT');
+                }
+            });
+        });
+    </script>
+}

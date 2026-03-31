@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SpaN5 Staff Portal</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --gold: #c5a880;
+            --gold-hover: #b39368;
+            --navy: #1a2b3c;
+            --navy-light: #243b55;
+            --beige: #f9f6f0;
+            --text-main: #0f172a;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--beige);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Sidebar Styling */
+        .staff-sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--navy);
+            position: fixed;
+            left: 0;
+            top: 0;
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-brand {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-brand span {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .sidebar-brand .text-gold {
+            color: var(--gold) !important;
+        }
+
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+
+        .nav-link-staff {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.5rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link-staff i {
+            width: 24px;
+            font-size: 1.15rem;
+            margin-right: 12px;
+        }
+
+        .nav-link-staff:hover {
+            color: var(--gold);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .nav-link-staff.active {
+            color: var(--gold);
+            background: rgba(255,255,255,0.05);
+            border-left-color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* Main Content wrapper */
+        .staff-main-wrapper {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .top-stats-bar {
+            background: white;
+            padding: 1.25rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Glass Cards (Staff Context) */
+        .glass-card {
+            background: white;
+            border-radius: 1.25rem;
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            transition: transform 0.3s ease;
+        }
+
+        .text-gold { color: var(--gold) !important; }
+        .bg-gold { background-color: var(--gold) !important; }
+        .btn-gold { 
+            background-color: var(--gold); 
+            color: white; 
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-gold:hover { 
+            background-color: var(--gold-hover); 
+            color: white; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(197, 168, 128, 0.4);
+        }
+
+        /* Responsive Mobile Sidebar */
+        @@media (max-width: 991px) {
+            .staff-sidebar {
+                left: -100%;
+            }
+            .staff-sidebar.show {
+                left: 0;
+            }
+            .staff-main-wrapper {
+                margin-left: 0;
+            }
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1100;
+            background: var(--navy);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Left Sidebar -->
+    <aside class="staff-sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span>Spa<span class="text-gold">N5</span> Staff</span>
+        </div>
+
+        <div class="user-profile-sidebar p-4 border-bottom border-light border-opacity-10">
+            <div class="d-flex align-items-center">
+                <div class="avatar-sm me-3" style="width: 45px; height: 45px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
+                    @(User.Identity?.Name?.Substring(0, 1) ?? "K")
+                </div>
+                <div>
+                    <div class="small fw-bold">@User.Identity?.Name</div>
+                    <div class="text-white-50 small" style="font-size: 10px;">Chuyên viên phục vụ</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            @{
+                string action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+            }
+            <a href="/Staff/Home/Index" class="nav-link-staff @(action == "Index" ? "active" : "")">
+                <i class="fas fa-tasks"></i>
+                <span>Lịch phục vụ</span>
+            </a>
+            <a href="/Staff/Home/History" class="nav-link-staff @(action == "History" ? "active" : "")">
+                <i class="fas fa-history"></i>
+                <span>Lịch sử phục vụ</span>
+            </a>
+            <a href="/Staff/Home/Profile" class="nav-link-staff @(action == "Profile" ? "active" : "")">
+                <i class="fas fa-user-circle"></i>
+                <span>Hồ sơ cá nhân</span>
+            </a>
+            <div class="mt-5 px-3">
+                <a href="/Admin/Auth/Logout" class="btn btn-outline-danger w-100 rounded-pill py-2 small">
+                    <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="staff-main-wrapper">
+        @RenderBody()
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // Auto-close on small screens
+        $(document).click(function(event) {
+            if ($(window).width() < 992) {
+                if (!$(event.target).closest('#sidebar, .mobile-toggle').length) {
+                    $('#sidebar').removeClass('show');
+                }
+            }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
