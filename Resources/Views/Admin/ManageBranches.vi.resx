@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, ...</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, ...</value></resheader>
+  <data name="ManageBranches"><value>Quản lý chi nhánh</value></data>
+  <data name="CreateBranch"><value>Thêm chi nhánh</value></data>
+  <data name="EditBranch"><value>Sửa chi nhánh</value></data>
+  <data name="ID"><value>ID</value></data>
+  <data name="Name"><value>Tên</value></data>
+  <data name="Address"><value>Địa chỉ</value></data>
+  <data name="Phone"><value>Điện thoại</value></data>
+  <data name="Status"><value>Trạng thái</value></data>
+  <data name="Email"><value>Email</value></data>
+  <data name="Actions"><value>Hành động</value></data>
+  <data name="Edit"><value>Sửa</value></data>
+  <data name="Disable"><value>Vô hiệu hóa</value></data>
+  <data name="Activate"><value>Kích hoạt</value></data>
+  <data name="ConfirmDeleteBranch"><value>Xác nhận xóa chi nhánh này?</value></data>
+  <data name="Delete"><value>Xóa</value></data>
+  <data name="Save"><value>Lưu</value></data>
+  <data name="Cancel"><value>Hủy</value></data>
+</root>

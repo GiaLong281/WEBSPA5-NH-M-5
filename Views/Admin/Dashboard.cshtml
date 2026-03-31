@@ -1,15 +1,24 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = Localizer["AdminDashboard"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container py-5" style="margin-top: 80px;">
-    <h1 class="font-playfair text-gold">Dashboard Admin</h1>
+    <h1 class="font-playfair text-gold">@Localizer["AdminDashboard"]</h1>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
     <div class="row mt-4">
         <div class="col-md-3">
             <a asp-action="ManageCustomers" class="text-decoration-none">
                 <div class="card text-white bg-primary mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Khách hàng</h5>
+                        <h5 class="card-title">@Localizer["Customers"]</h5>
                         <p class="card-text display-4">@ViewBag.TotalCustomers</p>
                     </div>
                 </div>
@@ -19,7 +28,7 @@
             <a asp-action="ManageBookings" class="text-decoration-none">
                 <div class="card text-white bg-success mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Lịch hẹn</h5>
+                        <h5 class="card-title">@Localizer["Bookings"]</h5>
                         <p class="card-text display-4">@ViewBag.TotalBookings</p>
                     </div>
                 </div>
@@ -29,7 +38,7 @@
             <a asp-action="ManageServices" class="text-decoration-none">
                 <div class="card text-white bg-warning mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Dịch vụ</h5>
+                        <h5 class="card-title">@Localizer["Services"]</h5>
                         <p class="card-text display-4">@ViewBag.TotalServices</p>
                     </div>
                 </div>
@@ -39,7 +48,7 @@
             <a asp-action="ManageStaff" class="text-decoration-none">
                 <div class="card text-white bg-info mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Nhân viên</h5>
+                        <h5 class="card-title">@Localizer["Staff"]</h5>
                         <p class="card-text display-4">@ViewBag.TotalStaff</p>
                     </div>
                 </div>
@@ -49,15 +58,16 @@
     <div class="row mt-4">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">Quản lý nhanh</div>
+                <div class="card-header">@Localizer["QuickManage"]</div>
                 <div class="card-body">
-                    <a asp-action="ManageStaff" class="btn btn-outline-primary m-1">Quản lý nhân viên</a>
+                    <a asp-action="ManageStaff" class="btn btn-outline-primary m-1">@Localizer["ManageStaff"]</a>
+                    <a asp-action="CreateUser" class="btn btn-outline-primary m-1">Tạo tài khoản mới</a>
                     <a asp-controller="ServiceCategory" asp-action="Index" class="btn btn-outline-primary m-1">
-                    <i class="fas fa-tags"></i> Quản lý loại dịch vụ </a>
-                    <a asp-action="ManageServices" class="btn btn-outline-primary m-1">Quản lý dịch vụ</a>
-                    <a asp-action="ManageBookings" class="btn btn-outline-primary m-1">Quản lý lịch hẹn</a>
-                    <a asp-action="Statistics" class="btn btn-outline-primary m-1">Thống kê</a>
-                    <a asp-action="AuditLog" class="btn btn-outline-primary m-1">Lịch sử thay đổi</a>
+                    <i class="fas fa-tags"></i> @Localizer["ManageServiceCategory"] </a>
+                    <a asp-action="ManageServices" class="btn btn-outline-primary m-1">@Localizer["ManageServices"]</a>
+                    <a asp-action="ManageBookings" class="btn btn-outline-primary m-1">@Localizer["ManageBookings"]</a>
+                    <a asp-action="Statistics" class="btn btn-outline-primary m-1">@Localizer["Statistics"]</a>
+                    <a asp-action="AuditLog" class="btn btn-outline-primary m-1">@Localizer["ChangeLog"]</a>
                     <a asp-action="ManageSystem" class="btn btn-outline-primary m-1">Hệ thống</a>
                 </div>
             </div>

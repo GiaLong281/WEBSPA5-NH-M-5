@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="PageTitle"><value>Home</value></data>
+  <data name="MainHeading"><value>Indulge Yourself
+Awaken Your Beauty</value></data>
+  <data name="MainDescription"><value>Experience the ultimate relaxation space and the best rejuvenating therapies at SpaN5.</value></data>
+  <data name="BookNow"><value>Book Now</value></data>
+  <data name="YearsExperience"><value>10+ Years</value></data>
+  <data name="ExperienceLabel"><value>Care Experience</value></data>
+  <data name="AboutUsTitle"><value>About SpaN5</value></data>
+  <data name="BalanceSubtitle"><value>Balance Body &amp; Mind.</value></data>
+  <data name="AboutDescription"><value>We believe that true relaxation comes from the harmony between a healthy body and a peaceful mind. With a serene natural space and traditional medicine therapies combined with modern approaches, SpaN5 wants to bring you the most memorable experiences.</value></data>
+  <data name="ProfessionalTherapists"><value>Professional, dedicated therapists</value></data>
+  <data name="OrganicProducts"><value>100% organic organic products</value></data>
+  <data name="PrivateSpace"><value>Quiet, private space</value></data>
+  <data name="ExploreServices"><value>Explore Services</value></data>
+  <data name="FeaturedServices"><value>Featured Services</value></data>
+  <data name="RejuvenationTherapies"><value>Rejuvenation Therapies</value></data>
+  <data name="MassageTitle"><value>Relaxing Massage</value></data>
+  <data name="MassageDesc"><value>Relieve muscle tension with Swedish massage therapy combined with natural hot stones.</value></data>
+  <data name="FacialTitle"><value>Facial Care</value></data>
+  <data name="FacialDesc"><value>Cleanse and rejuvenate skin with chamomile extract and organic serum imported from France.</value></data>
+  <data name="HerbalBathTitle"><value>Herbal Bath</value></data>
+  <data name="HerbalBathDesc"><value>Detoxify and stimulate blood circulation through a soaking treatment with 15 precious herbs.</value></data>
+  <data name="ViewDetails"><value>View Details</value></data>
+  <data name="CustomerTestimonials"><value>What Our Customers Say?</value></data>
+  <data name="TestimonialIntro"><value>Over 5000+ customers have experienced and are satisfied with SpaN5 services. Your trust is our greatest motivation.</value></data>
+  <data name="TestimonialContent"><value>After a stressful week of work, coming to SpaN5 is like stepping into another world. Wonderful space, gentle essential oil scents and skillful massage techniques. I will definitely come back regularly.</value></data>
+  <data name="TestimonialAuthor"><value>Nguyen Phuong My</value></data>
+  <data name="TestimonialRole"><value>Entrepreneur</value></data>
+</root>

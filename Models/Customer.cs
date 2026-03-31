@@ -17,5 +17,6 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

@@ -71,6 +71,12 @@ namespace SpaN5.Migrations
                     b.Property<int>("BranchId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CancelReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -337,6 +343,40 @@ namespace SpaN5.Migrations
                     b.HasIndex("MaThanhPho");
 
                     b.ToTable("Quans");
+                });
+
+            modelBuilder.Entity("SpaN5.Models.Review", b =>
+                {
+                    b.Property<int>("ReviewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ReviewId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("SpaN5.Models.Service", b =>
@@ -636,6 +676,25 @@ namespace SpaN5.Migrations
                     b.Navigation("ThanhPho");
                 });
 
+            modelBuilder.Entity("SpaN5.Models.Review", b =>
+                {
+                    b.HasOne("SpaN5.Models.Customer", "Customer")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SpaN5.Models.Service", "Service")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Service");
+                });
+
             modelBuilder.Entity("SpaN5.Models.Service", b =>
                 {
                     b.HasOne("SpaN5.Models.ServiceCategory", "Category")
@@ -720,6 +779,8 @@ namespace SpaN5.Migrations
             modelBuilder.Entity("SpaN5.Models.Customer", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("SpaN5.Models.DiaChi", b =>
@@ -740,6 +801,8 @@ namespace SpaN5.Migrations
             modelBuilder.Entity("SpaN5.Models.Service", b =>
                 {
                     b.Navigation("BookingDetails");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("ServiceMaterials");
                 });

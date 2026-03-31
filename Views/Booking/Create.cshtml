@@ -1,0 +1,219 @@
+@model SpaN5.Models.ViewModels.BookingViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Booking"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gold text-white text-center py-4 border-0">
+                    <h2 class="mb-0 font-playfair">@Localizer["BookService"]</h2>
+                    <p class="mb-0 mt-2 text-white-50">@Localizer["ChooseService"]</p>
+                </div>
+
+                <div class="card-body p-5">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                    }
+
+                    <form id="bookingForm" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="SelectedServiceId" class="form-label">
+                                @Localizer["Service"] <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="SelectedServiceId" class="form-control" asp-items="ViewBag.Services" required>
+                                <option value="">-- @Localizer["SelectService"] --</option>
+                            </select>
+                            <span asp-validation-for="SelectedServiceId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BranchId" class="form-label">
+                                @Localizer["Branch"] <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="BranchId" class="form-control" asp-items="ViewBag.Branches" required>
+                                <option value="">-- @Localizer["SelectBranch"] --</option>
+                            </select>
+                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Auto / Manual staff -->
+                        <div class="mb-3">
+                            <label class="form-label">Chọn nhân viên</label>
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="AutoAssignStaff"
+                                       id="autoAssign"
+                                       value="true"
+                                       @(Model.AutoAssignStaff ? "checked" : "") />
+                                <label class="form-check-label" for="autoAssign">
+                                    Hệ thống tự động phân công phù hợp
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="AutoAssignStaff"
+                                       id="manualAssign"
+                                       value="false"
+                                       @(!Model.AutoAssignStaff ? "checked" : "") />
+                                <label class="form-check-label" for="manualAssign">
+                                    Chọn nhân viên cụ thể
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Staff dropdown -->
+                        <div class="mb-3" id="staffSelectDiv" style="display:@(Model.AutoAssignStaff ? "none" : "block")">
+                            <label asp-for="StaffId" class="form-label">@Localizer["Staff"]</label>
+                            <select asp-for="StaffId" class="form-control">
+                                <option value="">-- Chọn nhân viên --</option>
+                            </select>
+                            <span asp-validation-for="StaffId" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BookingDate" class="form-label">
+                                    @Localizer["Date"] <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="BookingDate"
+                                       class="form-control"
+                                       type="date"
+                                       min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="BookingDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartTime" class="form-label">
+                                    @Localizer["Time"] <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="StartTime"
+                                       class="form-control"
+                                       type="time"
+                                       step="1800" />
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">@Localizer["Notes"]</label>
+                            <textarea asp-for="Notes"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="@Localizer["AdditionalRequests"]"></textarea>
+                        </div>
+
+                        <div class="alert alert-info" id="serviceInfo" style="display:none;">
+                            <p><strong>@Localizer["ServiceDetails"]:</strong></p>
+                            <p>
+                                <span id="serviceName"></span> -
+                                <span id="serviceDuration"></span> phút -
+                                <span id="servicePrice"></span> VNĐ
+                            </p>
+                        </div>
+
+                        <button type="submit" class="btn btn-gold w-100 py-2 rounded-pill fw-bold">
+                            @Localizer["ConfirmBooking"]
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $('#SelectedServiceId').change(async function () {
+            var serviceId = $(this).val();
+
+            if (serviceId) {
+                try {
+                    const res = await fetch(`/api/ApiService/${serviceId}`);
+                    const data = await res.json();
+
+                    $('#serviceInfo').show();
+                    $('#serviceName').text(data.serviceName);
+                    $('#serviceDuration').text(data.duration);
+                    $('#servicePrice').text(data.price.toLocaleString());
+
+                    if ($('#manualAssign').is(':checked')) {
+                        loadStaffList();
+                    }
+
+                } catch (error) {
+                    console.error('Lỗi tải dịch vụ:', error);
+                }
+            } else {
+                $('#serviceInfo').hide();
+            }
+        });
+
+        $(document).ready(function () {
+
+            $('input[name="AutoAssignStaff"]').change(function () {
+                if ($(this).val() === 'true') {
+                    $('#staffSelectDiv').hide();
+                } else {
+                    $('#staffSelectDiv').show();
+                    loadStaffList();
+                }
+            });
+
+            $('#BranchId, #BookingDate, #StartTime').change(function () {
+                if ($('#manualAssign').is(':checked')) {
+                    loadStaffList();
+                }
+            });
+
+            function loadStaffList() {
+                var branchId = $('#BranchId').val();
+                var bookingDate = $('#BookingDate').val();
+                var startTime = $('#StartTime').val();
+                var serviceId = $('#SelectedServiceId').val();
+
+                if (!branchId || !bookingDate || !startTime || !serviceId) return;
+
+                fetch(`/api/Booking/GetAvailableStaff?branchId=${branchId}&date=${bookingDate}&time=${startTime}&serviceId=${serviceId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        var staffSelect = $('#StaffId');
+
+                        staffSelect.empty();
+                        staffSelect.append('<option value="">-- Chọn nhân viên --</option>');
+
+                        data.forEach(staff => {
+                            staffSelect.append(
+                                `<option value="${staff.staffId}">
+                                    ${staff.fullName} - ${staff.position}
+                                </option>`
+                            );
+                        });
+
+                        if (data.length === 0) {
+                            staffSelect.append('<option disabled>Không có nhân viên rảnh</option>');
+                        }
+                    })
+                    .catch(error => console.error('Lỗi tải nhân viên:', error));
+            }
+        });
+    </script>
+}

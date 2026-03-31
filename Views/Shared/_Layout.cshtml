@@ -1,5 +1,9 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentUICulture.Name">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,12 +12,12 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- Custom CSS -->
@@ -22,120 +26,268 @@
 </head>
 <body>
 
-    <div id="spa-preloader" class="d-flex justify-content-center align-items-center" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #fff; z-index: 9999;">
+    <!-- Preloader -->
+    <div id="spa-preloader" class="d-flex justify-content-center align-items-center"
+         style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #fff; z-index: 9999;">
         <div class="text-center">
-            <h1 class="font-playfair text-gold display-3 fw-bold mb-3 animate-pulse">Spa<span class="text-dark">N5</span></h1>
+            <h1 class="font-playfair text-gold display-3 fw-bold mb-3">
+                Spa<span class="text-dark">N5</span>
+            </h1>
             <div class="spinner-grow text-gold" style="width: 2rem; height: 2rem;" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     </div>
 
+    <!-- Header -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light fixed-top spa-navbar transition-all">
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top spa-navbar">
             <div class="container">
-                <a class="navbar-brand spa-brand" asp-area="" asp-controller="Home" asp-action="Index">
+
+                <a class="navbar-brand spa-brand" asp-controller="Home" asp-action="Index">
                     <span class="fs-4">Spa<span class="text-gold">N5</span></span>
                 </a>
 
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#spaNav" aria-expanded="false">
+                <button class="navbar-toggler border-0"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#spaNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse justify-content-end" id="spaNav">
                     <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+
                         <li class="nav-item">
-                            <a class="nav-link active" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                @Localizer["Home"]
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="#services">Dịch vụ</a>
+                            <a class="nav-link" href="#services">
+                                @Localizer["Services"]
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="#about">Về chúng tôi</a>
+                            <a class="nav-link" href="#about">
+                                @Localizer["AboutUs"]
+                            </a>
                         </li>
+
+                        <!-- Customer xem chi nhánh -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Branches" asp-action="Index">
+                                Chi nhánh
+                            </a>
+                        </li>
+
+                        <!-- Admin quản lý chi nhánh -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Branch" asp-action="Index">
+                                    Quản lý chi nhánh
+                                </a>
+                            </li>
+                        }
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item dropdown ms-lg-3">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle"></i> @User.FindFirst("FullName")?.Value
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i>
+                                    @User.FindFirst("FullName")?.Value
                                 </a>
+
                                 <ul class="dropdown-menu dropdown-menu-end">
+
                                     @if (User.IsInRole("Admin"))
                                     {
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard Admin</a></li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-controller="Admin"
+                                               asp-action="Dashboard">
+                                                <i class="fas fa-tachometer-alt"></i>
+                                                @Localizer["AdminDashboard"]
+                                            </a>
+                                        </li>
                                     }
+
                                     @if (User.IsInRole("Staff"))
                                     {
-                                        <li><a class="dropdown-item" asp-controller="Staff" asp-action="Dashboard"><i class="fas fa-calendar-alt"></i> Dashboard Staff</a></li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-controller="Staff"
+                                               asp-action="Dashboard">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                @Localizer["StaffDashboard"]
+                                            </a>
+                                        </li>
                                     }
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fas fa-user"></i> Hồ sơ cá nhân</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword"><i class="fas fa-key"></i> Đổi mật khẩu</a></li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Account"
+                                           asp-action="Profile">
+                                            <i class="fas fa-user"></i>
+                                            @Localizer["Profile"]
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Account"
+                                           asp-action="ChangePassword">
+                                            <i class="fas fa-key"></i>
+                                            @Localizer["ChangePassword"]
+                                        </a>
+                                    </li>
+
                                     @if (User.IsInRole("Customer"))
                                     {
-                                        <li><a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings"><i class="fas fa-book"></i> Lịch sử đặt lịch</a></li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-controller="Booking"
+                                               asp-action="Upcoming">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                Lịch hẹn của tôi
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-controller="Booking"
+                                               asp-action="MyBookings">
+                                                <i class="fas fa-history"></i>
+                                                Lịch sử đặt lịch
+                                            </a>
+                                        </li>
                                     }
+
                                     <li><hr class="dropdown-divider"></li>
+
                                     <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post">
-                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                                        <form asp-controller="Account"
+                                              asp-action="Logout"
+                                              method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="fas fa-sign-out-alt"></i>
+                                                @Localizer["Logout"]
+                                            </button>
                                         </form>
                                     </li>
+
                                 </ul>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                                <a class="btn btn-outline-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                            <li class="nav-item ms-lg-3">
+                                <a class="btn btn-outline-gold rounded-pill px-4 py-2"
+                                   asp-controller="Account"
+                                   asp-action="Login">
+                                    @Localizer["Login"]
+                                </a>
                             </li>
-                            <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
-                                <a class="btn btn-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Register">Đăng ký</a>
+
+                            <li class="nav-item ms-lg-2">
+                                <a class="btn btn-gold rounded-pill px-4 py-2"
+                                   asp-controller="Account"
+                                   asp-action="Register">
+                                    @Localizer["Register"]
+                                </a>
                             </li>
                         }
 
-                        <!-- Ngôn ngữ -->
+                        <!-- Language -->
                         <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-globe"></i> VI
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               data-bs-toggle="dropdown">
+                                <i class="fas fa-globe"></i>
+                                @CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToUpper()
                             </a>
+
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#" onclick="setLanguage('vi')">Tiếng Việt</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">English</a></li>
+
+                                <li>
+                                    <form method="post"
+                                          asp-controller="Home"
+                                          asp-action="SetLanguage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="culture" value="vi-VN" />
+                                        <input type="hidden" name="returnUrl"
+                                               value="@Context.Request.Path@Context.Request.QueryString" />
+                                        <button type="submit" class="dropdown-item">
+                                            Tiếng Việt
+                                        </button>
+                                    </form>
+                                </li>
+
+                                <li>
+                                    <form method="post"
+                                          asp-controller="Home"
+                                          asp-action="SetLanguage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="culture" value="en-US" />
+                                        <input type="hidden" name="returnUrl"
+                                               value="@Context.Request.Path@Context.Request.QueryString" />
+                                        <button type="submit" class="dropdown-item">
+                                            English
+                                        </button>
+                                    </form>
+                                </li>
+
                             </ul>
                         </li>
+
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
+    <!-- Main -->
     <main role="main">
         @RenderBody()
     </main>
 
+    <!-- Footer -->
     <footer class="spa-footer">
         <div class="container pt-5 pb-4">
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="text-gold mb-3 font-playfair fs-4">SpaN5</h5>
-                    <p class="text-white-50">Nơi mang lại sự thư giãn tuyệt đối cho tâm hồn và cơ thể bạn.</p>
+                    <p class="text-white-50">@Localizer["FooterDescription"]</p>
                 </div>
+
                 <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="text-white mb-3">Liên kết</h5>
+                    <h5 class="text-white mb-3">@Localizer["Links"]</h5>
                     <ul class="list-unstyled footer-links">
-                        <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                        <li><a asp-controller="Home" asp-action="Terms">Điều khoản sử dụng</a></li>
+                        <li>
+                            <a asp-controller="Home" asp-action="Index">@Localizer["Home"]</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Home" asp-action="Terms">@Localizer["Terms"]</a>
+                        </li>
                     </ul>
                 </div>
             </div>
+
             <hr class="border-secondary mt-4 mb-4">
+
             <div class="text-center text-white-50">
                 <small>&copy; 2026 SpaN5 - Bản quyền thuộc hệ thống Spa chuyên nghiệp N5.</small>
             </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -149,21 +301,9 @@
                 setTimeout(() => preloader.style.display = 'none', 500);
             }
         });
-
-        function setLanguage(lang) {
-            // Lưu ngôn ngữ vào cookie hoặc localStorage và reload trang
-            localStorage.setItem('lang', lang);
-            location.reload();
-        }
-
-        // Đọc ngôn ngữ đã lưu (có thể tích hợp resource file)
-        const savedLang = localStorage.getItem('lang');
-        if (savedLang) {
-            // Cập nhật hiển thị ngôn ngữ trên dropdown
-            document.querySelector('#langDropdown .fa-globe').nextSibling.textContent = savedLang.toUpperCase();
-        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

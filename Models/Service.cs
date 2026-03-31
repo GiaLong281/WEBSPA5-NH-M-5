@@ -27,5 +27,6 @@ namespace SpaN5.Models
 
         public ICollection<ServiceMaterial> ServiceMaterials { get; set; } = new List<ServiceMaterial>();
         public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

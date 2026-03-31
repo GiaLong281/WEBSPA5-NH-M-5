@@ -1,6 +1,8 @@
 @model SpaN5.Models.ViewModels.RegisterViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Đăng ký";
+    ViewData["Title"] = Localizer["Register"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -9,53 +11,53 @@
         <div class="col-md-6 col-lg-5">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="card-header bg-gold text-white text-center py-4 border-0">
-                    <h2 class="mb-0 font-playfair">Đăng ký</h2>
-                    <p class="mb-0 mt-2 text-white-50">Trở thành thành viên SpaN5</p>
+                    <h2 class="mb-0 font-playfair">@Localizer["Register"]</h2>
+                    <p class="mb-0 mt-2 text-white-50">@Localizer["BeccomeMember"]</p>
                 </div>
                 <div class="card-body p-5">
                     <form asp-action="Register" method="post">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                         <div class="mb-3">
-                            <label asp-for="FullName" class="form-label">Họ và tên</label>
-                            <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" />
+                            <label asp-for="FullName" class="form-label">@Localizer["FullName"]</label>
+                            <input asp-for="FullName" class="form-control" placeholder="@Localizer["ExampleName"]" />
                             <span asp-validation-for="FullName" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Phone" class="form-label">Số điện thoại</label>
-                            <input asp-for="Phone" class="form-control" placeholder="0123456789" />
+                            <label asp-for="Phone" class="form-label">@Localizer["Phone"]</label>
+                            <input asp-for="Phone" class="form-control" placeholder="@Localizer["ExamplePhone"]" />
                             <span asp-validation-for="Phone" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Email" class="form-label">Email (tùy chọn)</label>
-                            <input asp-for="Email" class="form-control" placeholder="example@email.com" />
+                            <label asp-for="Email" class="form-label">@Localizer["Email"]</label>
+                            <input asp-for="Email" class="form-control" placeholder="@Localizer["ExampleEmail"]" />
                             <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Username" class="form-label">Tên đăng nhập</label>
+                            <label asp-for="Username" class="form-label">@Localizer["Username"]</label>
                             <input asp-for="Username" class="form-control" placeholder="username" />
                             <span asp-validation-for="Username" class="text-danger small"></span>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Password" class="form-label">Mật khẩu</label>
-                            <input asp-for="Password" class="form-control" placeholder="Ít nhất 6 ký tự" />
+                            <label asp-for="Password" class="form-label">@Localizer["Password"]</label>
+                            <input asp-for="Password" class="form-control" placeholder="@Localizer["MinPassword"]" />
                             <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
                         <div class="mb-4">
-                            <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
-                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
+                            <label asp-for="ConfirmPassword" class="form-label">@Localizer["ConfirmPassword"]</label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="@Localizer["ReEnterPassword"]" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                         </div>
                         <div class="mb-3 form-check">
                             <input asp-for="AcceptTerms" class="form-check-input" />
                             <label class="form-check-label" asp-for="AcceptTerms">
-                                Tôi đã đọc và đồng ý với <a asp-controller="Home" asp-action="Terms" target="_blank">Điều khoản sử dụng</a>
+                                @Localizer["IAgree"] <a asp-controller="Home" asp-action="Terms" target="_blank">@Localizer["Terms"]</a>
                             </label>
                             <span asp-validation-for="AcceptTerms" class="text-danger small d-block"></span>
                         </div>
-                        <button type="submit" class="btn btn-gold w-100 py-2 rounded-pill fw-bold">Đăng ký</button>
+                        <button type="submit" class="btn btn-gold w-100 py-2 rounded-pill fw-bold">@Localizer["Register"]</button>
                     </form>
                     <div class="text-center mt-4">
-                        <p class="mb-0">Đã có tài khoản? <a asp-action="Login" class="text-gold fw-bold">Đăng nhập ngay</a></p>
+                        <p class="mb-0">@Localizer["HaveAccount"] <a asp-action="Login" class="text-gold fw-bold">@Localizer["LoginNow"]</a></p>
                     </div>
                 </div>
             </div>

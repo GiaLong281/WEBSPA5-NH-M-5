@@ -1,33 +1,68 @@
 @model IEnumerable<SpaN5.Models.Branch>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Quản lý chi nhánh";
+    ViewData["Title"] = Localizer["ManageBranches"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container py-5">
-    <h1>Quản lý chi nhánh</h1>
-    <a asp-action="CreateBranch" class="btn btn-success mb-3">Thêm chi nhánh</a>
-    <table class="table">
-        <thead>
-            <tr><th>ID</th><th>Tên</th><th>Địa chỉ</th><th>Điện thoại</th><th>Email</th><th>Hành động</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="font-playfair text-gold">@Localizer["ManageBranches"]</h1>
+        <a asp-action="CreateBranch" class="btn btn-gold rounded-pill">
+            <i class="fas fa-plus"></i> @Localizer["CreateBranch"]
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>@item.BranchId</td>
-                    <td>@item.BranchName</td>
-                    <td>@item.Address</td>
-                    <td>@item.Phone</td>
-                    <td>@item.Email</td>
-                    <td>
-                        <a asp-action="EditBranch" asp-route-id="@item.BranchId" class="btn btn-sm btn-warning">Sửa</a>
-                        <form asp-action="DeleteBranch" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@item.BranchId" />
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    <th>@Localizer["ID"]</th>
+                    <th>@Localizer["Name"]</th>
+                    <th>@Localizer["Address"]</th>
+                    <th>@Localizer["Phone"]</th>
+                    <th>@Localizer["Status"]</th>
+                    <th>@Localizer["Actions"]</th>
+                 </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.BranchId</td>
+                        <td>@item.BranchName</td>
+                        <td>@item.Address</td>
+                        <td>@item.Phone</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Ngưng hoạt động</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="EditBranch" asp-route-id="@item.BranchId" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> @Localizer["Edit"]
+                            </a>
+                            <form asp-action="ToggleBranchStatus" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@item.BranchId" />
+                                <button type="submit" class="btn btn-sm @((item.IsActive) ? "btn-secondary" : "btn-success")">
+                                    @(item.IsActive ? Localizer["Disable"] : Localizer["Activate"])
+                                </button>
+                            </form>
+                            <form asp-action="DeleteBranch" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@item.BranchId" />
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["ConfirmDeleteBranch"]')">
+                                    <i class="fas fa-trash"></i> @Localizer["Delete"]
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

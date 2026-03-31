@@ -6,6 +6,9 @@ using SpaN5.Services;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace SpaN5.Controllers
 {
@@ -15,12 +18,14 @@ namespace SpaN5.Controllers
         private readonly SpaDbContext _context;
         private readonly AuditService _audit;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AdminController(SpaDbContext context, AuditService audit, IPasswordHasher<User> passwordHasher)
+        public AdminController(SpaDbContext context, AuditService audit, IPasswordHasher<User> passwordHasher, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _audit = audit;
             _passwordHasher = passwordHasher;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // Dashboard
@@ -43,44 +48,46 @@ namespace SpaN5.Controllers
         [HttpGet]
         public IActionResult CreateBranch() => View();
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBranch(Branch model)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Branches.Add(model);
-                await _context.SaveChangesAsync();
-                await _audit.LogAsync("Create", "Branch", model.BranchId.ToString(), null, JsonSerializer.Serialize(model));
-                return RedirectToAction(nameof(ManageBranches));
-            }
-            return View(model);
-        }
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> CreateBranch(Branch model)
+{
+    if (ModelState.IsValid)
+    {
+        model.CreatedAt = DateTime.Now;
+        model.UpdatedAt = DateTime.Now;
+        _context.Branches.Add(model);
+        await _context.SaveChangesAsync();
+        await _audit.LogAsync("Create", "Branch", model.BranchId.ToString(), null, JsonSerializer.Serialize(model));
+        return RedirectToAction(nameof(ManageBranches));
+    }
+    return View(model);
+}
 
-        [HttpGet]
-        public async Task<IActionResult> EditBranch(int id)
-        {
-            var branch = await _context.Branches.FindAsync(id);
-            if (branch == null) return NotFound();
-            return View(branch);
-        }
+[HttpGet]
+public async Task<IActionResult> EditBranch(int id)
+{
+    var branch = await _context.Branches.FindAsync(id);
+    if (branch == null) return NotFound();
+    return View(branch);
+}
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditBranch(int id, Branch model)
-        {
-            if (id != model.BranchId) return NotFound();
-            if (ModelState.IsValid)
-            {
-                var old = await _context.Branches.AsNoTracking().FirstOrDefaultAsync(b => b.BranchId == id);
-                _context.Update(model);
-                await _context.SaveChangesAsync();
-                await _audit.LogAsync("Update", "Branch", id.ToString(), JsonSerializer.Serialize(old), JsonSerializer.Serialize(model));
-                return RedirectToAction(nameof(ManageBranches));
-            }
-            return View(model);
-        }
-
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> EditBranch(int id, Branch model)
+{
+    if (id != model.BranchId) return NotFound();
+    if (ModelState.IsValid)
+    {
+        var old = await _context.Branches.AsNoTracking().FirstOrDefaultAsync(b => b.BranchId == id);
+        model.UpdatedAt = DateTime.Now;
+        _context.Update(model);
+        await _context.SaveChangesAsync();
+        await _audit.LogAsync("Update", "Branch", id.ToString(), JsonSerializer.Serialize(old), JsonSerializer.Serialize(model));
+        return RedirectToAction(nameof(ManageBranches));
+    }
+    return View(model);
+}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBranch(int id)
@@ -92,6 +99,23 @@ namespace SpaN5.Controllers
                 await _context.SaveChangesAsync();
                 await _audit.LogAsync("Delete", "Branch", id.ToString(), JsonSerializer.Serialize(branch), null);
             }
+            return RedirectToAction(nameof(ManageBranches));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleBranchStatus(int id)
+        {
+            var branch = await _context.Branches.FindAsync(id);
+            if (branch == null) return NotFound();
+
+            var old = JsonSerializer.Serialize(branch);
+            branch.IsActive = !branch.IsActive;
+            branch.UpdatedAt = DateTime.Now;
+            _context.Branches.Update(branch);
+            await _context.SaveChangesAsync();
+
+            await _audit.LogAsync("Update", "Branch", id.ToString(), old, JsonSerializer.Serialize(branch));
             return RedirectToAction(nameof(ManageBranches));
         }
 
@@ -176,6 +200,83 @@ namespace SpaN5.Controllers
                 await _audit.LogAsync("Delete", "Staff", id.ToString(), JsonSerializer.Serialize(staff), null);
             }
             return RedirectToAction(nameof(ManageStaff));
+        }
+
+        // GET: Tạo tài khoản mới
+        [HttpGet]
+        public async Task<IActionResult> CreateUser()
+        {
+            ViewBag.Roles = new List<string> { "Admin", "Staff" };
+            ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
+            return View();
+        }
+
+        // POST: Tạo tài khoản mới
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateUser(string Username, string Password, string FullName, string Email, string Role, int? BranchId)
+        {
+            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
+            {
+                ModelState.AddModelError("", "Tên đăng nhập và mật khẩu không được để trống.");
+                ViewBag.Roles = new List<string> { "Admin", "Staff" };
+                ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
+                return View();
+            }
+
+            // Kiểm tra username đã tồn tại
+            if (await _context.Users.AnyAsync(u => u.Username == Username))
+            {
+                ModelState.AddModelError("Username", "Tên đăng nhập đã tồn tại.");
+                ViewBag.Roles = new List<string> { "Admin", "Staff" };
+                ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
+                return View();
+            }
+
+            // Tạo User
+            var user = new User
+            {
+                Username = Username,
+                Role = Role,
+                FullName = FullName,
+                Email = Email,
+                CreatedAt = DateTime.Now
+            };
+            user.PasswordHash = _passwordHasher.HashPassword(user, Password);
+
+            // Nếu role Staff, tạo Staff trước để lấy StaffId
+            if (Role == "Staff")
+            {
+                if (!BranchId.HasValue)
+                {
+                    ModelState.AddModelError("BranchId", "Vui lòng chọn chi nhánh cho nhân viên.");
+                    ViewBag.Roles = new List<string> { "Admin", "Staff" };
+                    ViewBag.Branches = await _context.Branches.Where(b => b.IsActive).ToListAsync();
+                    return View();
+                }
+
+                var staff = new Staff
+                {
+                    FullName = FullName,
+                    Email = Email,
+                    BranchId = BranchId,
+                    Status = "active",
+                    CreatedAt = DateTime.Now
+                };
+                _context.Staffs.Add(staff);
+                await _context.SaveChangesAsync(); // để có StaffId
+                user.StaffId = staff.StaffId;
+            }
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            await _audit.LogAsync("Create", "User", user.Id.ToString(), null, JsonSerializer.Serialize(user));
+            TempData["SuccessMessage"] = $"Tài khoản {Username} với role {Role} đã được tạo thành công.";
+            if (Role == "Staff")
+                return RedirectToAction(nameof(ManageStaff));
+            else
+                return RedirectToAction(nameof(Dashboard));
         }
 
         // ================= QUẢN LÝ KHÁCH HÀNG =================
@@ -297,19 +398,35 @@ namespace SpaN5.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateService() => View();
+        public async Task<IActionResult> CreateService()
+        {
+            ViewBag.Categories = await _context.ServiceCategories.ToListAsync();
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateService(Service model)
+        public async Task<IActionResult> CreateService(Service model, IFormFile? ImageFile)
         {
             if (ModelState.IsValid)
             {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var path = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    model.Image = fileName;
+                }
+
                 _context.Services.Add(model);
                 await _context.SaveChangesAsync();
                 await _audit.LogAsync("Create", "Service", model.ServiceId.ToString(), null, JsonSerializer.Serialize(model));
                 return RedirectToAction(nameof(ManageServices));
             }
+            ViewBag.Categories = await _context.ServiceCategories.ToListAsync();
             return View(model);
         }
 
@@ -318,22 +435,38 @@ namespace SpaN5.Controllers
         {
             var service = await _context.Services.FindAsync(id);
             if (service == null) return NotFound();
+            ViewBag.Categories = await _context.ServiceCategories.ToListAsync();
             return View(service);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditService(int id, Service model)
+        public async Task<IActionResult> EditService(int id, Service model, IFormFile? ImageFile)
         {
             if (id != model.ServiceId) return NotFound();
             if (ModelState.IsValid)
             {
                 var old = await _context.Services.AsNoTracking().FirstOrDefaultAsync(s => s.ServiceId == id);
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var path = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    model.Image = fileName;
+                }
+                else
+                {
+                    model.Image = old?.Image;
+                }
                 _context.Update(model);
                 await _context.SaveChangesAsync();
                 await _audit.LogAsync("Update", "Service", id.ToString(), JsonSerializer.Serialize(old), JsonSerializer.Serialize(model));
                 return RedirectToAction(nameof(ManageServices));
             }
+            ViewBag.Categories = await _context.ServiceCategories.ToListAsync();
             return View(model);
         }
 

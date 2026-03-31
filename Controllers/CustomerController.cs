@@ -6,9 +6,6 @@ namespace SpaN5.Controllers
     [Authorize(Roles = "Customer")]
     public class CustomerController : Controller
     {
-        public IActionResult Profile()
-        {
-            return View();
-        }
+        public IActionResult Profile() => RedirectToAction("Profile", "Account");
     }
 }

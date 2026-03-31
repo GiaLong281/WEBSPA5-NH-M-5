@@ -24,6 +24,8 @@ namespace SpaN5.Models
         public DbSet<ServiceMaterial> ServiceMaterials { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
 
+        public DbSet<Review> Reviews { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Cấu hình quan hệ ServiceMaterial
@@ -94,6 +96,21 @@ namespace SpaN5.Models
         entity.HasOne(c => c.DiaChi)
             .WithMany(d => d.Customers)
             .HasForeignKey(c => c.MaDiaChi);
+    });
+
+    modelBuilder.Entity<Review>(entity =>
+    {
+        entity.HasKey(r => r.ReviewId);
+
+        entity.HasOne(r => r.Service)
+              .WithMany(s => s.Reviews)
+              .HasForeignKey(r => r.ServiceId)
+              .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(r => r.Customer)
+              .WithMany(c => c.Reviews)
+              .HasForeignKey(r => r.CustomerId)
+              .OnDelete(DeleteBehavior.Restrict);
     });
 }
         

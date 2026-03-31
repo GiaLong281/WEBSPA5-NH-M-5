@@ -6,8 +6,12 @@ using SpaN5.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// Localization
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
 
 // DbContext
 builder.Services.AddDbContext<SpaDbContext>(options =>
@@ -43,6 +47,16 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+var supportedCultures = new[] { "vi-VN", "en-US" };
+var localizationOptions = new RequestLocalizationOptions()
+{
+    DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("vi-VN"),
+    SupportedCultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList(),
+    SupportedUICultures = supportedCultures.Select(c => new System.Globalization.CultureInfo(c)).ToList()
+};
+
+app.UseRequestLocalization(localizationOptions);
 
 app.UseRouting();
 

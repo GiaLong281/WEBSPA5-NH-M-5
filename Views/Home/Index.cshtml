@@ -1,14 +1,16 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Trang Chủ";
+    ViewData["Title"] = Localizer["PageTitle"];
 }
 
 <!-- Hero Section -->
 <section class="hero-section position-relative vh-100 d-flex align-items-center" style="background: url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; margin-top: -76px;">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(26, 43, 60, 0.4);"></div>
     <div class="container position-relative z-index-1 text-center text-white">
-        <h1 class="display-3 font-playfair mb-4 animate-fade-up fw-bold">Nuông Chiều Bản Thân<br>Đánh Thức Vẻ Đẹp</h1>
-        <p class="lead mb-5 fw-light mx-auto" style="max-width: 600px; animation-delay: 0.2s;">Trải nghiệm không gian thư giãn tuyệt đối và những liệu pháp tái tạo năng lượng hàng đầu tại SpaN5.</p>
-        <a href="#booking" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1" style="animation-delay: 0.4s;">Đặt Lịch Ngay</a>
+        <h1 class="display-3 font-playfair mb-4 animate-fade-up fw-bold">@Html.Raw(Localizer["MainHeading"].ToString().Replace("\n", "<br>"))</h1>
+        <p class="lead mb-5 fw-light mx-auto" style="max-width: 600px; animation-delay: 0.2s;">@Localizer["MainDescription"]</p>
+        <a href="#booking" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1" style="animation-delay: 0.4s;">@Localizer["BookNow"]</a>
     </div>
 </section>
 
@@ -20,21 +22,21 @@
                 <div class="position-relative">
                     <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Spa interior" class="img-fluid rounded-3 shadow-lg" style="object-fit: cover; height: 500px; width: 100%;" loading="lazy">
                     <div class="position-absolute bottom-0 end-0 bg-white p-4 shadow-lg rounded-top-start-3 m-0" style="right: -20px !important; bottom: -20px !important;">
-                        <h3 class="font-playfair text-gold mb-0">10+ Năm</h3>
-                        <p class="mb-0 text-muted">Kinh nghiệm chăm sóc</p>
+                        <h3 class="font-playfair text-gold mb-0">@Localizer["YearsExperience"]</h3>
+                        <p class="mb-0 text-muted">@Localizer["ExperienceLabel"]</p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-5 offset-lg-1">
-                <span class="text-gold fw-bold text-uppercase letter-spacing-2">Về SpaN5</span>
-                <h2 class="font-playfair display-5 my-3 text-dark">Nơi Cân Bằng<br>Thân & Tâm.</h2>
-                <p class="text-muted mb-4" style="line-height: 1.8;">Chúng tôi tin rằng sự thư giãn thực sự đến từ sự hòa hợp giữa cơ thể khỏe mạnh và tinh thần an yên. Với không gian thiên nhiên tĩnh lặng và các liệu pháp y học cổ truyền kết hợp hiện đại, SpaN5 mong muốn mang đến cho bạn những trải nghiệm đáng nhớ nhất.</p>
+                <span class="text-gold fw-bold text-uppercase letter-spacing-2">@Localizer["AboutUsTitle"]</span>
+                <h2 class="font-playfair display-5 my-3 text-dark">@Html.Raw(Localizer["BalanceSubtitle"].ToString().Replace("\n", "<br>"))</h2>
+                <p class="text-muted mb-4" style="line-height: 1.8;">@Localizer["AboutDescription"]</p>
                 <ul class="list-unstyled mb-4">
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> Kỹ thuật viên chuyên nghiệp, tận tâm</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> Sản phẩm hữu cơ organic 100%</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> Không gian tĩnh lặng, riêng tư</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> @Localizer["ProfessionalTherapists"]</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> @Localizer["OrganicProducts"]</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> @Localizer["PrivateSpace"]</li>
                 </ul>
-                <a href="#services" class="btn btn-outline-gold rounded-pill px-4 py-2">Khám phá dịch vụ</a>
+                <a href="#services" class="btn btn-outline-gold rounded-pill px-4 py-2">@Localizer["ExploreServices"]</a>
             </div>
         </div>
     </div>
@@ -44,8 +46,8 @@
 <section id="services" class="py-5 bg-white section-fade">
     <div class="container py-4">
         <div class="text-center mb-5">
-            <span class="text-gold fw-bold text-uppercase letter-spacing-2">Dịch Vụ Nổi Bật</span>
-            <h2 class="font-playfair display-5 mt-2 mb-3">Những Liệu Trình Tái Tạo</h2>
+            <span class="text-gold fw-bold text-uppercase letter-spacing-2">@Localizer["FeaturedServices"]</span>
+            <h2 class="font-playfair display-5 mt-2 mb-3">@Localizer["RejuvenationTherapies"]</h2>
             <div class="mx-auto bg-gold" style="height: 2px; width: 60px;"></div>
         </div>
         
@@ -58,9 +60,9 @@
                     </div>
                     <div class="card-body p-4 text-center">
                         <i class="fas fa-hands text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">Massage Thư Giãn</h4>
-                        <p class="text-muted mb-4">Xua tan căng thẳng cơ bắp bằng liệu pháp massage Thụy Điển kết hợp đá nóng thiên nhiên.</p>
-                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">Xem chi tiết</a>
+                        <h4 class="font-playfair mb-3">@Localizer["MassageTitle"]</h4>
+                        <p class="text-muted mb-4">@Localizer["MassageDesc"]</p>
+                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">@Localizer["ViewDetails"]</a>
                     </div>
                 </div>
             </div>
@@ -72,9 +74,9 @@
                     </div>
                     <div class="card-body p-4 text-center">
                         <i class="fas fa-spa text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">Chăm Sóc Da Mặt</h4>
-                        <p class="text-muted mb-4">Thanh lọc và trẻ hóa làn da với tinh chất hoa cúc và serum hữu cơ nhập khẩu từ Pháp.</p>
-                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">Xem chi tiết</a>
+                        <h4 class="font-playfair mb-3">@Localizer["FacialTitle"]</h4>
+                        <p class="text-muted mb-4">@Localizer["FacialDesc"]</p>
+                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">@Localizer["ViewDetails"]</a>
                     </div>
                 </div>
             </div>
@@ -86,9 +88,9 @@
                     </div>
                     <div class="card-body p-4 text-center">
                         <i class="fas fa-leaf text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">Tắm Thảo Dược</h4>
-                        <p class="text-muted mb-4">Đào thải độc tố, kích thích tuần hoàn máu qua liệu trình ngâm mình với 15 loại thảo mộc quý.</p>
-                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">Xem chi tiết</a>
+                        <h4 class="font-playfair mb-3">@Localizer["HerbalBathTitle"]</h4>
+                        <p class="text-muted mb-4">@Localizer["HerbalBathDesc"]</p>
+                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">@Localizer["ViewDetails"]</a>
                     </div>
                 </div>
             </div>
@@ -101,8 +103,8 @@
     <div class="container py-5">
         <div class="row align-items-center">
             <div class="col-md-5 mb-4 mb-md-0">
-                <h2 class="font-playfair display-5 mb-4">Khách Hàng<br>Nói Gì Về Chúng Tôi?</h2>
-                <p class="text-muted mb-4">Hơn 5000+ khách hàng đã trải nghiệm và hài lòng với dịch vụ tại SpaN5. Sự tin tưởng của quý khách là động lực to lớn nhất.</p>
+                <h2 class="font-playfair display-5 mb-4">@Localizer["CustomerTestimonials"]</h2>
+                <p class="text-muted mb-4">@Localizer["TestimonialIntro"]</p>
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-dark rounded-circle" style="width: 45px; height: 45px;"><i class="fas fa-arrow-left"></i></button>
                     <button class="btn btn-dark rounded-circle bg-navy border-0" style="width: 45px; height: 45px;"><i class="fas fa-arrow-right"></i></button>
@@ -111,12 +113,12 @@
             <div class="col-md-7">
                 <div class="bg-white p-5 rounded-3 shadow-sm position-relative">
                     <i class="fas fa-quote-left fs-1 text-gold opacity-25 position-absolute top-0 start-0 ms-4 mt-4"></i>
-                    <p class="fs-5 fst-italic mb-4 text-dark position-relative z-index-1" style="line-height: 1.8;">"Sau một tuần làm việc căng thẳng, đến SpaN5 giống như bước vào một thế giới khác. Không gian tuyệt vời, mùi hương tinh dầu dịu nhẹ và kỹ thuật massage thì điêu luyện. Chắc chắn tôi sẽ quay lại thường xuyên."</p>
+                    <p class="fs-5 fst-italic mb-4 text-dark position-relative z-index-1" style="line-height: 1.8;">"@Localizer["TestimonialContent"]"</p>
                     <div class="d-flex align-items-center">
                         <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Customer" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;" loading="lazy">
                         <div>
-                            <h6 class="mb-0 fw-bold">Nguyễn Phương My</h6>
-                            <small class="text-muted">Doanh nhân</small>
+                            <h6 class="mb-0 fw-bold">@Localizer["TestimonialAuthor"]</h6>
+                            <small class="text-muted">@Localizer["TestimonialRole"]</small>
                         </div>
                     </div>
                 </div>
