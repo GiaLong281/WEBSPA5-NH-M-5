@@ -1,124 +1,437 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = Localizer["PageTitle"];
+    ViewData["Title"] = "Trang chủ";
 }
 
-<!-- Hero Section -->
-<section class="hero-section position-relative vh-100 d-flex align-items-center" style="background: url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; margin-top: -76px;">
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(26, 43, 60, 0.4);"></div>
-    <div class="container position-relative z-index-1 text-center text-white">
-        <h1 class="display-3 font-playfair mb-4 animate-fade-up fw-bold">@Html.Raw(Localizer["MainHeading"].ToString().Replace("\n", "<br>"))</h1>
-        <p class="lead mb-5 fw-light mx-auto" style="max-width: 600px; animation-delay: 0.2s;">@Localizer["MainDescription"]</p>
-        <a href="#booking" class="btn btn-gold btn-lg rounded-pill px-5 py-3 text-uppercase fw-bold letter-spacing-1" style="animation-delay: 0.4s;">@Localizer["BookNow"]</a>
+@section Styles {
+    <style>
+        .hero-wrap {
+            position: relative;
+            overflow: hidden;
+            min-height: calc(100vh - 96px);
+            display: grid;
+            align-items: center;
+            padding: 5rem 0 4rem;
+        }
+
+        .hero-wrap::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(255,255,255,0.36), transparent 18%),
+                radial-gradient(circle at 88% 12%, rgba(255,255,255,0.26), transparent 14%),
+                linear-gradient(180deg, rgba(18,32,45,0.24), rgba(18,32,45,0.38));
+            pointer-events: none;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(18,32,45,0.22), rgba(18,32,45,0.45)),
+                url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            transform: scale(1.02);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-copy {
+            max-width: 620px;
+            color: rgba(255,255,255,0.86);
+            font-size: 1.08rem;
+            line-height: 1.85;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.7rem 1rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.16);
+            backdrop-filter: blur(14px);
+        }
+
+        .stat-card {
+            border-radius: 22px;
+            padding: 1.15rem 1.25rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.14);
+            backdrop-filter: blur(16px);
+            color: #fff;
+        }
+
+        .scroll-down {
+            width: 54px;
+            height: 54px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.22);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .image-stack {
+            position: relative;
+            min-height: 520px;
+        }
+
+        .image-stack img {
+            object-fit: cover;
+        }
+
+        .image-main {
+            width: 78%;
+            height: 520px;
+            border-radius: 28px;
+            box-shadow: 0 24px 55px rgba(18, 32, 45, 0.18);
+        }
+
+        .image-floating {
+            position: absolute;
+            right: 0;
+            bottom: 38px;
+            width: 36%;
+            height: 230px;
+            border-radius: 24px;
+            border: 8px solid rgba(255,255,255,0.9);
+            box-shadow: 0 18px 38px rgba(18, 32, 45, 0.18);
+        }
+
+        .overlap-badge {
+            position: absolute;
+            left: 22px;
+            bottom: 22px;
+            padding: 1rem 1.1rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.86);
+            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow);
+            max-width: 260px;
+        }
+
+        .service-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(182,138,99,0.14), rgba(217,180,143,0.20));
+            color: var(--gold);
+            font-size: 1.4rem;
+        }
+
+        .service-thumb {
+            height: 220px;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            overflow: hidden;
+        }
+
+        .service-thumb img,
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .45s ease;
+        }
+
+        .service-card:hover .service-thumb img,
+        .gallery-card:hover img {
+            transform: scale(1.06);
+        }
+
+        .mini-section {
+            padding: 1.35rem 0 0;
+        }
+
+        .step-card {
+            height: 100%;
+            padding: 1.5rem;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .step-index {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--gold-2));
+            color: #fff;
+        }
+
+        .gallery-card {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            min-height: 280px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .gallery-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 35%, rgba(18,32,45,0.55) 100%);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 18px;
+            z-index: 1;
+            color: #fff;
+        }
+
+        .quote-mark {
+            font-size: 3.5rem;
+            line-height: 1;
+            color: rgba(182,138,99,0.22);
+        }
+
+        .booking-box {
+            border-radius: 30px;
+            padding: 2rem;
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,0.40), transparent 30%),
+                linear-gradient(135deg, rgba(18,32,45,0.96), rgba(30,45,58,0.96));
+            color: #fff;
+            box-shadow: 0 24px 60px rgba(18, 32, 45, 0.18);
+        }
+
+        .booking-item {
+            display: flex;
+            gap: 0.9rem;
+            align-items: flex-start;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .booking-item:first-child {
+            border-top: 0;
+        }
+
+        .booking-dot {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(255,255,255,0.10);
+            flex: 0 0 auto;
+        }
+
+        .soft-note {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .65rem .9rem;
+            border-radius: 999px;
+            background: rgba(182,138,99,0.10);
+            color: var(--gold);
+            font-weight: 600;
+        }
+    </style>
+}
+
+<section class="hero-wrap">
+    <div class="hero-bg"></div>
+    <div class="container hero-content">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7 text-white">
+                <div class="hero-pill mb-4 fade-up">
+                    <i class="fa-solid fa-star"></i>
+                    <span>@Localizer["PageTitle"]</span>
+                </div>
+
+                <h1 class="hero-title font-playfair fw-bold mb-4 fade-up" style="animation-delay: .08s;">
+                    @Html.Raw("Nâng cấp trải nghiệm spa<br/>sang, sạch, và thật mượt.")
+                </h1>
+
+                <p class="hero-copy mb-4 fade-up" style="animation-delay: .16s;">
+                    Không gian được thiết kế như một khu nghỉ dưỡng thu nhỏ: ánh sáng dịu, màu sắc ấm, các khối nội dung thoáng và những điểm nhấn tinh tế để khách nhìn là muốn đặt lịch ngay.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 fade-up" style="animation-delay: .24s;">
+                    <a href="#booking" class="btn btn-gold btn-lg rounded-pill px-4 py-3 fw-semibold">
+                        <i class="fa-solid fa-calendar-check me-2"></i> Đặt lịch ngay
+                    </a>
+                    <a href="#services" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-semibold">
+                        <i class="fa-solid fa-spa me-2"></i> Xem dịch vụ
+                    </a>
+                </div>
+
+                <div class="row g-3 mt-5 fade-up" style="animation-delay: .32s;">
+                    <div class="col-sm-4">
+                        <div class="stat-card">
+                            <div class="fs-3 fw-bold font-playfair">15+</div>
+                            <div class="small text-white-50">Năm kinh nghiệm</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="stat-card">
+                            <div class="fs-3 fw-bold font-playfair">2k+</div>
+                            <div class="small text-white-50">Lượt khách hài lòng</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="stat-card">
+                            <div class="fs-3 fw-bold font-playfair">24/7</div>
+                            <div class="small text-white-50">Tư vấn đặt lịch</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="image-stack fade-up" style="animation-delay: .16s;">
+                    <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?auto=format&fit=crop&w=900&q=80" class="image-main" alt="Spa interior" loading="eager">
+                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=700&q=80" class="image-floating" alt="Spa treatment" loading="lazy">
+                    <div class="overlap-badge">
+                        <div class="soft-note mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Signature ritual</div>
+                        <div class="fw-semibold text-dark">Cảm giác chạm vào là nhận ra ngay: khác biệt nằm ở chi tiết.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex justify-content-center">
+            <a href="#about" class="scroll-down" aria-label="Scroll down">
+                <i class="fa-solid fa-chevron-down"></i>
+            </a>
+        </div>
     </div>
 </section>
 
-<!-- About Section -->
-<section id="about" class="py-5 my-5 section-fade">
+<section class="section-pad" id="about">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <div class="position-relative">
-                    <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Spa interior" class="img-fluid rounded-3 shadow-lg" style="object-fit: cover; height: 500px; width: 100%;" loading="lazy">
-                    <div class="position-absolute bottom-0 end-0 bg-white p-4 shadow-lg rounded-top-start-3 m-0" style="right: -20px !important; bottom: -20px !important;">
-                        <h3 class="font-playfair text-gold mb-0">@Localizer["YearsExperience"]</h3>
-                        <p class="mb-0 text-muted">@Localizer["ExperienceLabel"]</p>
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="image-stack" style="min-height: 560px;">
+                    <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=900&q=80" class="image-main" style="height: 560px;" alt="Massage therapy" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1526947425960-945c6e72868a?auto=format&fit=crop&w=700&q=80" class="image-floating" alt="Relaxing spa" loading="lazy">
+                    <div class="overlap-badge">
+                        <div class="small text-uppercase text-gold fw-bold mb-1">Không gian chuẩn premium</div>
+                        <div class="fw-semibold text-dark">Mềm mắt, sạch bố cục, có chiều sâu và rất “đã” khi nhìn trên desktop lẫn mobile.</div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5 offset-lg-1">
-                <span class="text-gold fw-bold text-uppercase letter-spacing-2">@Localizer["AboutUsTitle"]</span>
-                <h2 class="font-playfair display-5 my-3 text-dark">@Html.Raw(Localizer["BalanceSubtitle"].ToString().Replace("\n", "<br>"))</h2>
-                <p class="text-muted mb-4" style="line-height: 1.8;">@Localizer["AboutDescription"]</p>
-                <ul class="list-unstyled mb-4">
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> @Localizer["ProfessionalTherapists"]</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> @Localizer["OrganicProducts"]</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-gold me-2"></i> @Localizer["PrivateSpace"]</li>
-                </ul>
-                <a href="#services" class="btn btn-outline-gold rounded-pill px-4 py-2">@Localizer["ExploreServices"]</a>
+
+            <div class="col-lg-6">
+                <span class="section-label">Giới thiệu</span>
+                <h2 class="font-playfair display-5 fw-bold mt-3 mb-4">Làm lại cảm giác thương hiệu từ cái nhìn đầu tiên</h2>
+                <p class="text-muted fs-5 lh-lg mb-4">
+                    Bản nâng cấp này ưu tiên trải nghiệm: hero rộng và giàu cảm xúc, các section phân lớp rõ ràng, nút CTA nổi bật, card có chiều sâu, và footer đủ sang để khép lại toàn bộ trang bằng một nốt trầm đẹp.
+                </p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="spa-card p-4 h-100">
+                            <div class="service-icon mb-3"><i class="fa-solid fa-leaf"></i></div>
+                            <h5 class="fw-bold mb-2">Tinh gọn</h5>
+                            <p class="text-muted mb-0">Bỏ bớt chi tiết thừa, giữ lại thứ làm người dùng muốn ở lại lâu hơn.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="spa-card p-4 h-100">
+                            <div class="service-icon mb-3"><i class="fa-solid fa-gem"></i></div>
+                            <h5 class="fw-bold mb-2">Sang hơn</h5>
+                            <p class="text-muted mb-0">Dùng kính mờ, độ tương phản dịu, màu vàng champagne và bóng đổ mềm.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#services" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold">Khám phá dịch vụ</a>
+                    <a href="#booking" class="btn btn-outline-gold rounded-pill px-4 py-3 fw-semibold">Đặt lịch tư vấn</a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Services Section -->
-<section id="services" class="py-5 bg-white section-fade">
-    <div class="container py-4">
+<section class="section-pad pt-0" id="services">
+    <div class="container">
         <div class="text-center mb-5">
-            <span class="text-gold fw-bold text-uppercase letter-spacing-2">@Localizer["FeaturedServices"]</span>
-            <h2 class="font-playfair display-5 mt-2 mb-3">@Localizer["RejuvenationTherapies"]</h2>
-            <div class="mx-auto bg-gold" style="height: 2px; width: 60px;"></div>
+            <span class="section-label">Dịch vụ nổi bật</span>
+            <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Ba khối nội dung chính, nhìn là hiểu, bấm là muốn đặt</h2>
+            <div class="subtle-divider mx-auto"></div>
         </div>
-        
-        <div class="row g-4">
-            <!-- Service 1 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 border-0 shadow-sm service-card transition-all">
-                    <div class="card-img-top overflow-hidden" style="height: 250px;">
-                        <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-100 h-100 transition-all" alt="Massage" style="object-fit: cover;" loading="lazy">
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <i class="fas fa-hands text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">@Localizer["MassageTitle"]</h4>
-                        <p class="text-muted mb-4">@Localizer["MassageDesc"]</p>
-                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">@Localizer["ViewDetails"]</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Service 2 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 border-0 shadow-sm service-card transition-all">
-                    <div class="card-img-top overflow-hidden" style="height: 250px;">
-                        <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-100 h-100 transition-all" alt="Facial" style="object-fit: cover;" loading="lazy">
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <i class="fas fa-spa text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">@Localizer["FacialTitle"]</h4>
-                        <p class="text-muted mb-4">@Localizer["FacialDesc"]</p>
-                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">@Localizer["ViewDetails"]</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Service 3 -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 border-0 shadow-sm service-card transition-all">
-                    <div class="card-img-top overflow-hidden" style="height: 250px;">
-                        <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="w-100 h-100 transition-all" alt="Body Treatment" style="object-fit: cover;" loading="lazy">
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <i class="fas fa-leaf text-gold fs-1 mb-3"></i>
-                        <h4 class="font-playfair mb-3">@Localizer["HerbalBathTitle"]</h4>
-                        <p class="text-muted mb-4">@Localizer["HerbalBathDesc"]</p>
-                        <a href="#" class="text-dark fw-bold text-decoration-none border-bottom border-dark pb-1 text-uppercase text-sm">@Localizer["ViewDetails"]</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- Testimonials -->
-<section id="testimonials" class="py-5 section-fade" style="background-color: var(--beige);">
-    <div class="container py-5">
-        <div class="row align-items-center">
-            <div class="col-md-5 mb-4 mb-md-0">
-                <h2 class="font-playfair display-5 mb-4">@Localizer["CustomerTestimonials"]</h2>
-                <p class="text-muted mb-4">@Localizer["TestimonialIntro"]</p>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-dark rounded-circle" style="width: 45px; height: 45px;"><i class="fas fa-arrow-left"></i></button>
-                    <button class="btn btn-dark rounded-circle bg-navy border-0" style="width: 45px; height: 45px;"><i class="fas fa-arrow-right"></i></button>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="service-card h-100 overflow-hidden">
+                    <div class="service-thumb">
+                        <img src="https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=900&q=80" alt="Massage service" loading="lazy">
+                    </div>
+                    <div class="p-4 p-xl-5">
+                        <div class="service-icon mb-4"><i class="fa-solid fa-hands-holding-circle"></i></div>
+                        <h4 class="fw-bold mb-3">Massage thư giãn</h4>
+                        <p class="text-muted lh-lg mb-4">
+                            Khối dịch vụ này được làm như một thẻ trưng bày cao cấp, có ảnh lớn, icon nhận diện, tiêu đề mạnh và khoảng thở vừa đủ để mắt không bị ngợp.
+                        </p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-semibold text-gold">Từ 299.000đ</span>
+                            <a href="#booking" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-7">
-                <div class="bg-white p-5 rounded-3 shadow-sm position-relative">
-                    <i class="fas fa-quote-left fs-1 text-gold opacity-25 position-absolute top-0 start-0 ms-4 mt-4"></i>
-                    <p class="fs-5 fst-italic mb-4 text-dark position-relative z-index-1" style="line-height: 1.8;">"@Localizer["TestimonialContent"]"</p>
-                    <div class="d-flex align-items-center">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Customer" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;" loading="lazy">
-                        <div>
-                            <h6 class="mb-0 fw-bold">@Localizer["TestimonialAuthor"]</h6>
-                            <small class="text-muted">@Localizer["TestimonialRole"]</small>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="service-card h-100 overflow-hidden">
+                    <div class="service-thumb">
+                        <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=900&q=80" alt="Facial treatment" loading="lazy">
+                    </div>
+                    <div class="p-4 p-xl-5">
+                        <div class="service-icon mb-4"><i class="fa-solid fa-spa"></i></div>
+                        <h4 class="fw-bold mb-3">Chăm sóc da</h4>
+                        <p class="text-muted lh-lg mb-4">
+                            Tông màu và spacing được giữ ổn định để trang có cảm giác cao cấp, giống một landing page được làm cho chuyển đổi chứ không chỉ để trưng.
+                        </p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-semibold text-gold">Từ 399.000đ</span>
+                            <a href="#booking" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="service-card h-100 overflow-hidden">
+                    <div class="service-thumb">
+                        <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=900&q=80" alt="Body treatment" loading="lazy">
+                    </div>
+                    <div class="p-4 p-xl-5">
+                        <div class="service-icon mb-4"><i class="fa-solid fa-seedling"></i></div>
+                        <h4 class="fw-bold mb-3">Thảo mộc & phục hồi</h4>
+                        <p class="text-muted lh-lg mb-4">
+                            Một điểm nhấn thiên về cảm giác nghỉ dưỡng, phù hợp cho thương hiệu spa muốn đi theo hướng dịu, sạch và có chút sang trọng kín đáo.
+                        </p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-semibold text-gold">Từ 459.000đ</span>
+                            <a href="#booking" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
                         </div>
                     </div>
                 </div>
@@ -127,19 +440,184 @@
     </div>
 </section>
 
-<!-- Additional CSS for this page -->
-<style>
-    .letter-spacing-1 { letter-spacing: 1px; }
-    .letter-spacing-2 { letter-spacing: 2px; }
-    .bg-navy { background-color: var(--navy) !important; }
-    .bg-gold { background-color: var(--gold) !important; }
-    .text-sm { font-size: 0.875rem; }
-    
-    .service-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
-    }
-    .service-card:hover img {
-        transform: scale(1.05);
-    }
-</style>
+<section class="section-pad pt-0" id="experience">
+    <div class="container">
+        <div class="row align-items-end mb-4 g-4">
+            <div class="col-lg-7">
+                <span class="section-label">Trải nghiệm</span>
+                <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Lộ trình chăm sóc được trình bày gọn, đẹp và dễ theo dõi</h2>
+                <p class="text-muted fs-5 mb-0">Mỗi bước đều có nhịp, có khoảng dừng và có lý do để người dùng tin rằng họ đang đi vào một dịch vụ được chăm chút thật sự.</p>
+            </div>
+            <div class="col-lg-5 text-lg-end">
+                <div class="d-inline-flex align-items-center gap-3 soft-note">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Thiết kế tối ưu cho desktop, tablet và mobile</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-index mb-3">1</div>
+                    <h5 class="fw-bold">Chọn chi nhánh</h5>
+                    <p class="text-muted lh-lg mb-0">Hiển thị rõ ràng để khách không phải tìm đường vòng trong menu.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-index mb-3">2</div>
+                    <h5 class="fw-bold">Chọn dịch vụ</h5>
+                    <p class="text-muted lh-lg mb-0">Card dịch vụ lớn, ảnh đẹp, giá nhìn một cái là hiểu ngay giá trị.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-index mb-3">3</div>
+                    <h5 class="fw-bold">Đặt lịch và thư giãn</h5>
+                    <p class="text-muted lh-lg mb-0">CTA mạnh, nút rõ, hành trình đặt lịch ngắn hơn và ít ma sát hơn.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad pt-0">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-label">Không gian</span>
+            <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Một bộ ảnh trưng bày giúp trang có chiều sâu hơn</h2>
+            <div class="subtle-divider mx-auto"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="gallery-card" style="min-height: 560px;">
+                    <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?auto=format&fit=crop&w=900&q=80" alt="Spa room" loading="lazy">
+                    <div class="gallery-caption">
+                        <h4 class="fw-bold mb-1">Không gian trị liệu</h4>
+                        <p class="mb-0 text-white-50">Ánh sáng dịu, bố cục rộng, cảm giác sạch và an toàn.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-4 h-100">
+                    <div class="col-md-6">
+                        <div class="gallery-card h-100">
+                            <img src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80" alt="Relax zone" loading="lazy">
+                            <div class="gallery-caption">
+                                <h5 class="fw-bold mb-1">Khu chờ</h5>
+                                <p class="mb-0 text-white-50">Nhẹ mắt và tinh tế.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="gallery-card h-100">
+                            <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=900&q=80" alt="Treatment tools" loading="lazy">
+                            <div class="gallery-caption">
+                                <h5 class="fw-bold mb-1">Quy trình phục hồi</h5>
+                                <p class="mb-0 text-white-50">Đúng chất premium, không bị rối.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="spa-card p-4 p-xl-5 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 h-100">
+                            <div>
+                                <span class="section-label">Điểm chạm thương hiệu</span>
+                                <h3 class="font-playfair fw-bold mt-3 mb-3">Làm đẹp như một trải nghiệm nghỉ dưỡng, không phải một biểu mẫu khô khan.</h3>
+                                <p class="text-muted mb-0">Khi trang có nhịp thị giác tốt, khách dễ tin hơn, ở lại lâu hơn và bấm CTA tự nhiên hơn.</p>
+                            </div>
+                            <a href="#booking" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold text-nowrap">
+                                <i class="fa-solid fa-pen-to-square me-2"></i> Giữ chỗ ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad pt-0">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5">
+                <span class="section-label">Đánh giá</span>
+                <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Một chút cảm xúc để trang bớt “cứng” và tăng độ tin cậy</h2>
+                <p class="text-muted fs-5 mb-4">Khối testimonial được làm như một thẻ nổi, có quote mark lớn, avatar tròn, chữ nghiêng vừa phải và nhịp khoảng cách thoáng hơn.</p>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-gold rounded-circle" style="width: 46px; height: 46px;">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <button class="btn btn-gold rounded-circle" style="width: 46px; height: 46px;">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="testimonial-card p-4 p-xl-5">
+                    <div class="quote-mark"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="fs-4 fst-italic lh-lg mb-4">
+                        “Giao diện này cho cảm giác cao cấp hơn hẳn: sạch, có điểm nhấn, nhìn vào là biết ngay đây là một spa biết chăm trải nghiệm khách hàng.”
+                    </p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" alt="Customer" class="rounded-circle" style="width: 64px; height: 64px; object-fit: cover;" loading="lazy">
+                        <div>
+                            <h6 class="mb-1 fw-bold">Khách hàng hài lòng</h6>
+                            <div class="text-muted">Spa experience review</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-pad pt-0" id="booking">
+    <div class="container">
+        <div class="booking-box">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-6">
+                    <span class="section-label" style="color:#e9c9ac;">Đặt lịch</span>
+                    <h2 class="font-playfair display-5 fw-bold mt-3 mb-3 text-white">Sẵn sàng biến trang chủ thành nơi khách muốn bấm vào trước tiên</h2>
+                    <p class="text-white-50 fs-5 mb-0">
+                        Mọi thứ ở đây được sắp theo thứ tự thuyết phục: ảnh đẹp trước, lợi ích rõ sau, rồi đến nút hành động thật gọn gàng.
+                    </p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="booking-item">
+                        <div class="booking-dot"><i class="fa-solid fa-phone"></i></div>
+                        <div>
+                            <div class="fw-semibold">Tư vấn nhanh</div>
+                            <div class="text-white-50">Kết nối khách hàng chỉ bằng một cú nhấp.</div>
+                        </div>
+                    </div>
+                    <div class="booking-item">
+                        <div class="booking-dot"><i class="fa-solid fa-clock"></i></div>
+                        <div>
+                            <div class="fw-semibold">Lịch làm việc rõ ràng</div>
+                            <div class="text-white-50">Tạo cảm giác chuyên nghiệp ngay cả trước khi đặt lịch.</div>
+                        </div>
+                    </div>
+                    <div class="booking-item">
+                        <div class="booking-dot"><i class="fa-solid fa-location-dot"></i></div>
+                        <div>
+                            <div class="fw-semibold">Chi nhánh dễ tìm</div>
+                            <div class="text-white-50">Nút điều hướng được đặt đúng chỗ, không phải mò.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold">
+                            <i class="fa-solid fa-user-plus me-2"></i> Tạo tài khoản
+                        </a>
+                        <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-light rounded-pill px-4 py-3 fw-semibold">
+                            <i class="fa-solid fa-map-location-dot me-2"></i> Xem chi nhánh
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

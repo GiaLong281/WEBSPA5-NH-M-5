@@ -84,7 +84,7 @@
     document.getElementById('ThanhPhoId').addEventListener('change', function () {
         var thanhPhoId = this.value;
         if (thanhPhoId) {
-            fetch(`/Admin/GetQuansByThanhPho?thanhPhoId=${thanhPhoId}`)
+            fetch(`/Admin/GetQuansByThanhPho?maThanhPho=${thanhPhoId}`)
                 .then(response => response.json())
                 .then(data => {
                     var quanSelect = document.getElementById('MaQuan');

@@ -16,6 +16,14 @@
         },
         "runtime": {
           "SpaN5.dll": {}
+        },
+        "resources": {
+          "en/SpaN5.resources.dll": {
+            "locale": "en"
+          },
+          "vi/SpaN5.resources.dll": {
+            "locale": "vi"
+          }
         }
       },
       "Azure.Core/1.38.0": {

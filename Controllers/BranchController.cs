@@ -19,18 +19,18 @@ namespace SpaN5.Controllers
             _audit = audit;
         }
 
-        // Danh sách chi nhánh (quản lý)
+                // Danh sách chi nhánh (quản lý)
         public async Task<IActionResult> Index()
         {
             var branches = await _context.Branches.ToListAsync();
-            return View(branches);
+            return View("~/Views/Admin/ManageBranches.cshtml", branches);
         }
 
         // Thêm mới - GET
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View("~/Views/Admin/CreateBranch.cshtml");
         }
 
         // Thêm mới - POST
@@ -47,7 +47,7 @@ namespace SpaN5.Controllers
                 await _audit.LogAsync("Create", "Branch", model.BranchId.ToString(), null, JsonSerializer.Serialize(model));
                 return RedirectToAction(nameof(Index));
             }
-            return View(model);
+            return View("~/Views/Admin/CreateBranch.cshtml", model);
         }
 
         // Chỉnh sửa - GET
@@ -56,7 +56,7 @@ namespace SpaN5.Controllers
         {
             var branch = await _context.Branches.FindAsync(id);
             if (branch == null) return NotFound();
-            return View(branch);
+            return View("~/Views/Admin/EditBranch.cshtml", branch);
         }
 
         // Chỉnh sửa - POST
@@ -74,7 +74,7 @@ namespace SpaN5.Controllers
                 await _audit.LogAsync("Update", "Branch", id.ToString(), JsonSerializer.Serialize(old), JsonSerializer.Serialize(model));
                 return RedirectToAction(nameof(Index));
             }
-            return View(model);
+            return View("~/Views/Admin/EditBranch.cshtml", model);
         }
 
         // Xóa - POST

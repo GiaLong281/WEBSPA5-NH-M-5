@@ -20,10 +20,10 @@
             <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" class="form-control" />
         </div>
-        <div class="mb-3">
-            <label asp-for="Position" class="form-label"></label>
-            <input asp-for="Position" class="form-control" />
-        </div>
+<div class="mb-3">
+    <label asp-for="BranchId" class="form-label">Chi nhánh</label>
+    <select asp-for="BranchId" class="form-control" asp-items="ViewBag.Branches"></select>
+</div>
         <button type="submit" class="btn btn-primary">Lưu</button>
         <a asp-action="ManageStaff" class="btn btn-secondary">Hủy</a>
     </form>

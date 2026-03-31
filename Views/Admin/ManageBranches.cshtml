@@ -8,7 +8,7 @@
 <div class="container py-5" style="margin-top: 80px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="font-playfair text-gold">@Localizer["ManageBranches"]</h1>
-        <a asp-action="CreateBranch" class="btn btn-gold rounded-pill">
+        <a asp-action="Create" class="btn btn-gold rounded-pill">
             <i class="fas fa-plus"></i> @Localizer["CreateBranch"]
         </a>
     </div>
@@ -44,16 +44,16 @@
                             }
                         </td>
                         <td>
-                            <a asp-action="EditBranch" asp-route-id="@item.BranchId" class="btn btn-sm btn-warning">
+                            <a asp-action="Edit" asp-route-id="@item.BranchId" class="btn btn-sm btn-warning">
                                 <i class="fas fa-edit"></i> @Localizer["Edit"]
                             </a>
-                            <form asp-action="ToggleBranchStatus" method="post" style="display:inline;">
+                            <form asp-action="ToggleStatus" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="@item.BranchId" />
                                 <button type="submit" class="btn btn-sm @((item.IsActive) ? "btn-secondary" : "btn-success")">
                                     @(item.IsActive ? Localizer["Disable"] : Localizer["Activate"])
                                 </button>
                             </form>
-                            <form asp-action="DeleteBranch" method="post" style="display:inline;">
+                            <form asp-action="Delete" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="@item.BranchId" />
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["ConfirmDeleteBranch"]')">
                                     <i class="fas fa-trash"></i> @Localizer["Delete"]

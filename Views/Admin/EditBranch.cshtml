@@ -7,7 +7,7 @@
 }
 <div class="container py-5" style="margin-top: 80px;">
     <h1 class="font-playfair text-gold mb-4">@Localizer["EditBranch"]</h1>
-    <form asp-action="EditBranch" method="post" class="card shadow-sm p-4">
+    <form asp-action="Edit" method="post" class="card shadow-sm p-4">
         <input asp-for="BranchId" type="hidden" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -95,7 +95,7 @@
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-gold rounded-pill px-4">@Localizer["Save"]</button>
-            <a asp-action="ManageBranches" class="btn btn-outline-secondary rounded-pill px-4">@Localizer["Cancel"]</a>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">@Localizer["Cancel"]</a>
         </div>
     </form>
 </div>

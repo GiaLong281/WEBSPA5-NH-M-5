@@ -1,0 +1,148 @@
+@model IEnumerable<SpaN5.Models.Service>
+@{
+    ViewData["Title"] = "Quản lý dịch vụ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h1>Quản lý dịch vụ</h1>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    <div class="mb-3">
+        <a asp-action="CreateService" class="btn btn-success">
+            <i class="fas fa-plus"></i> Thêm dịch vụ mới
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Hình ảnh</th>
+                    <th>Tên dịch vụ</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th>Phổ biến</th>
+                    <th>Ngày tạo</th>
+                    <th>Hành động</th>
+                </thead
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var service in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@service.ServiceId</td>
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(service.Image))
+                                {
+                                    <img src="/images/@service.Image" alt="@service.ServiceName" style="width: 60px; height: 60px; object-fit: cover;" class="rounded border" />
+                                }
+                                else
+                                {
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="fas fa-image text-muted fa-2x"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <strong>@service.ServiceName</strong>
+                                @if (!string.IsNullOrEmpty(service.Description))
+                                {
+                                    <br />
+                                    <small class="text-muted">@(service.Description.Length > 50 ? service.Description.Substring(0, 50) + "..." : service.Description)</small>
+                                }
+                            </td>
+                            <td>
+                                @if (service.Category != null)
+                                {
+                                    <span class="badge bg-info">@service.Category.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Chưa phân loại</span>
+                                }
+                            </td>
+                            <td class="text-end text-nowrap">@service.Price.ToString("N0") VNĐ</td>
+                            <td class="text-center">@service.Duration phút</td>
+                            <td class="text-center">
+                                @if (service.IsActive)
+                                {
+                                    <span class="badge bg-success">Hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Không hoạt động</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (service.IsPopular)
+                                {
+                                    <span class="badge bg-warning text-dark">Phổ biến</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark">Không phổ biến</span>
+                                }
+                            </td>
+                            <td class="text-nowrap">@service.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td class="text-nowrap">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="EditService" asp-route-id="@service.ServiceId" class="btn btn-warning" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="DeleteService" method="post" style="display:inline;" 
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa dịch vụ @service.ServiceName?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@service.ServiceId" />
+                                        <button type="submit" class="btn btn-danger" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i> Chưa có dịch vụ nào. 
+                                <a asp-action="CreateService">Thêm dịch vụ mới</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto dismiss alerts after 3 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 3000);
+    </script>
+}

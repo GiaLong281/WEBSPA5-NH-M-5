@@ -19,19 +19,20 @@ namespace SpaN5.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateReview([FromBody] CreateReviewModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Dữ liệu không hợp lệ" });
+[HttpPost]
+public async Task<IActionResult> CreateReview([FromBody] CreateReviewModel model)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(new { message = "Dữ liệu không hợp lệ" });
 
-            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
-                return BadRequest(new { message = "Không xác định được người dùng" });
+    // ✅ SỬA: Lấy CustomerId từ claim
+    var customerIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("CustomerId")?.Value;
+    if (string.IsNullOrEmpty(customerIdClaim) || !int.TryParse(customerIdClaim, out var customerId))
+        return BadRequest(new { message = "Không xác định được khách hàng" });
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId == userId);
-            if (customer == null)
-                return BadRequest(new { message = "Không tìm thấy thông tin khách hàng" });
+    var customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+    if (customer == null)
+        return BadRequest(new { message = "Không tìm thấy thông tin khách hàng" });
 
             var service = await _context.Services.FindAsync(model.ServiceId);
             if (service == null)

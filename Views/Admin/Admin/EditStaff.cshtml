@@ -1,36 +1,28 @@
 @model SpaN5.Models.Staff
 @{
-    ViewData["Title"] = "Thêm nhân viên";
+    ViewData["Title"] = "Sửa nhân viên";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container py-5" style="margin-top: 80px;">
-    <h1>Thêm nhân viên</h1>
-    <form asp-action="CreateStaff" method="post">
+    <h1>Sửa nhân viên</h1>
+    <form asp-action="EditStaff" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3">
-            <label asp-for="FullName" class="form-label">Họ tên</label>
+            <label asp-for="FullName" class="form-label"></label>
             <input asp-for="FullName" class="form-control" />
             <span asp-validation-for="FullName" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Phone" class="form-label">Điện thoại</label>
+            <label asp-for="Phone" class="form-label"></label>
             <input asp-for="Phone" class="form-control" />
         </div>
         <div class="mb-3">
-            <label asp-for="Email" class="form-label">Email</label>
+            <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" class="form-control" />
         </div>
         <div class="mb-3">
-            <label asp-for="Position" class="form-label">Chức vụ</label>
+            <label asp-for="Position" class="form-label"></label>
             <input asp-for="Position" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="BranchId" class="form-label">Chi nhánh</label>
-            <select asp-for="BranchId" class="form-control" asp-items="ViewBag.Branches"></select>
-        </div>
-        <div class="mb-3">
-            <label>Mật khẩu đăng nhập</label>
-            <input type="password" name="Password" class="form-control" required />
         </div>
         <button type="submit" class="btn btn-primary">Lưu</button>
         <a asp-action="ManageStaff" class="btn btn-secondary">Hủy</a>
