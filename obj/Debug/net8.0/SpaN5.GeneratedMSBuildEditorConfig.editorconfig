@@ -98,6 +98,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQXVkaXRMb2cuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/BookingDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQm9va2luZ0RldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlQnJhbmNoLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -280,6 +284,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/MyBookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcTXlCb29raW5ncy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/PT ungdung/WEBSPA5-NH-M-5/Views/_ViewImports.cshtml]

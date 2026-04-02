@@ -1,0 +1,121 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Lịch hẹn của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentStatus = ViewBag.CurrentStatus as string;
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 10);
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="font-playfair text-gold">Lịch hẹn của tôi</h1>
+        <a asp-action="Dashboard" class="btn btn-outline-gold rounded-pill">
+            <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+        </a>
+    </div>
+
+    <!-- Bộ lọc trạng thái -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tất cả</option>
+                        <option value="Pending" selected="@(currentStatus == "Pending")">Chờ xác nhận</option>
+                        <option value="Confirmed" selected="@(currentStatus == "Confirmed")">Đã xác nhận</option>
+                        <option value="InProgress" selected="@(currentStatus == "InProgress")">Đang thực hiện</option>
+                        <option value="Completed" selected="@(currentStatus == "Completed")">Hoàn thành</option>
+                        <option value="Cancelled" selected="@(currentStatus == "Cancelled")">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-gold w-100">Lọc</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh sách booking -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+            <p>Không có lịch hẹn nào.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Dịch vụ</th>
+                        <th>Chi nhánh</th>
+                        <th>Ngày</th>
+                        <th>Giờ</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var booking = item.Booking;
+                        var statusClass = booking.Status switch
+                        {
+                            BookingStatus.Pending => "bg-warning text-dark",
+                            BookingStatus.Confirmed => "bg-info",
+                            BookingStatus.InProgress => "bg-primary",
+                            BookingStatus.Completed => "bg-success",
+                            BookingStatus.Cancelled => "bg-danger",
+                            _ => "bg-secondary"
+                        };
+                        var statusText = booking.Status switch
+                        {
+                            BookingStatus.Pending => "Chờ xác nhận",
+                            BookingStatus.Confirmed => "Đã xác nhận",
+                            BookingStatus.InProgress => "Đang thực hiện",
+                            BookingStatus.Completed => "Hoàn thành",
+                            BookingStatus.Cancelled => "Đã hủy",
+                            _ => ""
+                        };
+                        <tr>
+                            <td>@booking.BookingCode</td>
+                            <td>@item.CustomerName</td>
+                            <td>@item.ServiceName</td>
+                            <td>@item.BranchName</td>
+                            <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                            <td>@booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")</td>
+                            <td><span class="badge @statusClass">@statusText</span></td>
+                            <td class="text-nowrap">
+                                <a asp-action="Details" asp-route-id="@booking.BookingId" class="btn btn-sm btn-outline-gold">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Phân trang -->
+        @if (totalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="?status=@currentStatus&page=@i&pageSize=@pageSize">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+</div>

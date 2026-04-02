@@ -93,6 +93,37 @@ namespace SpaN5.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
+
+        // Bắt đầu thực hiện (Confirmed -> InProgress)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> StartBooking(int bookingId)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId &&
+                                          b.BookingDetails.Any(bd => bd.StaffId == staffId));
+            if (booking == null) return NotFound();
+
+            if (booking.Status != BookingStatus.Confirmed)
+            {
+                TempData["ErrorMessage"] = "Chỉ có thể bắt đầu lịch đã xác nhận.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            booking.Status = BookingStatus.InProgress;
+            await _context.SaveChangesAsync();
+
+            await _audit.LogAsync("Start", "Booking", booking.BookingId.ToString(), null,
+                System.Text.Json.JsonSerializer.Serialize(new { Status = "InProgress" }));
+
+            TempData["SuccessMessage"] = $"Đã bắt đầu thực hiện lịch {booking.BookingCode}.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
         // Hoàn thành lịch (Confirmed -> Completed)
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -153,6 +184,70 @@ namespace SpaN5.Controllers
 
             TempData["SuccessMessage"] = $"Đã hủy lịch {booking.BookingCode}.";
             return RedirectToAction(nameof(Dashboard));
+        }
+
+
+        // GET: Staff/MyBookings
+        public async Task<IActionResult> MyBookings(string status = null, int page = 1, int pageSize = 10)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var query = _context.BookingDetails
+                .Include(bd => bd.Booking)
+                    .ThenInclude(b => b.Customer)
+                .Include(bd => bd.Booking)
+                    .ThenInclude(b => b.Branch)
+                .Include(bd => bd.Service)
+                .Where(bd => bd.StaffId == staffId);
+
+            if (!string.IsNullOrEmpty(status) && Enum.TryParse<BookingStatus>(status, true, out var bookingStatus))
+            {
+                query = query.Where(bd => bd.Booking.Status == bookingStatus);
+            }
+
+            var totalItems = await query.CountAsync();
+            var bookings = await query
+                .OrderByDescending(bd => bd.Booking.BookingDate)
+                .ThenByDescending(bd => bd.Booking.StartTime)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(bd => new
+                {
+                    Booking = bd.Booking,
+                    ServiceName = bd.Service.ServiceName,
+                    CustomerName = bd.Booking.Customer != null ? bd.Booking.Customer.FullName : "",
+                    BranchName = bd.Booking.Branch != null ? bd.Booking.Branch.BranchName : ""
+                })
+                .ToListAsync();
+
+            ViewBag.CurrentStatus = status;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
+            return View(bookings);
+        }
+
+
+        // GET: Staff/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var bookingDetail = await _context.BookingDetails
+                .Include(bd => bd.Booking)
+                    .ThenInclude(b => b.Customer)
+                .Include(bd => bd.Booking)
+                    .ThenInclude(b => b.Branch)
+                .Include(bd => bd.Service)
+                .Include(bd => bd.Staff)
+                .FirstOrDefaultAsync(bd => bd.BookingId == id && bd.StaffId == staffId);
+
+            if (bookingDetail == null) return NotFound();
+
+            return View(bookingDetail.Booking);
         }
 
         private int? GetStaffId()

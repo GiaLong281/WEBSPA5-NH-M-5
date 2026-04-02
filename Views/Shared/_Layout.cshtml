@@ -493,6 +493,15 @@
                                             </li>
                                         }
 
+                                        @if (User.IsInRole("Staff"))
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Staff" asp-action="MyBookings">
+                                                    <i class="fas fa-list me-2"></i> Lịch hẹn của tôi
+                                                </a>
+                                            </li>
+                                        }
+
                                         <li>
                                             <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
                                                 <i class="fa-solid fa-user me-2"></i> Hồ sơ
