@@ -1,0 +1,229 @@
+@{
+    ViewData["Title"] = "Lịch biểu nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="font-playfair text-gold fw-bold mb-1">Lịch biểu nhân viên</h1>
+            <p class="text-muted mb-0">Quản lý và theo dõi lịch trình chăm sóc khách hàng</p>
+        </div>
+
+        @if (isAdmin)
+        {
+            <div class="bg-white p-2 rounded-4 shadow-sm border d-flex align-items-center gap-2">
+                <label for="staffFilter" class="small fw-bold text-muted px-2">NHÂN VIÊN</label>
+                <select id="staffFilter" class="form-select border-0 bg-light rounded-3" style="min-width: 200px;">
+                    @if (ViewBag.Staffs != null)
+                    {
+                        foreach (var s in ViewBag.Staffs)
+                        {
+                            <option value="@s.StaffId" selected="@(ViewBag.SelectedStaffId == s.StaffId ? "selected" : null)">
+                                @s.FullName (@s.BranchName)
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+        }
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div id="calendar" class="p-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chi tiết -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-xl rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalTitle">Chi tiết lịch hẹn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="p-3 bg-soft rounded-circle text-gold">
+                        <i class="fa-solid fa-calendar-check fa-2x"></i>
+                    </div>
+                    <div>
+                        <div class="text-gold fw-bold small text-uppercase" id="modalStatusLabel">Status</div>
+                        <h4 class="mb-0 fw-bold" id="modalCustomerName">Customer Name</h4>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-muted small">MÃ ĐƠN HÀNG</div>
+                        <div class="fw-bold" id="modalBookingCode">-</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted small">DỊCH VỤ</div>
+                        <div class="fw-bold" id="modalService">-</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted small">BẮT ĐẦU</div>
+                        <div class="fw-bold text-dark" id="modalStart">-</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted small">KẾT THÚC</div>
+                        <div class="fw-bold text-dark" id="modalEnd">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                <a id="btnGoToBooking" href="#" class="btn btn-gold rounded-pill px-4">Xem yêu cầu</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FullCalendar v6.1.10 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    
+    <style>
+        :root {
+            --fc-border-color: rgba(18, 32, 45, 0.05);
+            --fc-today-bg-color: rgba(182, 138, 99, 0.03);
+            --fc-page-bg-color: transparent;
+            --fc-list-event-hover-bg-color: rgba(182, 138, 99, 0.05);
+        }
+
+        #calendar {
+            min-height: 700px;
+            font-family: inherit;
+        }
+
+        .fc .fc-toolbar-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .fc .fc-button-primary {
+            background-color: var(--ink);
+            border-color: var(--ink);
+            border-radius: 50px;
+            padding: 8px 20px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .fc .fc-button-primary:hover {
+            background-color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .fc .fc-button-primary:disabled {
+            opacity: 0.5;
+        }
+
+        .fc .fc-col-header-cell {
+            background: #fdfbf8;
+            padding: 12px 0;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+        }
+
+        .fc-event {
+            border: 0 !important;
+            padding: 2px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .fc-event:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .modal-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .bg-soft { background: rgba(182, 138, 99, 0.08); }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var staffFilter = document.getElementById('staffFilter');
+            var initialStaffId = '@ViewBag.SelectedStaffId' || null;
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                },
+                locale: 'vi',
+                slotMinTime: '07:00:00',
+                slotMaxTime: '22:00:00',
+                allDaySlot: false,
+                height: 'auto',
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    var staffId = staffFilter ? staffFilter.value : initialStaffId;
+                    if (!staffId) {
+                        successCallback([]);
+                        return;
+                    }
+
+                    var url = `/api/ApiStaffCalendar/GetBookings?staffId=${staffId}&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`;
+                    
+                    fetch(url)
+                        .then(res => res.json())
+                        .then(data => successCallback(data))
+                        .catch(err => {
+                            console.error('Lỗi tải lịch:', err);
+                            failureCallback(err);
+                        });
+                },
+                eventClick: function(info) {
+                    var props = info.event.extendedProps;
+                    
+                    document.getElementById('modalTitle').innerText = info.event.title;
+                    document.getElementById('modalCustomerName').innerText = props.customer;
+                    document.getElementById('modalStatusLabel').innerText = props.status;
+                    document.getElementById('modalBookingCode').innerText = props.bookingCode;
+                    document.getElementById('modalService').innerText = props.service;
+                    
+                    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    document.getElementById('modalStart').innerText = info.event.start.toLocaleDateString('vi-VN', options);
+                    document.getElementById('modalEnd').innerText = info.event.end.toLocaleDateString('vi-VN', options);
+                    
+                    document.getElementById('btnGoToBooking').href = `/Admin/ManageBookings?code=${props.bookingCode}`;
+                    
+                    var modal = new bootstrap.Modal(document.getElementById('eventModal'));
+                    modal.show();
+                },
+                buttonText: {
+                    today: 'Hôm nay',
+                    month: 'Tháng',
+                    week: 'Tuần',
+                    day: 'Ngày',
+                    list: 'Danh sách'
+                }
+            });
+
+            calendar.render();
+
+            if (staffFilter) {
+                staffFilter.addEventListener('change', function() {
+                    calendar.refetchEvents();
+                });
+            }
+        });
+    </script>
+}

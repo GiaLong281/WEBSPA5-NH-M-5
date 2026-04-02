@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\01b62ac7-7361-449d-a5e4-589e365a0263.jpg",
+      "PackagePath": "staticwebassets\\images\\01b62ac7-7361-449d-a5e4-589e365a0263.jpg"
+    },
+    {
       "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\30064757482_14ca196a7c_b.jpg",
       "PackagePath": "staticwebassets\\images\\30064757482_14ca196a7c_b.jpg"
     },
@@ -31,6 +35,22 @@
     {
       "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\images.jpg",
       "PackagePath": "staticwebassets\\images\\images.jpg"
+    },
+    {
+      "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_interior.png",
+      "PackagePath": "staticwebassets\\images\\spa_interior.png"
+    },
+    {
+      "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_massage.png",
+      "PackagePath": "staticwebassets\\images\\spa_massage.png"
+    },
+    {
+      "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_relaxing.png",
+      "PackagePath": "staticwebassets\\images\\spa_relaxing.png"
+    },
+    {
+      "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_room.png",
+      "PackagePath": "staticwebassets\\images\\spa_room.png"
     },
     {
       "Id": "D:\\PT ungdung\\WEBSPA5-NH-M-5\\wwwroot\\js\\site.js",

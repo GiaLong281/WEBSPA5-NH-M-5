@@ -23,15 +23,28 @@ namespace SpaN5.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int? serviceId)
         {
-            var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
-
             var model = new BookingViewModel
             {
                 BookingDate = DateTime.Today,
                 StartTime = new TimeSpan(9, 0, 0),
                 AutoAssignStaff = true
             };
+
+            // Nếu đã đăng nhập, lấy thông tin từ Customer
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var customerId = GetCustomerId();
+                if (customerId.HasValue)
+                {
+                    var customer = await _context.Customers.FindAsync(customerId.Value);
+                    if (customer != null)
+                    {
+                        model.FullName = customer.FullName;
+                        model.Email = customer.Email ?? "";
+                        model.Phone = customer.Phone;
+                    }
+                }
+            }
 
             if (serviceId.HasValue)
             {
@@ -45,34 +58,11 @@ namespace SpaN5.Controllers
                 }
             }
 
-            var branches = await _context.Branches
-                .Where(b => b.IsActive)
-                .ToListAsync();
-
-            ViewBag.Services = new SelectList(
-                await _context.Services.Where(s => s.IsActive).ToListAsync(),
-                "ServiceId", "ServiceName", model.SelectedServiceId);
+            ViewBag.Services = await BuildServiceSelectList(model.SelectedServiceId);
 
             ViewBag.Branches = new SelectList(
-                branches,
+                await _context.Branches.Where(b => b.IsActive).ToListAsync(),
                 "BranchId", "BranchName");
-
-            if (branches.Any())
-            {
-                model.BranchId = branches.First().BranchId;
-
-                var staffs = await _context.Staffs
-                    .Where(s => s.BranchId == model.BranchId && s.Status == "active")
-                    .Select(s => new
-                    {
-                        s.StaffId,
-                        s.FullName,
-                        s.Position
-                    })
-                    .ToListAsync();
-
-                ViewBag.Staffs = staffs;
-            }
 
             return View(model);
         }
@@ -88,7 +78,14 @@ namespace SpaN5.Controllers
             }
 
             var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
+            if (customerId == null)
+            {
+                // Nếu chưa đăng nhập, có thể tạo guest booking (tuỳ chọn)
+                // Ở đây vì controller có [Authorize] nên sẽ không vào đây, giữ nguyên để an toàn
+                ModelState.AddModelError("", "Vui lòng đăng nhập để đặt lịch.");
+                await LoadDropdowns(model);
+                return View(model);
+            }
 
             var service = await _context.Services.FindAsync(model.SelectedServiceId);
             if (service == null || !service.IsActive)
@@ -98,18 +95,46 @@ namespace SpaN5.Controllers
                 return View(model);
             }
 
+            var branch = await _context.Branches.FindAsync(model.BranchId);
+            if (branch == null || !branch.IsActive)
+            {
+                ModelState.AddModelError("BranchId", "Chi nhánh không hợp lệ");
+                await LoadDropdowns(model);
+                return View(model);
+            }
+
+            // Kiểm tra ngày mở cửa
+            if (!IsBranchOpenOnDate(branch, model.BookingDate))
+            {
+                ModelState.AddModelError("BookingDate", $"Chi nhánh không hoạt động vào ngày {model.BookingDate:dd/MM/yyyy}.");
+                await LoadDropdowns(model);
+                return View(model);
+            }
+
             var startDateTime = model.BookingDate.Date.Add(model.StartTime);
             var endDateTime = startDateTime.AddMinutes(service.Duration);
             model.EndTime = endDateTime;
 
+            var openTime = branch.OpeningTime;
+            var closeTime = branch.ClosingTime;
+            if (openTime == closeTime || closeTime <= openTime)
+            {
+                openTime = new TimeSpan(8, 0, 0);
+                closeTime = new TimeSpan(20, 0, 0);
+            }
+
+            // Kiểm tra giờ trong khung mở cửa
+            if (startDateTime.TimeOfDay < openTime || endDateTime.TimeOfDay > closeTime)
+            {
+                ModelState.AddModelError("StartTime", $"Giờ đặt phải trong khoảng {openTime:hh\\:mm} - {closeTime:hh\\:mm}.");
+                await LoadDropdowns(model);
+                return View(model);
+            }
+
+            // Xử lý nhân viên (Tự động hoặc Thủ công)
             if (model.AutoAssignStaff)
             {
-                model.StaffId = await FindAvailableStaff(
-                    model.BranchId,
-                    model.BookingDate,
-                    startDateTime,
-                    endDateTime);
-
+                model.StaffId = await FindAvailableStaff(model.BranchId, model.BookingDate, startDateTime, endDateTime);
                 if (model.StaffId == null)
                 {
                     ModelState.AddModelError("", "Không tìm thấy nhân viên rảnh trong thời gian này.");
@@ -119,22 +144,16 @@ namespace SpaN5.Controllers
             }
             else
             {
-                if (model.StaffId == null)
+                if (!model.StaffId.HasValue || model.StaffId <= 0)
                 {
-                    ModelState.AddModelError("StaffId", "Vui lòng chọn nhân viên.");
+                    ModelState.AddModelError("StaffId", "Vui lòng chọn nhân viên");
                     await LoadDropdowns(model);
                     return View(model);
                 }
 
-                var available = await IsStaffAvailable(
-                    model.StaffId.Value,
-                    model.BookingDate,
-                    startDateTime,
-                    endDateTime);
-
-                if (!available)
+                if (!await IsStaffAvailable(model.StaffId.Value, model.BookingDate, startDateTime, endDateTime))
                 {
-                    ModelState.AddModelError("StaffId", "Nhân viên đã có lịch vào thời gian này.");
+                    ModelState.AddModelError("StaffId", "Nhân viên bạn chọn đã có lịch trùng trong thời gian này.");
                     await LoadDropdowns(model);
                     return View(model);
                 }
@@ -172,6 +191,37 @@ namespace SpaN5.Controllers
 
             TempData["SuccessMessage"] = $"Đặt lịch thành công! Mã đơn hàng: {bookingCode}";
             return RedirectToAction(nameof(Upcoming));
+        }
+
+        // Helper kiểm tra ngày mở cửa
+        private bool IsBranchOpenOnDate(Branch branch, DateTime date)
+        {
+            if (string.IsNullOrEmpty(branch.Workday))
+                return true; 
+
+            var workday = branch.Workday.ToLower();
+            if (workday.Contains("cả tuần") || workday.Contains("all") || workday.Contains("mọi ngày") || workday.Contains("hàng ngày"))
+                return true;
+
+            var dayOfWeek = date.DayOfWeek;
+            var isMatch = dayOfWeek switch
+            {
+                DayOfWeek.Monday => workday.Contains("thứ 2") || workday.Contains("t2") || workday.Contains("monday"),
+                DayOfWeek.Tuesday => workday.Contains("thứ 3") || workday.Contains("t3") || workday.Contains("tuesday"),
+                DayOfWeek.Wednesday => workday.Contains("thứ 4") || workday.Contains("t4") || workday.Contains("wednesday"),
+                DayOfWeek.Thursday => workday.Contains("thứ 5") || workday.Contains("t5") || workday.Contains("thursday"),
+                DayOfWeek.Friday => workday.Contains("thứ 6") || workday.Contains("t6") || workday.Contains("friday"),
+                DayOfWeek.Saturday => workday.Contains("thứ 7") || workday.Contains("t7") || workday.Contains("saturday"),
+                DayOfWeek.Sunday => workday.Contains("chủ nhật") || workday.Contains("cn") || workday.Contains("sunday"),
+                _ => true
+            };
+            
+            if (!isMatch && !(workday.Contains("thứ") || workday.Contains("t2") || workday.Contains("t3") || workday.Contains("cn") || workday.Contains("day")))
+            {
+                return true;
+            }
+            
+            return isMatch;
         }
 
         public async Task<IActionResult> Upcoming()
@@ -325,9 +375,7 @@ namespace SpaN5.Controllers
 
         private async Task LoadDropdowns(BookingViewModel model)
         {
-            ViewBag.Services = new SelectList(
-                await _context.Services.Where(s => s.IsActive).ToListAsync(),
-                "ServiceId", "ServiceName", model.SelectedServiceId);
+            ViewBag.Services = await BuildServiceSelectList(model.SelectedServiceId);
 
             ViewBag.Branches = new SelectList(
                 await _context.Branches.Where(b => b.IsActive).ToListAsync(),
@@ -345,6 +393,29 @@ namespace SpaN5.Controllers
                     })
                     .ToListAsync();
             }
+        }
+
+        private async Task<List<SelectListItem>> BuildServiceSelectList(int? selectedId = null)
+        {
+            var services = await _context.Services
+                .Include(s => s.Category)
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.Category.Name)
+                .ThenBy(s => s.ServiceName)
+                .ToListAsync();
+
+            var items = new List<SelectListItem>();
+            foreach (var s in services)
+            {
+                items.Add(new SelectListItem
+                {
+                    Value = s.ServiceId.ToString(),
+                    Text = $"{s.ServiceName} ({s.Duration} phút — {s.Price:N0}đ)",
+                    Group = new SelectListGroup { Name = s.Category?.Name ?? "Khác" },
+                    Selected = selectedId.HasValue && selectedId.Value == s.ServiceId
+                });
+            }
+            return items;
         }
 
         private int? GetCustomerId()

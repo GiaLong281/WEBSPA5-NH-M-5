@@ -266,18 +266,18 @@
                 </div>
 
                 <h1 class="hero-title font-playfair fw-bold mb-4 fade-up" style="animation-delay: .08s;">
-                    @Html.Raw("Nâng cấp trải nghiệm spa<br/>sang, sạch, và thật mượt.")
+                    Nâng tầm trải nghiệm spa<br/>sang trọng, sạch sẽ &amp; thư giãn.
                 </h1>
 
                 <p class="hero-copy mb-4 fade-up" style="animation-delay: .16s;">
-                    Không gian được thiết kế như một khu nghỉ dưỡng thu nhỏ: ánh sáng dịu, màu sắc ấm, các khối nội dung thoáng và những điểm nhấn tinh tế để khách nhìn là muốn đặt lịch ngay.
+                    Không gian được thiết kế dành riêng để giúp bạn thư giãn sau những ngày bận rộn. Ánh sáng dịu nhẹ, hương thơm tinh tế và đội ngũ chuyên nghiệp luôn sẵn sàng phục vụ bạn.
                 </p>
 
                 <div class="d-flex flex-wrap gap-3 fade-up" style="animation-delay: .24s;">
-                    <a href="#booking" class="btn btn-gold btn-lg rounded-pill px-4 py-3 fw-semibold">
+                    <a asp-controller="Booking" asp-action="Create" class="btn btn-gold btn-lg rounded-pill px-4 py-3 fw-semibold">
                         <i class="fa-solid fa-calendar-check me-2"></i> Đặt lịch ngay
                     </a>
-                    <a href="#services" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-semibold">
+                    <a asp-controller="Services" asp-action="Index" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-semibold">
                         <i class="fa-solid fa-spa me-2"></i> Xem dịch vụ
                     </a>
                 </div>
@@ -306,8 +306,8 @@
 
             <div class="col-lg-5">
                 <div class="image-stack fade-up" style="animation-delay: .16s;">
-                    <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?auto=format&fit=crop&w=900&q=80" class="image-main" alt="Spa interior" loading="eager">
-                    <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=700&q=80" class="image-floating" alt="Spa treatment" loading="lazy">
+                    <img src="~/images/spa_interior.png" class="image-main" alt="Spa interior" loading="eager">
+                    <img src="~/images/spa_massage.png" class="image-floating" alt="Spa treatment" loading="lazy">
                     <div class="overlap-badge">
                         <div class="soft-note mb-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Signature ritual</div>
                         <div class="fw-semibold text-dark">Cảm giác chạm vào là nhận ra ngay: khác biệt nằm ở chi tiết.</div>
@@ -329,8 +329,8 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="image-stack" style="min-height: 560px;">
-                    <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=900&q=80" class="image-main" style="height: 560px;" alt="Massage therapy" loading="lazy">
-                    <img src="https://images.unsplash.com/photo-1526947425960-945c6e72868a?auto=format&fit=crop&w=700&q=80" class="image-floating" alt="Relaxing spa" loading="lazy">
+                    <img src="~/images/spa_massage.png" class="image-main" style="height: 560px;" alt="Massage therapy" loading="lazy">
+                    <img src="~/images/spa_relaxing.png" class="image-floating" alt="Relaxing spa" loading="lazy">
                     <div class="overlap-badge">
                         <div class="small text-uppercase text-gold fw-bold mb-1">Không gian chuẩn premium</div>
                         <div class="fw-semibold text-dark">Mềm mắt, sạch bố cục, có chiều sâu và rất “đã” khi nhìn trên desktop lẫn mobile.</div>
@@ -340,31 +340,31 @@
 
             <div class="col-lg-6">
                 <span class="section-label">Giới thiệu</span>
-                <h2 class="font-playfair display-5 fw-bold mt-3 mb-4">Làm lại cảm giác thương hiệu từ cái nhìn đầu tiên</h2>
+                <h2 class="font-playfair display-5 fw-bold mt-3 mb-4">Hành trình làm đẹp dành riêng cho bạn</h2>
                 <p class="text-muted fs-5 lh-lg mb-4">
-                    Bản nâng cấp này ưu tiên trải nghiệm: hero rộng và giàu cảm xúc, các section phân lớp rõ ràng, nút CTA nổi bật, card có chiều sâu, và footer đủ sang để khép lại toàn bộ trang bằng một nốt trầm đẹp.
+                    Chúng tôi đặt trải nghiệm khách hàng lên hàng đầu — từ khâu đặt lịch online tiện lợi, không gian tiếp đón ấm cúng, đến từng liệu trình được cá nhân hóa theo nhu cầu của bạn.
                 </p>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <div class="spa-card p-4 h-100">
                             <div class="service-icon mb-3"><i class="fa-solid fa-leaf"></i></div>
-                            <h5 class="fw-bold mb-2">Tinh gọn</h5>
-                            <p class="text-muted mb-0">Bỏ bớt chi tiết thừa, giữ lại thứ làm người dùng muốn ở lại lâu hơn.</p>
+                            <h5 class="fw-bold mb-2">Nguyên liệu thiên nhiên</h5>
+                            <p class="text-muted mb-0">Sử dụng 100% thảo dược và tinh dầu tự nhiên, an toàn cho mọi loại da.</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="spa-card p-4 h-100">
                             <div class="service-icon mb-3"><i class="fa-solid fa-gem"></i></div>
-                            <h5 class="fw-bold mb-2">Sang hơn</h5>
-                            <p class="text-muted mb-0">Dùng kính mờ, độ tương phản dịu, màu vàng champagne và bóng đổ mềm.</p>
+                            <h5 class="fw-bold mb-2">Không gian cao cấp</h5>
+                            <p class="text-muted mb-0">Thiết kế nội thất sang trọng, ánh sáng dịu nhẹ và âm nhạc thư giãn chọn lọc.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="#services" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold">Khám phá dịch vụ</a>
-                    <a href="#booking" class="btn btn-outline-gold rounded-pill px-4 py-3 fw-semibold">Đặt lịch tư vấn</a>
+                    <a asp-controller="Booking" asp-action="Create" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold">Khám phá &amp; Đặt lịch</a>
+                    <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-gold rounded-pill px-4 py-3 fw-semibold">Xem chi nhánh</a>
                 </div>
             </div>
         </div>
@@ -375,7 +375,7 @@
     <div class="container">
         <div class="text-center mb-5">
             <span class="section-label">Dịch vụ nổi bật</span>
-            <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Ba khối nội dung chính, nhìn là hiểu, bấm là muốn đặt</h2>
+            <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Các dịch vụ nổi bật tại SpaN5</h2>
             <div class="subtle-divider mx-auto"></div>
         </div>
 
@@ -383,17 +383,17 @@
             <div class="col-lg-4 col-md-6">
                 <div class="service-card h-100 overflow-hidden">
                     <div class="service-thumb">
-                        <img src="https://images.unsplash.com/photo-1487412912498-0447578fcca8?auto=format&fit=crop&w=900&q=80" alt="Massage service" loading="lazy">
+                        <img src="~/images/spa_massage.png" alt="Massage service" loading="lazy">
                     </div>
                     <div class="p-4 p-xl-5">
                         <div class="service-icon mb-4"><i class="fa-solid fa-hands-holding-circle"></i></div>
                         <h4 class="fw-bold mb-3">Massage thư giãn</h4>
                         <p class="text-muted lh-lg mb-4">
-                            Khối dịch vụ này được làm như một thẻ trưng bày cao cấp, có ảnh lớn, icon nhận diện, tiêu đề mạnh và khoảng thở vừa đủ để mắt không bị ngợp.
+                            Liệu pháp massage toàn thân với tinh dầu thảo mộc giúp giải tỏa căng thẳng, cải thiện tuần hoàn máu và mang lại cảm giác thư giãn sâu.
                         </p>
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="fw-semibold text-gold">Từ 299.000đ</span>
-                            <a href="#booking" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
+                            <a asp-controller="Booking" asp-action="Create" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
                         </div>
                     </div>
                 </div>
@@ -402,17 +402,17 @@
             <div class="col-lg-4 col-md-6">
                 <div class="service-card h-100 overflow-hidden">
                     <div class="service-thumb">
-                        <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=900&q=80" alt="Facial treatment" loading="lazy">
+                        <img src="~/images/spa_relaxing.png" alt="Facial treatment" loading="lazy">
                     </div>
                     <div class="p-4 p-xl-5">
                         <div class="service-icon mb-4"><i class="fa-solid fa-spa"></i></div>
                         <h4 class="fw-bold mb-3">Chăm sóc da</h4>
                         <p class="text-muted lh-lg mb-4">
-                            Tông màu và spacing được giữ ổn định để trang có cảm giác cao cấp, giống một landing page được làm cho chuyển đổi chứ không chỉ để trưng.
+                            Các liệu trình chăm sóc da chuyên sâu từ làm sạch, dưỡng ẩm đến trị liệu, phù hợp với nhiều loại da khác nhau.
                         </p>
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="fw-semibold text-gold">Từ 399.000đ</span>
-                            <a href="#booking" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
+                            <a asp-controller="Booking" asp-action="Create" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
                         </div>
                     </div>
                 </div>
@@ -421,17 +421,17 @@
             <div class="col-lg-4 col-md-6">
                 <div class="service-card h-100 overflow-hidden">
                     <div class="service-thumb">
-                        <img src="https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=900&q=80" alt="Body treatment" loading="lazy">
+                        <img src="~/images/spa_room.png" alt="Body treatment" loading="lazy">
                     </div>
                     <div class="p-4 p-xl-5">
                         <div class="service-icon mb-4"><i class="fa-solid fa-seedling"></i></div>
                         <h4 class="fw-bold mb-3">Thảo mộc & phục hồi</h4>
                         <p class="text-muted lh-lg mb-4">
-                            Một điểm nhấn thiên về cảm giác nghỉ dưỡng, phù hợp cho thương hiệu spa muốn đi theo hướng dịu, sạch và có chút sang trọng kín đáo.
+                            Kết hợp thảo dược truyền thống và công nghệ hiện đại giúp phục hồi năng lượng, tái tạo làn da và cải thiện giấc ngủ.
                         </p>
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="fw-semibold text-gold">Từ 459.000đ</span>
-                            <a href="#booking" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
+                            <a asp-controller="Booking" asp-action="Create" class="btn btn-outline-gold rounded-pill px-3 py-2">Đặt ngay</a>
                         </div>
                     </div>
                 </div>
@@ -445,8 +445,8 @@
         <div class="row align-items-end mb-4 g-4">
             <div class="col-lg-7">
                 <span class="section-label">Trải nghiệm</span>
-                <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Lộ trình chăm sóc được trình bày gọn, đẹp và dễ theo dõi</h2>
-                <p class="text-muted fs-5 mb-0">Mỗi bước đều có nhịp, có khoảng dừng và có lý do để người dùng tin rằng họ đang đi vào một dịch vụ được chăm chút thật sự.</p>
+                <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Lộ trình đặt lịch nhanh chóng, dễ dàng</h2>
+                <p class="text-muted fs-5 mb-0">Chỉ cần 3 bước đơn giản để sở hữu một buổi spa thư giãn tuyệt vời. Không cần gọi điện, không cần chờ đợi.</p>
             </div>
             <div class="col-lg-5 text-lg-end">
                 <div class="d-inline-flex align-items-center gap-3 soft-note">
@@ -460,22 +460,22 @@
             <div class="col-md-4">
                 <div class="step-card">
                     <div class="step-index mb-3">1</div>
-                    <h5 class="fw-bold">Chọn chi nhánh</h5>
-                    <p class="text-muted lh-lg mb-0">Hiển thị rõ ràng để khách không phải tìm đường vòng trong menu.</p>
+                    <h5 class="fw-bold">Chọn chi nhánh &amp; dịch vụ</h5>
+                    <p class="text-muted lh-lg mb-0">Lựa chọn chi nhánh gần nhất và dịch vụ phù hợp với nhu cầu của bạn.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="step-card">
                     <div class="step-index mb-3">2</div>
-                    <h5 class="fw-bold">Chọn dịch vụ</h5>
-                    <p class="text-muted lh-lg mb-0">Card dịch vụ lớn, ảnh đẹp, giá nhìn một cái là hiểu ngay giá trị.</p>
+                    <h5 class="fw-bold">Chọn ngày &amp; giờ</h5>
+                    <p class="text-muted lh-lg mb-0">Hệ thống tự động hiển thị khung giờ trống phù hợp với chi nhánh bạn chọn.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="step-card">
                     <div class="step-index mb-3">3</div>
-                    <h5 class="fw-bold">Đặt lịch và thư giãn</h5>
-                    <p class="text-muted lh-lg mb-0">CTA mạnh, nút rõ, hành trình đặt lịch ngắn hơn và ít ma sát hơn.</p>
+                    <h5 class="fw-bold">Thư giãn để nhân viên lo</h5>
+                    <p class="text-muted lh-lg mb-0">Nhân viên được chỉ định tự động. Bạn chỉ cần đến đúng giờ và tận hưởng.</p>
                 </div>
             </div>
         </div>
@@ -486,14 +486,14 @@
     <div class="container">
         <div class="text-center mb-5">
             <span class="section-label">Không gian</span>
-            <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Một bộ ảnh trưng bày giúp trang có chiều sâu hơn</h2>
+            <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Không gian trải nghiệm đẳng cấp</h2>
             <div class="subtle-divider mx-auto"></div>
         </div>
 
         <div class="row g-4">
             <div class="col-lg-5">
                 <div class="gallery-card" style="min-height: 560px;">
-                    <img src="https://images.unsplash.com/photo-1600334129128-68505d1815b8?auto=format&fit=crop&w=900&q=80" alt="Spa room" loading="lazy">
+                    <img src="~/images/spa_room.png" alt="Spa room" loading="lazy">
                     <div class="gallery-caption">
                         <h4 class="fw-bold mb-1">Không gian trị liệu</h4>
                         <p class="mb-0 text-white-50">Ánh sáng dịu, bố cục rộng, cảm giác sạch và an toàn.</p>
@@ -524,11 +524,11 @@
                         <div class="spa-card p-4 p-xl-5 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 h-100">
                             <div>
                                 <span class="section-label">Điểm chạm thương hiệu</span>
-                                <h3 class="font-playfair fw-bold mt-3 mb-3">Làm đẹp như một trải nghiệm nghỉ dưỡng, không phải một biểu mẫu khô khan.</h3>
-                                <p class="text-muted mb-0">Khi trang có nhịp thị giác tốt, khách dễ tin hơn, ở lại lâu hơn và bấm CTA tự nhiên hơn.</p>
+                                <h3 class="font-playfair fw-bold mt-3 mb-3">Làm đẹp như một trải nghiệm nghỉ dưỡng, không phải một buổi hẹn khô khan.</h3>
+                                <p class="text-muted mb-0">Sự kết hợp hoàn hảo giữa chuyên môn và tâm huyết mang lại cho bạn trải nghiệm khác biệt.</p>
                             </div>
-                            <a href="#booking" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold text-nowrap">
-                                <i class="fa-solid fa-pen-to-square me-2"></i> Giữ chỗ ngay
+                            <a asp-controller="Booking" asp-action="Create" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold text-nowrap">
+                                <i class="fa-solid fa-calendar-check me-2"></i> Đặt lịch ngay
                             </a>
                         </div>
                     </div>
@@ -543,8 +543,8 @@
         <div class="row align-items-center g-4">
             <div class="col-lg-5">
                 <span class="section-label">Đánh giá</span>
-                <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Một chút cảm xúc để trang bớt “cứng” và tăng độ tin cậy</h2>
-                <p class="text-muted fs-5 mb-4">Khối testimonial được làm như một thẻ nổi, có quote mark lớn, avatar tròn, chữ nghiêng vừa phải và nhịp khoảng cách thoáng hơn.</p>
+                <h2 class="font-playfair display-5 fw-bold mt-3 mb-3">Khách hàng nói gì về chúng tôi?</h2>
+                <p class="text-muted fs-5 mb-4">Sự hài lòng của bạn là động lực lớn nhất của đội ngũ SpaN5. Hãy xem những gì khách hàng chia sẻ về trải nghiệm của họ.</p>
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-gold rounded-circle" style="width: 46px; height: 46px;">
                         <i class="fa-solid fa-arrow-left"></i>
@@ -559,13 +559,13 @@
                 <div class="testimonial-card p-4 p-xl-5">
                     <div class="quote-mark"><i class="fa-solid fa-quote-left"></i></div>
                     <p class="fs-4 fst-italic lh-lg mb-4">
-                        “Giao diện này cho cảm giác cao cấp hơn hẳn: sạch, có điểm nhấn, nhìn vào là biết ngay đây là một spa biết chăm trải nghiệm khách hàng.”
+                        "Tôi đã thử nhiều spa nhưng SpaN5 thật sự khác biệt. Không gian sang trọng, nhân viên tận tâm và liệu trình massage giúp tôi ngủ ngon hơn hẳn!"
                     </p>
                     <div class="d-flex align-items-center gap-3">
                         <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" alt="Customer" class="rounded-circle" style="width: 64px; height: 64px; object-fit: cover;" loading="lazy">
                         <div>
-                            <h6 class="mb-1 fw-bold">Khách hàng hài lòng</h6>
-                            <div class="text-muted">Spa experience review</div>
+                            <h6 class="mb-1 fw-bold">Nguyễn Thị Minh Anh</h6>
+                            <div class="text-muted">Khách hàng thân thiết từ 2023</div>
                         </div>
                     </div>
                 </div>
@@ -580,9 +580,9 @@
             <div class="row g-4 align-items-center">
                 <div class="col-lg-6">
                     <span class="section-label" style="color:#e9c9ac;">Đặt lịch</span>
-                    <h2 class="font-playfair display-5 fw-bold mt-3 mb-3 text-white">Sẵn sàng biến trang chủ thành nơi khách muốn bấm vào trước tiên</h2>
+                    <h2 class="font-playfair display-5 fw-bold mt-3 mb-3 text-white">Sẵn sàng để trải nghiệm sự khác biệt?</h2>
                     <p class="text-white-50 fs-5 mb-0">
-                        Mọi thứ ở đây được sắp theo thứ tự thuyết phục: ảnh đẹp trước, lợi ích rõ sau, rồi đến nút hành động thật gọn gàng.
+                        Đặt lịch ngay hôm nay để nhận ưu đãi đặc biệt cho khách hàng mới. Đội ngũ chuyên viên của chúng tôi luôn sẵn sàng phục vụ bạn.
                     </p>
                 </div>
                 <div class="col-lg-6">
@@ -609,8 +609,8 @@
                     </div>
 
                     <div class="d-flex flex-wrap gap-3 mt-4">
-                        <a asp-controller="Account" asp-action="Register" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold">
-                            <i class="fa-solid fa-user-plus me-2"></i> Tạo tài khoản
+                        <a asp-controller="Booking" asp-action="Create" class="btn btn-gold rounded-pill px-4 py-3 fw-semibold">
+                            <i class="fa-solid fa-calendar-check me-2"></i> Đặt lịch ngay
                         </a>
                         <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-light rounded-pill px-4 py-3 fw-semibold">
                             <i class="fa-solid fa-map-location-dot me-2"></i> Xem chi nhánh

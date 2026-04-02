@@ -1,0 +1,62 @@
+@model IEnumerable<SpaN5.Models.Setting>
+@{
+    ViewData["Title"] = "Cài đặt hệ thống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <h1 class="font-playfair text-gold mb-4">Cài đặt hệ thống</h1>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-gold text-white">
+            <h5 class="mb-0">Thông số cấu hình</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Số giờ trước khi hủy lịch</label>
+                        <input type="number" name="Booking:CancelHoursBefore" 
+                               value="@(Model.FirstOrDefault(s => s.Key == "Booking:CancelHoursBefore")?.Value ?? "24")" 
+                               class="form-control" />
+                        <small class="text-muted">Khách hàng chỉ có thể hủy lịch trước giờ này (giờ)</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Thời gian tối thiểu đặt lịch trước (giờ)</label>
+                        <input type="number" name="Booking:MinAdvanceHours" 
+                               value="@(Model.FirstOrDefault(s => s.Key == "Booking:MinAdvanceHours")?.Value ?? "2")" 
+                               class="form-control" />
+                        <small class="text-muted">Khách hàng phải đặt lịch ít nhất trước giờ này</small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Bước thời gian (phút)</label>
+                        <input type="number" name="Booking:TimeSlotStep" 
+                               value="@(Model.FirstOrDefault(s => s.Key == "Booking:TimeSlotStep")?.Value ?? "30")" 
+                               class="form-control" />
+                        <small class="text-muted">Khung giờ cách nhau (phút)</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Giờ bắt đầu làm việc mặc định</label>
+                        <input type="time" name="Working:DefaultStartTime" 
+                               value="@(Model.FirstOrDefault(s => s.Key == "Working:DefaultStartTime")?.Value ?? "08:00")" 
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-gold rounded-pill px-4">Lưu cài đặt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

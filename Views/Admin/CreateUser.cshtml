@@ -18,11 +18,11 @@
                 <div class="card-body p-5">
                     <form method="post" asp-action="CreateUser">
                         @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
 
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Username"] <span class="text-danger">*</span></label>
-                            <input type="text" name="Username" class="form-control" required />
+                            <input type="text" name="Username" class="form-control" value="@ViewBag.Username" required />
                         </div>
 
                         <div class="mb-3">
@@ -32,12 +32,12 @@
 
                         <div class="mb-3">
                             <label class="form-label">@Localizer["FullName"]</label>
-                            <input type="text" name="FullName" class="form-control" />
+                            <input type="text" name="FullName" class="form-control" value="@ViewBag.FullName" />
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Email"]</label>
-                            <input type="email" name="Email" class="form-control" />
+                            <input type="email" name="Email" class="form-control" value="@ViewBag.Email" />
                         </div>
 
                         <div class="mb-3">
@@ -46,18 +46,32 @@
                                 <option value="">-- Chọn role --</option>
                                 @foreach (var role in roles)
                                 {
-                                    <option value="@role">@role</option>
+                                    if (ViewBag.Role != null && ViewBag.Role == role)
+                                    {
+                                        <option value="@role" selected>@role</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
                                 }
                             </select>
                         </div>
 
-                        <div class="mb-3" id="BranchDiv" style="display: none;">
+                        <div class="mb-3" id="BranchDiv" style="display: @(ViewBag.Role == "Staff" ? "block" : "none");">
                             <label class="form-label">@Localizer["Branch"] <span class="text-danger">*</span></label>
                             <select name="BranchId" class="form-control">
                                 <option value="">-- Chọn chi nhánh --</option>
                                 @foreach (var branch in branches)
                                 {
-                                    <option value="@branch.BranchId">@branch.BranchName</option>
+                                    if (ViewBag.BranchId != null && ViewBag.BranchId == branch.BranchId)
+                                    {
+                                        <option value="@branch.BranchId" selected>@branch.BranchName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@branch.BranchId">@branch.BranchName</option>
+                                    }
                                 }
                             </select>
                         </div>

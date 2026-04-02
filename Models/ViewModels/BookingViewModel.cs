@@ -12,14 +12,14 @@ namespace SpaN5.Models.ViewModels
         [Required(ErrorMessage = "Vui lòng chọn chi nhánh")]
         public int BranchId { get; set; }
 
-        public int? StaffId { get; set; }  // null = tự động phân công
+        public int? StaffId { get; set; }
+        public bool AutoAssignStaff { get; set; } = true;
 
         [Required(ErrorMessage = "Vui lòng chọn ngày")]
         [DataType(DataType.Date)]
         public DateTime BookingDate { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn giờ")]
-        [DataType(DataType.Time)]
         public TimeSpan StartTime { get; set; }
 
         public string? Notes { get; set; }
@@ -30,7 +30,16 @@ namespace SpaN5.Models.ViewModels
         public decimal Price { get; set; }
         public DateTime EndTime { get; set; }
 
-        // Tự động phân công
-        public bool AutoAssignStaff { get; set; } = true;
+        // Thông tin khách hàng
+        [Required(ErrorMessage = "Vui lòng nhập họ tên")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng nhập email")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        public string Phone { get; set; } = string.Empty;
     }
 }

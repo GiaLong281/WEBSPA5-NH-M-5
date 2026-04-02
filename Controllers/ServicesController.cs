@@ -13,6 +13,13 @@ namespace SpaN5.Controllers
             _context = context;
         }
 
+        // Hiển thị danh sách dịch vụ (gọi API từ client)
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        // Chi tiết dịch vụ
         public async Task<IActionResult> Details(int id)
         {
             var service = await _context.Services

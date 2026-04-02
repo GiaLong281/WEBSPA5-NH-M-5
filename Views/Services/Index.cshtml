@@ -89,17 +89,16 @@
 
         async function fetchServices() {
             const keyword = document.getElementById('keyword').value;
-            const categoryId = document.getElementById('categoryId').value;
+            const categoryId = document.getElementById('categoryId');
             const minPrice = document.getElementById('minPrice').value;
             const maxPrice = document.getElementById('maxPrice').value;
-
             const isActive = document.getElementById('isActive').value;
 
             const params = new URLSearchParams({
                 page: currentPage,
                 pageSize: pageSize,
                 ...(keyword && { keyword }),
-                ...(categoryId && { categoryId }),
+                ...(categoryId && categoryId.value && { categoryId: categoryId.value }),
                 ...(minPrice && { minPrice }),
                 ...(maxPrice && { maxPrice }),
                 ...(isActive !== '' && { isActive })
@@ -131,6 +130,9 @@
             let html = '';
             services.forEach(service => {
                 const imageUrl = service.image ? `/images/${service.image}` : '/images/no-image.jpg';
+                const statusBadge = service.isActive 
+                    ? '<span class="badge bg-success">Hoạt động</span>' 
+                    : '<span class="badge bg-secondary">Tạm ngưng</span>';
                 html += `
                     <div class="col-lg-4 col-md-6">
                         <div class="card h-100 border-0 shadow-sm service-card transition-all position-relative">
@@ -138,7 +140,10 @@
                                 <img src="${imageUrl}" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="${service.serviceName}" loading="lazy">
                             </div>
                             <div class="card-body p-4">
-                                <h5 class="font-playfair mb-2">${service.serviceName}</h5>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h5 class="font-playfair mb-2">${service.serviceName}</h5>
+                                    ${statusBadge}
+                                </div>
                                 <div class="mb-2">
                                     <span class="badge bg-gold text-dark">${service.categoryName}</span>
                                 </div>

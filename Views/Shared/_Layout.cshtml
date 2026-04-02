@@ -38,6 +38,59 @@
             --radius-xl: 28px;
             --radius-lg: 22px;
             --radius-md: 16px;
+
+            /* Admin Theme */
+            --admin-primary: #12202d;
+            --admin-accent: #b68a63;
+            --admin-surface: #ffffff;
+            --admin-bg: #f8f9fa;
+        }
+
+        .admin-stat-card {
+            background: var(--admin-surface);
+            border: 1px solid rgba(18, 32, 45, 0.05);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+
+        .admin-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(182, 138, 99, 0.12);
+            border-color: rgba(182, 138, 99, 0.2);
+        }
+
+        .admin-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .admin-quick-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .admin-quick-link:hover {
+            background: rgba(182, 138, 99, 0.05);
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: scale(1.02);
         }
 
         html {
@@ -84,8 +137,6 @@
         }
 
         .spa-navbar {
-            top: 0;
-            z-index: 1030;
             backdrop-filter: blur(18px);
             background: var(--nav);
             border-bottom: 1px solid rgba(255,255,255,0.45);
@@ -93,7 +144,7 @@
             transition: all 0.3s ease;
         }
 
-        .spa-navbar.navbar-scrolled {
+        .navbar-scrolled .spa-navbar {
             background: rgba(251, 247, 242, 0.92);
             box-shadow: 0 12px 40px rgba(18, 32, 45, 0.08);
         }
@@ -153,7 +204,7 @@
         }
 
         main[role="main"] {
-            padding-top: 96px;
+            padding-top: 136px;
         }
 
         .btn-gold {
@@ -342,7 +393,7 @@
 
         @@media (max-width: 991.98px) {
             main[role="main"] {
-                padding-top: 84px;
+                padding-top: 124px;
             }
 
             .nav-link {
@@ -362,22 +413,22 @@
     </div>
 
     <div class="spa-shell d-flex flex-column min-vh-100">
-        <div class="spa-announcement py-2">
-            <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge rounded-pill px-3 py-2">Premium spa</span>
-                    <span class="small">Chăm sóc cơ thể và tinh thần trong một trải nghiệm mượt như lụa.</span>
-                </div>
-                <div class="small d-none d-md-flex align-items-center gap-3">
-                    <span><i class="fa-solid fa-location-dot me-1"></i> Việt Nam</span>
-                    <span><i class="fa-solid fa-phone me-1"></i> 0900 000 000</span>
-                    <span><i class="fa-solid fa-clock me-1"></i> 08:00 - 21:00</span>
+        <header class="fixed-top spa-header shadow-sm">
+            <div class="spa-announcement py-2">
+                <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill px-3 py-2">Premium spa</span>
+                        <span class="small">Chăm sóc cơ thể và tinh thần trong một trải nghiệm mượt như lụa.</span>
+                    </div>
+                    <div class="small d-none d-md-flex align-items-center gap-3">
+                        <span><i class="fa-solid fa-location-dot me-1"></i> Việt Nam</span>
+                        <span><i class="fa-solid fa-phone me-1"></i> 0900 000 000</span>
+                        <span><i class="fa-solid fa-clock me-1"></i> 08:00 - 21:00</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <header>
-            <nav class="navbar navbar-expand-lg fixed-top spa-navbar">
+            <nav class="navbar navbar-expand-lg spa-navbar">
                 <div class="container">
                     <a class="spa-brand" asp-controller="Home" asp-action="Index" aria-label="SpaN5 Home">
                         <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
@@ -397,7 +448,9 @@
                                 <a class="nav-link" href="#about">Giới thiệu</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#services">Dịch vụ</a>
+                                <a class="nav-link" asp-controller="Services" asp-action="Index">
+                                    @Localizer["Services"]
+                                </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#experience">Trải nghiệm</a>
@@ -431,11 +484,11 @@
                                             </li>
                                         }
 
-                                        @if (User.IsInRole("Staff"))
+                                        @if (User.IsInRole("Staff") || User.IsInRole("Admin"))
                                         {
                                             <li>
-                                                <a class="dropdown-item" asp-controller="Staff" asp-action="Dashboard">
-                                                    <i class="fa-solid fa-calendar-check me-2"></i> Ca làm việc
+                                                <a class="dropdown-item" asp-controller="StaffCalendar" asp-action="Index">
+                                                    <i class="fa-solid fa-calendar-week me-2"></i> Lịch làm việc
                                                 </a>
                                             </li>
                                         }
@@ -552,7 +605,7 @@
                         <ul class="list-unstyled footer-links">
                             <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
                             <li><a href="#about">Giới thiệu</a></li>
-                            <li><a href="#services">Dịch vụ</a></li>
+                            <li><a asp-controller="Services" asp-action="Index">@Localizer["Services"]</a></li>
                             <li><a asp-controller="Branches" asp-action="Index">Chi nhánh</a></li>
                         </ul>
                     </div>
@@ -562,7 +615,7 @@
                         <ul class="list-unstyled footer-links">
                             <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
                             <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
-                            <li><a href="#booking">Đặt lịch</a></li>
+                            <li><a asp-controller="Booking" asp-action="Create">Đặt lịch</a></li>
                         </ul>
                     </div>
 
@@ -629,7 +682,7 @@
 
             const toggleScrollState = () => {
                 const scrolled = window.scrollY > 18;
-                if (nav) nav.classList.toggle('navbar-scrolled', scrolled);
+                if (nav) nav.parentElement.classList.toggle('navbar-scrolled', scrolled);
                 if (backToTop) backToTop.classList.toggle('show', window.scrollY > 500);
             };
 

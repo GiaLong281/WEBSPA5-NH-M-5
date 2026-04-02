@@ -25,6 +25,7 @@ namespace SpaN5.Models
         public DbSet<StockTransaction> StockTransactions { get; set; }
 
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Setting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
