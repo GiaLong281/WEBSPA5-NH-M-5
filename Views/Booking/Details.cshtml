@@ -2,131 +2,244 @@
 @{
     ViewData["Title"] = "Chi Tiết Lịch Hẹn";
     var firstDetail = Model.BookingDetails.FirstOrDefault();
-    var serviceName = firstDetail?.Service?.ServiceName ?? "Dịch vụ đã chọn";
+    var service = firstDetail?.Service;
+    var serviceName = service?.ServiceName ?? "Dịch vụ đã chọn";
+    var isVip = service?.IsVip ?? false;
 }
 
 <style>
-    .details-container {
-        max-width: 900px;
-        margin: 0 auto;
+    :root {
+        --p-navy: #1a2b3c;
+        --p-gold: #c5a880;
+        --p-gold-light: #e8d5b5;
+        --p-beige: #f9f7f4;
     }
-    .status-badge {
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-transform: uppercase;
+
+    body {
+        background-color: var(--p-beige);
+        font-family: 'Inter', sans-serif;
+        color: var(--p-navy);
     }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-confirmed { background: #d4edda; color: #155724; }
-    .status-cancelled { background: #f8d7da; color: #721c24; }
-    
-    .info-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        border: 1px solid #eee;
+
+    .main-wrapper {
+        padding: 60px 20px;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
-    .label-custom {
-        color: #999;
-        font-size: 0.8rem;
-        text-transform: uppercase;
+
+    .title-area {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .title-area h4 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
         letter-spacing: 1px;
+        margin-bottom: 8px;
+        color: var(--p-navy);
+        font-size: 1.5rem;
     }
-    .value-custom {
+
+    .booking-code-pill {
+        display: inline-block;
+        background: white;
+        padding: 4px 15px;
+        border-radius: 100px;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: #333;
-        font-size: 1.1rem;
+        border: 1px solid #eee;
+        color: #999;
+    }
+
+    .compact-ticket {
+        background: white;
+        width: 100%;
+        max-width: 650px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        overflow: hidden;
+        border-top: 4px solid var(--p-gold);
+    }
+
+    .ticket-section {
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--p-gold);
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f8f8f8;
+        padding-bottom: 8px;
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.65rem;
+        color: #bbb;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+        font-weight: 700;
+    }
+
+    .info-item p {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 4px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+    .status-pending { background: #fffcf0; color: #b8860b; border: 1px solid #ffeeba; }
+    .status-confirmed { background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; }
+    .status-cancelled { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+    .status-completed { background: var(--p-navy); color: white; }
+
+    .vip-badge {
+        background: linear-gradient(45deg, var(--p-gold), #e8d5b5);
+        color: var(--p-navy);
+        padding: 1px 8px;
+        font-size: 0.55rem;
+        border-radius: 3px;
+        margin-left: 5px;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-ticket {
+        flex: 1;
+        padding: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 6px;
+        text-transform: uppercase;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel {
+        background: white;
+        color: #ff4d4d;
+        border: 1px solid #ffdada;
+    }
+    .btn-cancel:hover { background: #fff5f5; border-color: #ff4d4d; }
+
+    .btn-main {
+        background: var(--p-navy);
+        color: white;
+        border: none;
+    }
+    .btn-main:hover { background: #2c3e50; transform: translateY(-1px); }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 0.7rem;
+        color: #999;
     }
 </style>
 
-<div class="container py-5">
-    <div class="details-container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="font-playfair mb-0">Chi Tiết Lịch Hẹn</h2>
-            <div>
-                @switch (Model.Status)
+<div class="main-wrapper">
+    <div class="title-area">
+        <h4>Chi Tiết Lịch Hẹn @if(isVip) { <span class="vip-badge">ROYAL VIP</span> }</h4>
+        <div class="booking-code-pill">Mã đơn: @Model.BookingCode</div>
+    </div>
+
+    <div class="compact-ticket">
+        <div class="ticket-section pb-0">
+            <div class="section-title">Thông tin dịch vụ</div>
+            <div class="info-row">
+                <div class="info-item">
+                    <label>Dịch vụ</label>
+                    <p>@serviceName</p>
+                </div>
+                <div class="info-item">
+                    <label>Trạng thái</label>
+                    <div>
+                        <span class="status-badge status-@Model.Status.ToString().ToLower()">
+                            @switch (Model.Status)
+                            {
+                                case SpaN5.Models.BookingStatus.Pending: @:ĐANG CHỜ
+                                    break;
+                                case SpaN5.Models.BookingStatus.Confirmed: @:ĐÃ XÁC NHẬN
+                                    break;
+                                case SpaN5.Models.BookingStatus.Cancelled: @:ĐÃ HỦY
+                                    break;
+                                case SpaN5.Models.BookingStatus.Completed: @:HOÀN THÀNH
+                                    break;
+                                default: @Model.Status
+                                    break;
+                            }
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <label>Ngày hẹn</label>
+                    <p>@Model.StartTime.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="info-item">
+                    <label>Thời gian</label>
+                    <p>@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm") (@service?.Duration phút)</p>
+                </div>
+                <div class="info-item col-12" style="grid-column: span 2;">
+                    <label>Ghi chú</label>
+                    <p class="small text-muted font-italic">@(string.IsNullOrEmpty(Model.Notes) ? "Không có yêu cầu thêm" : Model.Notes)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="ticket-section" style="background: #fafafb; border-top: 1px dashed #eee;">
+            <div class="section-title">Thông tin khách hàng</div>
+            <div class="info-row">
+                <div class="info-item">
+                    <label>Họ tên</label>
+                    <p>@Model.Customer.FullName</p>
+                </div>
+                <div class="info-item text-end">
+                    <label>Số điện thoại</label>
+                    <p>@Model.Customer.Phone</p>
+                </div>
+                <div class="info-item col-12" style="grid-column: span 2;">
+                    <label>Tổng thanh toán</label>
+                    <p class="text-gold fs-5">@Model.TotalAmount.ToString("N0") VNĐ</p>
+                </div>
+            </div>
+
+            <div class="action-group">
+                @if (Model.Status != SpaN5.Models.BookingStatus.Cancelled && Model.Status != SpaN5.Models.BookingStatus.Completed)
                 {
-                    case SpaN5.Models.BookingStatus.Pending:
-                        <span class="status-badge status-pending">Đang chờ</span>
-                        break;
-                    case SpaN5.Models.BookingStatus.Confirmed:
-                        <span class="status-badge status-confirmed">Đã xác nhận</span>
-                        break;
-                    case SpaN5.Models.BookingStatus.Cancelled:
-                        <span class="status-badge status-cancelled">Đã hủy</span>
-                        break;
-                    default:
-                        <span class="status-badge bg-light text-dark">@Model.Status</span>
-                        break;
+                    <button onclick="confirmCancel()" class="btn btn-ticket btn-cancel">Hủy lịch</button>
                 }
+                <a href="/Booking" class="btn btn-ticket btn-main">Đặt thêm</a>
+                <a href="/" class="btn btn-ticket btn-outline-secondary">Trang chủ</a>
             </div>
         </div>
+    </div>
 
-        <div class="row g-4">
-            <div class="col-md-8">
-                <div class="info-card p-4 mb-4">
-                    <h5 class="border-bottom pb-3 mb-4"><i class="fas fa-info-circle me-2 text-gold"></i>Thông Tin Dịch Vụ</h5>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="label-custom d-block">Mã Booking</label>
-                            <span class="value-custom">@Model.BookingCode</span>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="label-custom d-block">Gói dịch vụ</label>
-                            <span class="value-custom">@serviceName</span>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="label-custom d-block">Ngày hẹn</label>
-                            <span class="value-custom">@Model.StartTime.ToString("dd/MM/yyyy")</span>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="label-custom d-block">Thời gian</label>
-                            <span class="value-custom">@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</span>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="label-custom d-block">Tổng tiền</label>
-                            <span class="value-custom text-success">@Model.TotalAmount.ToString("N0") VNĐ</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card p-4 mt-4">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-info-circle fa-2x text-gold"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">Thanh toán tại quầy</h6>
-                            <p class="small text-muted mb-0">Vui lòng thanh toán trực tiếp tại spa sau khi hoàn thành dịch vụ.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="info-card p-4 sticky-top" style="top: 100px;">
-                    <h5 class="border-bottom pb-3 mb-4">Thao Tác</h5>
-                    
-                    @if (Model.Status != SpaN5.Models.BookingStatus.Cancelled && Model.Status != SpaN5.Models.BookingStatus.Completed)
-                    {
-                        <button onclick="confirmCancel()" class="btn btn-outline-danger w-100 mb-3 rounded-pill py-2">
-                            <i class="fas fa-times me-2"></i>Hủy Lịch Hẹn
-                        </button>
-                    }
-                    
-                    <a href="/" class="btn btn-dark w-100 rounded-pill py-2">
-                        <i class="fas fa-home me-2"></i>Về Trang Chủ
-                    </a>
-                    
-                    <hr>
-                    <div class="text-center">
-                        <p class="small text-muted mb-0">Hỗ trợ hotline:</p>
-                        <p class="fw-bold text-gold">1900 123 456</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="footer-note">
+        <p>SpaN5 Premium - 123 Đường Tự Do, Quận 1, TP HCM <br> Hotline hỗ trợ: <span class="fw-bold">1900 123 456</span></p>
     </div>
 </div>
 
@@ -134,35 +247,28 @@
 <script>
     function confirmCancel() {
         Swal.fire({
-            title: 'Bạn có chắc chắn?',
-            text: "Lịch hẹn sẽ bị hủy và không thể hoàn tác!",
+            title: 'Hủy lịch hẹn?',
+            text: "Dữ liệu sẽ không thể phục hồi.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Đúng, hủy nó!',
-            cancelButtonText: 'Giữ lại'
+            confirmButtonColor: '#ff4d4d',
+            cancelButtonColor: '#1a2b3c',
+            confirmButtonText: 'Đồng ý hủy',
+            cancelButtonText: 'Quay lại'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch('/Booking/Cancel', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'bookingCode=@Model.BookingCode'
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire(
-                            'Đã hủy!',
-                            data.message,
-                            'success'
-                        ).then(() => {
-                            location.reload();
-                        });
+                        Swal.fire({ icon: 'success', title: 'Đã hủy', text: data.message })
+                        .then(() => location.reload());
                     } else {
-                        Swal.fire('Lỗi!', data.message, 'error');
+                        Swal.fire({ icon: 'error', title: 'Lỗi', text: data.message });
                     }
                 });
             }

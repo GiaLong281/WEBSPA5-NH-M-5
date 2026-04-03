@@ -19,6 +19,8 @@ namespace SpaN5.Models
 
         public bool IsActive { get; set; } = true;
         public bool IsPopular { get; set; } = false;
+        public bool IsVip { get; set; } = false;
+        public int MaxCapacity { get; set; } = 10;
         public string? VideoUrl { get; set; }
 
 

@@ -1,443 +1,715 @@
 @model SpaN5.Models.BookingViewModel
 @{
-    ViewData["Title"] = "Đặt Lịch Dịch Vụ";
+    ViewData["Title"] = "Đặt Lịch Dịch Vụ - SpaN5 Premium";
 }
 
 <style>
     :root {
-        --navy: #1a2b3c;
-        --gold: #d4af37;
-        --beige: #f5f5dc;
-        --light-gray: #f8f9fa;
+        --p-navy: #1a2b3c;
+        --p-gold: #c5a880;
+        --p-gold-light: #dfcdb4;
+        --p-beige: #f9f6f0;
+        --p-white: #ffffff;
+        --p-glass: rgba(255, 255, 255, 0.85);
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
 
     body {
-        background-color: var(--light-gray);
+        background: linear-gradient(135deg, #f5f2ed 0%, #e8e3da 100%);
+        min-height: 100vh;
     }
 
-    .booking-container {
-        max-width: 900px;
-        margin: 50px auto;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    /* Premium Container */
+    .booking-wrapper {
+        max-width: 1200px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    @@media (max-width: 992px) {
+        .booking-wrapper {
+            grid-template-columns: 1fr;
+        }
+        .summary-sidebar {
+            order: -1;
+            position: sticky;
+            top: 80px;
+            z-index: 10;
+        }
+    }
+
+    /* Glass Cards */
+    .glass-card {
+        background: var(--p-glass);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+        padding: 40px;
         overflow: hidden;
     }
 
-    .step-header {
-        background: var(--navy);
-        color: white;
-        padding: 30px;
-        text-align: center;
-    }
-
-    .step-indicator {
+    /* Progress Tracker (Modern) */
+    .premium-steps {
         display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-
-    .step-item {
+        justify-content: space-between;
+        margin-bottom: 50px;
         position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        z-index: 1;
+        padding-top: 20px;
     }
 
-    .step-item::after {
+    .premium-steps::before {
         content: '';
         position: absolute;
-        top: 20px;
-        left: 50%;
-        width: 100%;
+        top: 40px;
+        left: 10%;
+        right: 10%;
         height: 2px;
-        background: rgba(255,255,255,0.2);
-        z-index: -1;
+        background: #e0e0e0;
+        z-index: 0;
     }
 
-    .step-item:last-child::after {
-        display: none;
+    .p-step {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        flex: 1;
     }
 
-    .step-circle {
-        width: 40px;
-        height: 40px;
+    .p-step-circle {
+        width: 44px;
+        height: 44px;
+        background: white;
+        border: 2px solid #e0e0e0;
         border-radius: 50%;
-        background: rgba(255,255,255,0.2);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        transition: all 0.3s;
-        border: 2px solid transparent;
+        margin: 0 auto 12px;
+        font-weight: 700;
+        color: #999;
+        transition: var(--transition);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.02);
     }
 
-    .step-item.active .step-circle {
-        background: var(--gold);
-        border-color: white;
-        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    .p-step.active .p-step-circle {
+        background: var(--p-navy);
+        border-color: var(--p-navy);
+        color: white;
+        transform: scale(1.1);
+        box-shadow: 0 10px 20px rgba(26, 43, 60, 0.2);
     }
 
-    .step-item.completed .step-circle {
-        background: var(--gold);
+    .p-step.completed .p-step-circle {
+        background: var(--p-gold);
+        border-color: var(--p-gold);
+        color: white;
     }
 
-    .step-label {
-        margin-top: 10px;
-        font-size: 0.85rem;
-        letter-spacing: 1px;
-        opacity: 0.7;
+    .p-step-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        transition: var(--transition);
     }
 
-    .step-item.active .step-label,
-    .step-item.completed .step-label {
-        opacity: 1;
-        font-weight: bold;
-        color: var(--gold);
+    .p-step.active .p-step-label {
+        color: var(--p-navy);
     }
 
-    .step-content {
-        padding: 40px;
+    /* Step Contents */
+    .step-panel {
         display: none;
-        animation: fadeIn 0.5s;
+        animation: slideInCustom 0.6s ease-out;
     }
 
-    .step-content.active {
+    .step-panel.active {
         display: block;
     }
 
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
+    @@keyframes slideInCustom {
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Step 1: Services */
-    .service-card {
-        border: 2px solid transparent;
-        border-radius: 10px;
-        padding: 20px;
+    /* Service Cards (Agoda Style) */
+    .service-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .premium-service-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #f0f0f0;
+        transition: var(--transition);
         cursor: pointer;
-        transition: all 0.3s;
-        height: 100%;
-        background: var(--light-gray);
-    }
-
-    .service-card:hover {
-        border-color: var(--gold);
-        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1);
-    }
-
-    .service-card.selected {
-        border-color: var(--gold);
-        background: rgba(212, 175, 55, 0.05);
         position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
-    .service-card.selected::before {
-        content: '\f058'; /* fa-check-circle */
-        font-family: 'Font Awesome 5 Free';
+    .premium-service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border-color: var(--p-gold-light);
+    }
+
+    .premium-service-card.selected {
+        border-color: var(--p-gold);
+        background: #fdfaf5;
+        box-shadow: 0 0 0 4px rgba(197, 168, 128, 0.1);
+    }
+
+    .premium-service-card.selected::after {
+        content: '\f058';
+        font-family: 'Font Awesome 6 Free';
         font-weight: 900;
         position: absolute;
-        top: 10px;
-        right: 10px;
-        color: var(--gold);
+        top: 15px;
+        right: 15px;
+        color: var(--p-gold);
         font-size: 1.5rem;
+        z-index: 5;
     }
 
-    /* Step 2: Date & Time */
-    .time-slot {
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-align: center;
-        background: white;
-    }
-
-    .time-slot:hover {
-        border-color: var(--gold);
-        color: var(--gold);
-    }
-
-    .time-slot.selected {
-        background: var(--gold);
-        color: white;
-        border-color: var(--gold);
-    }
-
-    .time-slot.disabled {
-        background: #f1f1f1;
-        color: #aaa;
-        cursor: not-allowed;
-        border-color: #eee;
-    }
-
-    .time-slot.booked {
-        background: #ffebee;
-        color: #d32f2f;
-        border-color: #ffcdd2;
-        cursor: not-allowed;
-        position: relative;
-    }
-
-    .time-slot.booked::after {
-        content: 'Đã đặt';
-        position: absolute;
-        bottom: -20px;
-        left: 0;
-        width: 100%;
-        font-size: 0.65rem;
-        color: #d32f2f;
-        font-weight: bold;
-    }
-
-
-    /* Buttons */
-    .btn-gold {
-        background-color: var(--gold);
-        color: white;
-        border: none;
-    }
-    
-    .btn-gold:hover {
-        background-color: #c49f2c;
-        color: white;
-    }
-
-    .btn-outline-navy {
-        border: 1px solid var(--navy);
-        color: var(--navy);
-    }
-
-    .btn-outline-navy:hover {
-        background-color: var(--navy);
-        color: white;
-    }
-
-    .hover-opacity-100:hover {
-        opacity: 1 !important;
-    }
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-    .service-image-container:hover img {
-        transform: scale(1.1);
-    }
-    .video-container {
-        position: relative;
-        padding-bottom: 56.25%; /* 16:9 */
-        height: 0;
+    .service-img-wrapper {
+        height: 160px;
+        border-radius: 16px 16px 0 0;
         overflow: hidden;
-        border-radius: 8px;
-        background: #000;
     }
-    .video-container iframe, .video-container video {
-        position: absolute;
-        top: 0;
-        left: 0;
+
+    .service-img-wrapper img {
         width: 100%;
         height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
     }
 
+    .premium-service-card:hover .service-img-wrapper img {
+        transform: scale(1.1);
+    }
 
-    .material-item {
-        background: #fdfaf0;
-        border-left: 3px solid var(--gold);
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        font-size: 0.9rem;
+    .service-body {
+        padding: 20px;
+        flex-grow: 1;
+        position: relative;
+    }
+
+    /* Service Overlay Button */
+    .service-img-wrapper {
+        position: relative;
+    }
+
+    .service-overlay-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--p-navy);
+        font-size: 1.2rem;
+        opacity: 0;
+        transition: var(--transition);
+        z-index: 4;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .premium-service-card:hover .service-overlay-btn {
+        opacity: 1;
+    }
+
+    .service-overlay-btn:hover {
+        background: var(--p-gold);
+        color: white;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    /* Selected Badge */
+    .selected-badge {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: var(--p-gold);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .premium-service-card.selected .selected-badge {
+        display: block;
+    }
+
+    /* VIP Styling */
+    .premium-service-card.vip {
+        border: 2px solid var(--p-gold);
+        background: linear-gradient(135deg, #ffffff 0%, #fff9ef 100%);
+        animation: vip-pulse 3s infinite;
+    }
+
+    .premium-service-card.vip::before {
+        content: 'VIP';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: var(--p-gold);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.6rem;
+        font-weight: 900;
+        z-index: 10;
+        letter-spacing: 1px;
+    }
+
+    @@keyframes vip-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(197, 168, 128, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(197, 168, 128, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(197, 168, 128, 0); }
+    }
+
+    /* Calendar UI (Agoda Style) */
+    .custom-calendar {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .cal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+    }
+
+    .cal-day-name {
+        text-align: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #bbb;
+        text-transform: uppercase;
+        padding-bottom: 15px;
+    }
+
+    .cal-cell {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .cal-cell:hover:not(.disabled):not(.other-month) {
+        background: #f8f9fa;
+        color: var(--p-gold);
+    }
+
+    .cal-cell.today {
+        color: var(--p-navy);
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    .cal-cell.selected {
+        background: var(--p-navy) !important;
+        color: white !important;
+        box-shadow: 0 8px 15px rgba(26, 43, 60, 0.3);
+    }
+
+    .cal-cell.disabled {
+        color: #eee;
+        cursor: not-allowed;
+    }
+
+    .cal-cell.other-month {
+        opacity: 0.2;
+        cursor: default;
+    }
+
+    /* Time Bubbles */
+    .time-bubbles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .time-bubble {
+        padding: 12px 18px;
+        border: 1.5px solid #eee;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        text-align: center;
+        background: white;
+        color: var(--p-navy);
+        min-width: 90px;
+    }
+
+    .time-bubble:hover:not(.booked):not(.past) {
+        border-color: var(--p-gold);
+        color: var(--p-gold);
+        transform: translateY(-2px);
+    }
+
+    .time-bubble.selected {
+        background: var(--p-navy);
+        color: white;
+        border-color: var(--p-navy);
+        box-shadow: 0 8px 15px rgba(26, 43, 60, 0.2);
+    }
+
+    .time-bubble.past {
+        background: #fdfdfd;
+        color: #e2e8f0;
+        border-color: #f1f5f9;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .time-bubble.booked {
+        background: #ced4da;
+        color: #6c757d;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+        text-decoration: line-through;
+        position: relative;
+    }
+
+    .time-bubble.booked::after {
+        content: 'HẾT';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.5rem;
+        background: #444;
+        color: white;
+        padding: 1px 4px;
+        border-radius: 4px;
+        text-decoration: none;
+        line-height: 1;
+    }
+
+    /* VIP Modal Theme */
+    #modalBodyContent.vip-theme {
+        background: linear-gradient(135deg, #ffffff 0%, #fff9ef 100%) !important;
+    }
+
+    .vip-badge-premium {
+        background: linear-gradient(45deg, #c5a880, #e8d5b5);
+        color: white;
+        padding: 6px 15px;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 10px rgba(197, 168, 128, 0.3);
+        display: inline-block;
+    }
+
+    .vip-title {
+        background: linear-gradient(to right, #1a2b3c, #c5a880);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+
+    /* Sidebar Summary */
+    .summary-sidebar {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+
+    .summary-card {
+        background: var(--p-navy);
+        color: white;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 30px 60px rgba(26, 43, 60, 0.15);
+    }
+
+    .summary-item {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 15px 0;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .summary-price {
+        font-size: 1.5rem;
+        color: var(--p-gold);
+        font-weight: 700;
+    }
+
+    /* Buttons */
+    .btn-next {
+        background: var(--p-navy);
+        color: white;
+        border: none;
+        padding: 14px 35px;
+        border-radius: 100px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        transition: var(--transition);
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn-next:hover {
+        background: #233a52;
+        transform: scale(1.02);
+        box-shadow: 0 10px 25px rgba(26, 43, 60, 0.2);
+        color: white;
+    }
+
+    .btn-prev {
+        background: transparent;
+        color: #777;
+        border: 1px solid #ddd;
+        padding: 14px 30px;
+        border-radius: 100px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .btn-prev:hover {
+        border-color: #999;
+        color: #333;
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 24px;
+        border: none;
+        overflow: hidden;
     }
 </style>
 
-<div class="container py-5">
-    <div class="booking-container">
-        <!-- Header -->
-        <div class="step-header">
-            <h2 class="font-playfair mb-4">Hoàn Tất Đặt Lịch Chăm Sóc</h2>
-            <div class="step-indicator">
-                <div class="step-item active" id="indicator-1">
-                    <div class="step-circle">1</div>
-                    <div class="step-label text-uppercase">Dịch Vụ</div>
+<div class="container-fluid py-5">
+    <div class="booking-wrapper">
+        <!-- Main Form Area -->
+        <div class="glass-card">
+            <!-- Progress Tracker -->
+            <div class="premium-steps">
+                <div class="p-step active" id="p-indicator-1">
+                    <div class="p-step-circle">1</div>
+                    <div class="p-step-label">Dịch Vụ</div>
                 </div>
-                <div class="step-item" id="indicator-2">
-                    <div class="step-circle">2</div>
-                    <div class="step-label text-uppercase">Thời Gian</div>
+                <div class="p-step" id="p-indicator-2">
+                    <div class="p-step-circle">2</div>
+                    <div class="p-step-label">Thời Gian</div>
                 </div>
-                <div class="step-item" id="indicator-3">
-                    <div class="step-circle">3</div>
-                    <div class="step-label text-uppercase">Thông Tin</div>
+                <div class="p-step" id="p-indicator-3">
+                    <div class="p-step-circle">3</div>
+                    <div class="p-step-label">Xác Nhận</div>
                 </div>
             </div>
-        </div>
 
-        <form asp-controller="Booking" asp-action="SubmitBooking" method="post" id="bookingForm">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="ServiceId" id="ServiceId" />
-            <input type="hidden" asp-for="Date" id="Date" />
-            <input type="hidden" asp-for="Time" id="Time" />
+            <form asp-controller="Booking" asp-action="SubmitBooking" method="post" id="bookingForm">
+                @Html.AntiForgeryToken()
+                
+                <input type="hidden" asp-for="ServiceId" id="ServiceId" />
+                <input type="hidden" asp-for="Date" id="Date" />
+                <input type="hidden" asp-for="Time" id="Time" />
 
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="alert alert-danger mx-4 mt-4">
-                    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Lỗi Đặt Lịch</h5>
-                    @Html.ValidationSummary(false, "", new { @class = "mb-0" })
-                </div>
-            }
-
-            <!-- Step 1: Chọn Dịch Vụ -->
-            <div class="step-content active" id="step-1">
-                <h4 class="font-playfair text-center mb-4 text-navy">Chọn Liệu Trình Bạn Mong Muốn</h4>
-                <div class="row g-4 mb-4">
-                    @foreach (var service in ViewBag.Services)
-                    {
-                        var isSelected = Model?.ServiceId == service.ServiceId ? "selected" : "";
-                        <div class="col-md-6 col-lg-4">
-                            <div class="service-card @isSelected" onclick="selectService(@service.ServiceId, this)" data-service-id="@service.ServiceId">
-                                @if (!string.IsNullOrEmpty(service.Image))
-                                {
-                                    <div class="service-image-container position-relative overflow-hidden rounded-3 mb-3" style="height: 140px; cursor: pointer;" onclick="event.stopPropagation(); showServiceDetails(@service.ServiceId)">
-                                        <img src="@service.Image" class="w-100 h-100 object-fit-cover transition-all" alt="@service.ServiceName" />
-                                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25 opacity-0 hover-opacity-100 transition-all">
-                                            <div class="text-white text-center">
-                                                <i class="fas fa-play-circle fs-2 mb-1"></i>
-                                                <div class="small fw-bold">Chi Tiết & Video</div>
-                                            </div>
-                                        </div>
+                <!-- Step 1: Services Grid -->
+                <div class="step-panel active" id="p-step-1">
+                    <h3 class="font-playfair mb-4">Chọn liệu trình bạn mong muốn</h3>
+                    <div class="service-grid">
+                        @foreach (var service in ViewBag.Services)
+                        {
+                            var isSelected = Model?.ServiceId == service.ServiceId;
+                            var vipClass = (bool)service.IsVip ? "vip" : "";
+                            <div class="premium-service-card @(isSelected ? "selected" : "") @vipClass" 
+                                 onclick="selectService(@service.ServiceId, '@service.ServiceName', @service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture), this)"
+                                 data-aos="fade-up">
+                                <div class="service-img-wrapper">
+                                    <img src="@service.Image" alt="@service.ServiceName">
+                                    <div class="service-overlay-btn" onclick="event.stopPropagation(); showServiceDetails(@service.ServiceId)">
+                                        <i class="fas fa-search-plus"></i>
                                     </div>
-                                }
-
-                                <h5 class="font-playfair mb-2">@service.ServiceName</h5>
-                                <div class="d-flex justify-content-between text-muted small mb-2">
-                                    <span><i class="far fa-clock me-1"></i> @service.Duration phút</span>
-                                    <span class="fw-bold text-gold">@string.Format("{0:0,0}", service.Price) đ</span>
                                 </div>
-                                <p class="small text-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@service.Description</p>
+                                <div class="service-body">
+                                    <h5 class="fw-bold mb-1">@service.ServiceName</h5>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="text-muted small"><i class="far fa-clock me-1"></i> @service.Duration phút</span>
+                                        <span class="text-gold fw-bold">@string.Format("{0:0,0}", service.Price) đ</span>
+                                    </div>
+                                    <div class="selected-badge"><i class="fas fa-check me-1"></i> Đã chọn</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="text-end mt-5">
+                        <button type="button" class="btn btn-next w-auto px-5" onclick="goToStep(2)">Tiếp Tục <i class="fas fa-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Custom Calendar -->
+                <div class="step-panel" id="p-step-2">
+                    <h3 class="font-playfair mb-4">Chọn thời gian phù hợp</h3>
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="custom-calendar shadow-sm">
+                                <div class="cal-header">
+                                    <button type="button" class="btn btn-sm btn-light rounded-circle" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                                    <h5 class="mb-0 fw-bold" id="calMonthDisplay">Tháng 5, 2024</h5>
+                                    <button type="button" class="btn btn-sm btn-light rounded-circle" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="cal-grid" id="calendarGrid">
+                                    <!-- Days loaded via JS -->
+                                </div>
                             </div>
                         </div>
-                    }
-                </div>
-                <!-- Validation for Step 1 -->
-                <div class="alert alert-danger d-none" id="step1-error">
-                    <i class="fas fa-exclamation-circle me-2"></i> Vui lòng chọn một dịch vụ để tiếp tục.
-                </div>
-                <div class="text-end mt-4">
-                    <button type="button" class="btn btn-gold rounded-pill px-4 py-2 fw-bold letter-spacing-1" onclick="nextStep(2)">Tiếp Tục <i class="fas fa-arrow-right ms-2"></i></button>
-                </div>
-            </div>
-
-            <!-- Step 2: Chọn Thời Gian -->
-            <div class="step-content" id="step-2">
-                <h4 class="font-playfair text-center mb-4 text-navy">Chọn Lịch Hẹn Thoải Mái Nhất</h4>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <label class="form-label fw-bold">Chọn Ngày</label>
-                        <input type="date" class="form-control form-control-lg" id="datePicker" min="@DateTime.Now.ToString("yyyy-MM-dd")" onchange="loadTimes(this.value)">
+                        <div class="col-lg-5">
+                            <div class="time-selection-panel">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="p-1 px-3 bg-light rounded-pill small fw-bold text-navy" id="selectedDateDisplay">Chưa chọn ngày</div>
+                                </div>
+                                <h6 class="fw-bold text-navy mb-3"><i class="far fa-clock me-2"></i> Giờ khả dụng</h6>
+                                <div class="time-bubbles" id="timeSlotsContainer">
+                                    <div class="text-muted small italic">Vui lòng chọn ngày để xem giờ</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-prev" onclick="goToStep(1)"><i class="fas fa-arrow-left me-2"></i> Quay Lại</button>
+                        <button type="button" class="btn btn-next w-auto px-5" onclick="goToStep(3)">Tiếp Tục <i class="fas fa-arrow-right ms-2"></i></button>
                     </div>
                 </div>
+
+                <!-- Step 3: Confirmation -->
+                <div class="step-panel" id="p-step-3">
+                    <h3 class="font-playfair mb-4">Thông tin cá nhân</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="CustomerName" class="form-control border-0 bg-light rounded-4" placeholder="Họ và tên" id="CustomerName">
+                                <label>Họ và Tên</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="PhoneNumber" class="form-control border-0 bg-light rounded-4" placeholder="Số điện thoại" id="PhoneNumber">
+                                <label>Số Điện Thoại</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Email" class="form-control border-0 bg-light rounded-4" placeholder="Email">
+                                <label>Email (Tùy chọn)</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Notes" class="form-control border-0 bg-light rounded-4" style="height: 120px" placeholder="Yêu cầu khác"></textarea>
+                                <label>Ghi chú / Yêu cầu thêm</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning border-0 rounded-4 mt-4 small">
+                        <i class="fas fa-shield-alt me-2"></i> SpaN5 cam kết bảo mật thông tin khách hàng và chỉ sử dụng cho mục đích phục vụ lịch hẹn.
+                    </div>
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-prev" onclick="goToStep(2)"><i class="fas fa-arrow-left me-2"></i> Quay Lại</button>
+                        <button type="button" class="btn btn-next w-auto px-5" onclick="submitBookingForm()">Hoàn Tất Đặt Lịch <i class="fas fa-check-circle ms-2"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar Summary -->
+        <div class="summary-sidebar">
+            <div class="summary-card" data-aos="fade-left">
+                <h4 class="font-playfair mb-4 text-gold">Đơn lịch của bạn</h4>
                 
-                <div class="time-container mt-3 d-none" id="timeSelectionArea">
-                    <label class="form-label fw-bold mb-3">Chọn Giờ Khả Dụng</label>
-                    <div class="row g-3" id="timeSlotsGrid">
-                        <!-- Time slots will be loaded here via JS -->
-                    </div>
+                <div class="summary-item">
+                    <div class="summary-label">Dịch vụ</div>
+                    <div class="summary-value" id="sum-service">Chưa chọn</div>
                 </div>
 
-                <!-- Validation for Step 2 -->
-                <div class="alert alert-danger d-none mt-3" id="step2-error">
-                    <i class="fas fa-exclamation-circle me-2"></i> Vui lòng chọn ngày và giờ hợp lệ.
+                <div class="summary-item">
+                    <div class="summary-label">Thời gian</div>
+                    <div class="summary-value" id="sum-time">-- : --</div>
+                    <div class="summary-value small opacity-50" id="sum-date">Chưa chọn ngày</div>
                 </div>
 
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-outline-navy rounded-pill px-4 py-2 fw-bold" onclick="prevStep(1)"><i class="fas fa-arrow-left me-2"></i> Quay Lại</button>
-                    <button type="button" class="btn btn-gold rounded-pill px-4 py-2 fw-bold letter-spacing-1" onclick="nextStep(3)">Tiếp Tục <i class="fas fa-arrow-right ms-2"></i></button>
+                <div class="summary-item pt-4">
+                    <div class="summary-label">Tổng thanh toán</div>
+                    <div class="summary-price" id="sum-total">0 đ</div>
+                </div>
+
+                <div class="mt-4 p-3 rounded-3" style="background: rgba(255,255,255,0.05);">
+                    <div class="small opacity-50 mb-2"><i class="fas fa-map-marker-alt me-2"></i> Cơ sở:</div>
+                    <div class="small fw-bold">Chi nhánh N5 Premium - Quận 1</div>
                 </div>
             </div>
-
-            <!-- Step 3: Thông Tin Cá Nhân -->
-            <div class="step-content" id="step-3">
-                <h4 class="font-playfair text-center mb-4 text-navy">Thông Tin Khách Hàng</h4>
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label class="form-label">Họ và Tên <span class="text-danger">*</span></label>
-                        <input asp-for="CustomerName" class="form-control form-control-lg" id="CustomerName" placeholder="Tên của bạn">
-                        <span asp-validation-for="CustomerName" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                        <input asp-for="PhoneNumber" class="form-control form-control-lg" id="PhoneNumber" placeholder="Nhập SĐT">
-                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Email (Tuỳ chọn)</label>
-                        <input asp-for="Email" class="form-control form-control-lg" placeholder="example@email.com">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Ghi Chú</label>
-                        <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Yêu cầu đặc biệt của bạn (VD: Muốn kỹ thuật viên nữ, tránh xoa bóp mạnh,..)"></textarea>
-                    </div>
-                </div>
-                
-                <div class="alert alert-info mt-4">
-                    <strong><i class="fas fa-info-circle me-2"></i> Xác nhận:</strong> Bằng việc nhấn "Hoàn Tất Đặt Lịch", bạn xác nhận đồng ý với các chính sách dịch vụ của SpaN5.
-                </div>
-
-                <!-- Validation for Step 3 -->
-                <div class="alert alert-danger d-none mt-3" id="step3-error">
-                    <i class="fas fa-exclamation-circle me-2"></i> Vui lòng điền đầy đủ Họ Tên và Số Điện Thoại.
-                </div>
-
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-outline-navy rounded-pill px-4 py-2 fw-bold" onclick="prevStep(2)"><i class="fas fa-arrow-left me-2"></i> Quay Lại</button>
-                    <button type="button" class="btn btn-gold rounded-pill px-5 py-2 fw-bold letter-spacing-1 text-uppercase" onclick="submitForm()">Hoàn Tất Đặt Lịch</button>
-                </div>
+            
+            <div class="alert alert-info mt-3 rounded-4 border-0 small">
+                <i class="fas fa-info-circle me-2"></i> Hỗ trợ đặt lịch: <br>
+                <strong class="text-navy">1900 1234</strong>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<!-- Service Detail Modal -->
-<div class="modal fade" id="serviceDetailModal" tabindex="-1" aria-hidden="true">
+<!-- Modal Service Detail -->
+<div class="modal fade" id="serviceModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-navy text-white border-0">
-                <h5 class="modal-title font-playfair" id="modalServiceName">Chi Tiết Dịch Vụ</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div id="videoContainer" class="mb-3 d-none">
-                            <h6 class="fw-bold text-navy mb-2"><i class="fas fa-video me-2 text-gold"></i>Video Liệu Trình:</h6>
-                            <div class="video-container">
-                                <div id="videoPlayer"></div>
-                            </div>
-                        </div>
-                        <img id="modalServiceImage" src="" class="img-fluid rounded-3 shadow-sm w-100 object-fit-cover" style="max-height: 300px;" alt="">
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge bg-gold text-dark p-2" id="modalServiceDuration"></span>
-                            <span class="h4 text-gold mb-0 fw-bold" id="modalServicePrice"></span>
-                        </div>
-                        <h4 class="font-playfair text-navy mb-3" id="modalServiceTitle"></h4>
-                        <p class="text-muted mb-4" id="modalServiceDesc"></p>
-                        
-                        <div>
-                            <h6 class="fw-bold text-navy mb-3"><i class="fas fa-leaf me-2 text-success"></i>Thành phần nguyên liệu:</h6>
-                            <div id="modalMaterialsList">
-                                <!-- Materials will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer border-0 p-3">
-                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-gold rounded-pill px-4 fw-bold" id="btnSelectFromModal">Chọn Dịch Vụ Này</button>
+        <div class="modal-content shadow-lg">
+            <div id="modalBodyContent">
+                <!-- Loaded via JS -->
             </div>
         </div>
     </div>
@@ -446,215 +718,329 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // JS Logic
+        // State
         let currentStep = 1;
-        const totalSteps = 3;
+        let selectedService = { id: 0, name: '', price: 0 };
+        let selectedDate = null;
+        let selectedTime = null;
+        let calendarDate = new Date();
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Auto Select Service if passed
-            const preselectedServiceId = document.getElementById('ServiceId').value;
-            if (preselectedServiceId && preselectedServiceId !== '0') {
-                const selectedCard = document.querySelector(`.service-card[data-service-id="${preselectedServiceId}"]`);
-                if (selectedCard) {
-                    selectedCard.classList.add('selected');
-                }
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            initCalendar();
+            AOS.refresh();
             
-            // Nếu có lỗi ModelState, có thể tự động next tới bước 2 hoặc 3 nếu cần thiết
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <text>
-                if (document.getElementById('Date').value) {
-                    nextStep(2);
-                }
-                </text>
+            // Check if service is pre-selected
+            const preId = document.getElementById('ServiceId').value;
+            if(preId && preId != '0') {
+                const card = document.querySelector(`.premium-service-card[onclick*="selectService(${preId},"]`);
+                if(card) card.click();
             }
         });
 
-        // Step 1: Select Service
-        function selectService(id, element) {
+        // Step Navigation
+        function goToStep(step) {
+            // Validation
+            if (step > currentStep) {
+                if (currentStep === 1 && selectedService.id === 0) {
+                    Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Vui lòng chọn dịch vụ để tiếp tục' });
+                    return;
+                }
+                if (currentStep === 2 && (!selectedDate || !selectedTime)) {
+                    Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Vui lòng chọn ngày và giờ hẹn' });
+                    return;
+                }
+            }
+
+            // UI Update
+            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+            const targetPanel = document.getElementById(`p-step-${step}`);
+            if(targetPanel) targetPanel.classList.add('active');
+
+            document.querySelectorAll('.p-step').forEach((s, idx) => {
+                const i = idx + 1;
+                if (i < step) { s.className = 'p-step completed'; }
+                else if (i === step) { s.className = 'p-step active'; }
+                else { s.className = 'p-step'; }
+            });
+
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Service Selection
+        function selectService(id, name, price, el) {
+            selectedService = { id, name, price };
             document.getElementById('ServiceId').value = id;
-            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-            element.classList.add('selected');
-            document.getElementById('step1-error').classList.add('d-none');
+            
+            // UI
+            document.querySelectorAll('.premium-service-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+
+            // Summary
+            document.getElementById('sum-service').innerText = name;
+            document.getElementById('sum-total').innerText = price.toLocaleString('vi-VN') + ' đ';
+
+            // Reset Time if service changed (might affect availability)
+            if(selectedDate) fetchTimeSlots(selectedDate);
         }
 
-        // Navigate Next
-        function nextStep(step) {
-            // Validate step 1
-            if (step === 2 && !document.getElementById('ServiceId').value) {
-                document.getElementById('step1-error').classList.remove('d-none');
-                return;
+        // Calendar Logic
+        function initCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const display = document.getElementById('calMonthDisplay');
+            grid.innerHTML = '';
+
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            
+            display.innerText = `Tháng ${month + 1}, ${year}`;
+
+            // Add Day Names
+            const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            days.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'cal-day-name';
+                div.innerText = d;
+                grid.appendChild(div);
+            });
+
+            // Calculate dates
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const prevLastDate = new Date(year, month, 0).getDate();
+
+            // Prev month padding
+            for(let i = firstDay; i > 0; i--) {
+                const div = document.createElement('div');
+                div.className = 'cal-cell other-month';
+                div.innerText = prevLastDate - i + 1;
+                grid.appendChild(div);
             }
-            // Validate step 2
-            if (step === 3 && (!document.getElementById('Date').value || !document.getElementById('Time').value)) {
-                document.getElementById('step2-error').classList.remove('d-none');
-                return;
+
+            // Current month
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            for(let i = 1; i <= lastDate; i++) {
+                const date = new Date(year, month, i);
+                const div = document.createElement('div');
+                div.className = 'cal-cell';
+                div.innerText = i;
+
+                if(date < today) {
+                    div.classList.add('disabled');
+                } else {
+                    if(date.getTime() === today.getTime()) div.classList.add('today');
+                    
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                    if(selectedDate === dateStr) div.classList.add('selected');
+
+                    div.onclick = () => selectDate(dateStr, div);
+                }
+                grid.appendChild(div);
             }
-
-            // Move
-            document.getElementById('step-' + currentStep).classList.remove('active');
-            document.getElementById('step-' + step).classList.add('active');
-            
-            // Update indicator
-            document.getElementById('indicator-' + currentStep).classList.remove('active');
-            document.getElementById('indicator-' + currentStep).classList.add('completed');
-            document.getElementById('indicator-' + step).classList.add('active');
-            
-            currentStep = step;
         }
 
-        // Navigate Prev
-        function prevStep(step) {
-            document.getElementById('step-' + currentStep).classList.remove('active');
-            document.getElementById('step-' + step).classList.add('active');
-            
-            document.getElementById('indicator-' + currentStep).classList.remove('active');
-            document.getElementById('indicator-' + step).classList.remove('completed');
-            document.getElementById('indicator-' + step).classList.add('active');
-            
-            currentStep = step;
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            initCalendar();
         }
 
-        // Load Times via API
-        function loadTimes(date) {
-            document.getElementById('Date').value = date;
-            document.getElementById('Time').value = ''; // Reset
+        function selectDate(dateStr, el) {
+            selectedDate = dateStr;
+            document.getElementById('Date').value = dateStr;
             
-            if(!date) return;
+            // UI
+            document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
 
-            const serviceId = document.getElementById('ServiceId').value || 0;
-            const grid = document.getElementById('timeSlotsGrid');
-            const area = document.getElementById('timeSelectionArea');
-            
-            grid.innerHTML = '<div class="text-center p-3"><i class="fas fa-spinner fa-spin fa-2x text-gold"></i></div>';
-            area.classList.remove('d-none');
-            document.getElementById('step2-error').classList.add('d-none');
+            const d = new Date(dateStr);
+            document.getElementById('selectedDateDisplay').innerText = d.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('sum-date').innerText = d.toLocaleDateString('vi-VN');
 
-            // API Call
-            fetch(`/Booking/GetAvailableTimes?date=${date}&serviceId=${serviceId}`)
+            fetchTimeSlots(dateStr);
+        }
+
+        function fetchTimeSlots(date) {
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = '<div class="spinner-border spinner-border-sm text-gold"></div>';
+
+            fetch(`/Booking/GetAvailableTimes?date=${date}&serviceId=${selectedService.id}`)
                 .then(res => res.json())
                 .then(data => {
-                    grid.innerHTML = '';
-                    if (data.success && data.times.length > 0) {
-                        data.times.forEach(item => {
-                            const isBooked = item.isBooked;
-                            const bookedClass = isBooked ? 'booked' : '';
-                            const clickAttr = isBooked ? '' : `onclick="selectTime('${item.time}', this)"`;
-                            const titleAttr = isBooked ? 'title="Khung giờ đã có người chọn"' : '';
+                    container.innerHTML = '';
+                    if(data.success && data.times.length > 0) {
+                        data.times.forEach(slot => {
+                            const bubble = document.createElement('div');
+                            let statusClass = '';
+                            if (slot.isPast) statusClass = 'past';
+                            else if (slot.isFull) statusClass = 'booked';
                             
-                            grid.innerHTML += `
-                                <div class="col-4 col-md-3 col-lg-2">
-                                    <div class="time-slot ${bookedClass}" ${clickAttr} ${titleAttr}>${item.time}</div>
-                                </div>
-                            `;
+                            bubble.className = `time-bubble ${statusClass}`;
+                            bubble.innerText = slot.time;
+                            
+                            if (statusClass === '') {
+                                if(selectedTime === slot.time) bubble.classList.add('selected');
+                                bubble.onclick = () => selectTimeSlot(slot.time, bubble);
+                            } else {
+                                bubble.title = slot.isPast ? 'Thời gian này đã qua' : 'Đã hết phòng cho khung giờ này';
+                            }
+                            container.appendChild(bubble);
                         });
+                    } else {
+                        container.innerHTML = '<div class="text-danger small">Hết lịch trống trong ngày này</div>';
                     }
- else {
-                        grid.innerHTML = '<div class="text-danger px-3">Không có khung giờ nào trống trong ngày này.</div>';
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    grid.innerHTML = '<div class="text-danger px-3">Lỗi tải dữ liệu. Vui lòng thử lại.</div>';
                 });
         }
 
-        function selectTime(time, element) {
+        function selectTimeSlot(time, el) {
+            selectedTime = time;
             document.getElementById('Time').value = time;
-            document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
-            element.classList.add('selected');
-            document.getElementById('step2-error').classList.add('d-none');
+            
+            document.querySelectorAll('.time-bubble').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+
+            document.getElementById('sum-time').innerText = time;
         }
 
-        function submitForm() {
-            // Basic validation for Step 3
+        function submitBookingForm() {
             const name = document.getElementById('CustomerName').value.trim();
             const phone = document.getElementById('PhoneNumber').value.trim();
-            
-            if (!name || !phone) {
-                document.getElementById('step3-error').classList.remove('d-none');
+
+            if(!name || !phone) {
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Vui lòng điền đầy đủ họ tên và số điện thoại liên lạc' });
                 return;
             }
-            
-            document.getElementById('bookingForm').submit();
+
+            Swal.fire({
+                title: 'Xác nhận đặt lịch?',
+                text: "SpaN5 sẽ liên hệ với bạn để xác nhận lại lịch hẹn",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1a2b3c',
+                cancelButtonColor: '#999',
+                confirmButtonText: 'Đồng ý đặt lịch',
+                cancelButtonText: 'Kiểm tra lại'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('bookingForm');
+                    const formData = new FormData(form);
+
+                    // Hiển thị loading
+                    Swal.fire({
+                        title: 'Đang xử lý...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            window.location.href = data.redirectUrl;
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Thông báo',
+                                html: data.message
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({ icon: 'error', title: 'Lỗi hệ thống', text: 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.' });
+                    });
+                }
+            });
         }
 
-        // Service Details Logic
+        // Preload Service Modal (Modern implementation)
         function showServiceDetails(id) {
-            const modalElement = document.getElementById('serviceDetailModal');
+            const modalElement = document.getElementById('serviceModal');
             const modal = new bootstrap.Modal(modalElement);
-            const materialsList = document.getElementById('modalMaterialsList');
-            const videoContainer = document.getElementById('videoContainer');
-            const videoPlayer = document.getElementById('videoPlayer');
+            const content = document.getElementById('modalBodyContent');
             
-            // Loading state
-            materialsList.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin text-gold"></i> Đang tải...</div>';
-            videoContainer.classList.add('d-none');
-            videoPlayer.innerHTML = '';
+            content.innerHTML = '<div class="p-5 text-center"><div class="spinner-border text-gold mb-3"></div><p class="text-muted">Đang tải thông tin dịch vụ...</p></div>';
+            content.className = 'modal-body p-0'; 
             modal.show();
 
-            // Clear video on close
-            modalElement.addEventListener('hidden.bs.modal', function () {
-                videoPlayer.innerHTML = '';
-            }, { once: true });
-
             fetch(`/Booking/GetServiceDetails/${id}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    return res.json();
+                })
                 .then(response => {
-                    if (response.success) {
+                    if(response.success) {
                         const data = response.data;
-                        document.getElementById('modalServiceTitle').innerText = data.serviceName;
-                        document.getElementById('modalServiceDesc').innerText = data.description || 'Chưa có mô tả.';
-                        document.getElementById('modalServicePrice').innerText = data.price.toLocaleString('vi-VN') + ' đ';
-                        document.getElementById('modalServiceDuration').innerHTML = `<i class="far fa-clock me-1"></i> ${data.duration} phút`;
-                        document.getElementById('modalServiceImage').src = data.image || '/images/default-spa.jpg';
+                        // Handle potential case-sensitivity issues from JSON serializer
+                        const isVip = data.isVip || data.IsVip || false;
+                        const sId = data.serviceId || data.ServiceId || id;
+                        const sName = data.serviceName || data.ServiceName || 'Dịch vụ';
+                        const sPrice = data.price || data.Price || 0;
+                        const sImg = data.image || data.Image || 'https://via.placeholder.com/600x800';
+                        const sDur = data.duration || data.Duration || 0;
+                        const sDesc = data.description || data.Description || 'Mô tả đang cập nhật...';
+                        const sVid = data.videoUrl || data.VideoUrl || null;
+
+                        if (isVip) content.classList.add('vip-theme');
                         
-                        // Handle Video
-                        if (data.videoUrl) {
-                            videoContainer.classList.remove('d-none');
-                            if (data.videoUrl.includes('youtube.com') || data.videoUrl.includes('youtu.be')) {
-                                // Simple YouTube embed logic
-                                let videoId = '';
-                                if (data.videoUrl.includes('v=')) videoId = data.videoUrl.split('v=')[1].split('&')[0];
-                                else videoId = data.videoUrl.split('/').pop();
-                                videoPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-                            } else if (data.videoUrl.includes('vimeo.com')) {
-                                let videoId = data.videoUrl.split('/').pop();
-                                videoPlayer.innerHTML = `<iframe src="https://player.vimeo.com/video/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-                            } else {
-                                // Local or direct video link
-                                videoPlayer.innerHTML = `<video controls class="w-100"><source src="${data.videoUrl}" type="video/mp4">Trình duyệt không hỗ trợ video.</video>`;
-                            }
-                        }
-
-                        materialsList.innerHTML = '';
-                        if (data.materials && data.materials.length > 0) {
-                            data.materials.forEach(m => {
-                                materialsList.innerHTML += `
-                                    <div class="material-item d-flex justify-content-between align-items-center">
-                                        <span>${m.materialName}</span>
-                                        <span class="badge bg-light text-dark fw-normal">${m.quantity} ${m.unit}</span>
+                        content.innerHTML = `
+                            <div class="row g-0">
+                                <div class="col-lg-5 position-relative">
+                                    <img src="${sImg}" class="w-100 h-100 object-fit-cover" style="min-height: 400px;">
+                                    ${isVip ? '<div class="position-absolute top-0 start-0 p-3"><span class="vip-badge-premium"><i class="fas fa-crown me-2"></i>Trải nghiệm thượng lưu</span></div>' : ''}
+                                </div>
+                                <div class="col-lg-7 p-5">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            ${isVip ? '<small class="text-gold fw-bold text-uppercase ls-1">Dịch vụ đặc quyền</small>' : ''}
+                                            <h2 class="font-playfair mb-0 ${isVip ? 'vip-title' : 'text-navy'}">${sName}</h2>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                `;
-                            });
-                        } else {
-                            materialsList.innerHTML = '<p class="text-muted small">Thông tin nguyên liệu đang được cập nhật.</p>';
-                        }
+                                    <div class="d-flex gap-3 mb-4">
+                                        <span class="badge ${isVip ? 'bg-navy text-gold' : 'bg-gold text-dark'} px-3 py-2">${sDur} phút</span>
+                                        <span class="badge bg-light text-navy border px-3 py-2">${sPrice.toLocaleString('vi-VN')} đ</span>
+                                    </div>
+                                    <p class="text-muted leading-relaxed mb-4">${sDesc}</p>
+                                    
+                                    ${sVid ? `
+                                        <div class="mt-4">
+                                            <h6 class="fw-bold mb-3"><i class="fas fa-play-circle me-2"></i> Xem Video Liệu Trình</h6>
+                                            <div class="ratio ratio-16x9 rounded-4 overflow-hidden ${isVip ? 'shadow-lg border-2 border-gold' : 'shadow-sm'}">
+                                                <iframe src="${sVid.replace('watch?v=', 'embed/')}" allowfullscreen></iframe>
+                                            </div>
+                                        </div>
+                                    ` : ''}
 
-                        // Update select button in modal
-                        document.getElementById('btnSelectFromModal').onclick = function() {
-                            const card = document.querySelector(`.service-card[data-service-id="${id}"]`);
-                            selectService(id, card);
-                            modal.hide();
-                        };
+                                    <div class="mt-5">
+                                        <button class="btn ${isVip ? 'btn-next' : 'btn-outline-navy'} w-auto px-5" onclick="selectFromModal(${sId}, '${sName}', ${sPrice})">Chọn Dịch Vụ Này</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        content.innerHTML = `<div class="p-5 text-center text-danger"><i class="fas fa-exclamation-circle fa-3x mb-3"></i><p>${response.message || 'Không thể tải thông tin'}</p></div>`;
                     }
                 })
                 .catch(err => {
-                    console.error(err);
-                    materialsList.innerHTML = '<div class="text-danger">Lỗi tải dữ liệu.</div>';
+                    console.error('Modal Fetch Error:', err);
+                    content.innerHTML = `<div class="p-5 text-center text-danger"><i class="fas fa-wifi-slash fa-3x mb-3"></i><p>Lỗi kết nối máy chủ. Vui lòng thử lại sau.</p></div>`;
                 });
+        }
+
+        function selectFromModal(id, name, price) {
+            const card = document.querySelector(`.premium-service-card[onclick*="selectService(${id},"]`);
+            if(card) card.click();
+            bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
         }
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }

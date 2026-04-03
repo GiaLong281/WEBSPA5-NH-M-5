@@ -2,149 +2,231 @@
 @{
     ViewData["Title"] = "Đặt Lịch Thành Công";
     var firstDetail = Model.BookingDetails.FirstOrDefault();
-    var serviceName = firstDetail?.Service?.ServiceName ?? "Dịch vụ đã chọn";
+    var service = firstDetail?.Service;
+    var serviceName = service?.ServiceName ?? "Dịch vụ đã chọn";
+    var isVip = service?.IsVip ?? false;
 }
 
 <style>
-    .success-container {
-        max-width: 800px;
-        margin: 0 auto;
+    :root {
+        --p-navy: #1a2b3c;
+        --p-gold: #c5a880;
+        --p-gold-light: #e8d5b5;
+        --p-beige: #f9f7f4;
     }
-    .success-card {
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        overflow: hidden;
-        border-top: 6px solid #d4af37;
+
+    body {
+        background-color: var(--p-beige);
+        font-family: 'Inter', sans-serif;
+        color: var(--p-navy);
     }
-    .success-header {
-        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-        padding: 40px 20px;
-        text-align: center;
+
+    .main-wrapper {
+        padding: 50px 20px;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
+
     .success-icon {
-        width: 80px;
-        height: 80px;
-        background: #d4af37;
-        color: white;
-        font-size: 40px;
+        width: 60px;
+        height: 60px;
+        background: #f0fff4;
+        color: #2f855a;
+        border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 50%;
-        margin: 0 auto 20px;
-        box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        font-size: 24px;
+        margin-bottom: 20px;
+        border: 2px solid #c6f6d5;
+        animation: scaleIn 0.5s ease-out;
     }
-    .booking-info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        padding: 30px;
-        background: #fafafa;
-        border-radius: 15px;
-        margin: 20px;
+
+    @@keyframes scaleIn {
+        from { transform: scale(0); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
-    .info-item {
-        border-bottom: 1px dashed #eee;
-        padding-bottom: 15px;
-    }
-    .info-label {
-        color: #888;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
-    }
-    .info-value {
-        color: #333;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-    .booking-code-box {
-        background: rgba(212, 175, 55, 0.1);
-        border: 2px dashed #d4af37;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
+
+    .title-area {
         text-align: center;
+        margin-bottom: 30px;
     }
-    .code-text {
-        font-size: 2rem;
+
+    .title-area h3 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--p-navy);
+        margin-bottom: 5px;
+        font-size: 1.8rem;
+    }
+
+    .title-area p {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .compact-ticket {
+        background: white;
+        width: 100%;
+        max-width: 650px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        overflow: hidden;
+        border-top: 4px solid var(--p-gold);
+    }
+
+    .ticket-section {
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 0.65rem;
         font-weight: 800;
-        color: #d4af37;
-        letter-spacing: 3px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--p-gold);
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f8f8f8;
+        padding-bottom: 8px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .summary-item label {
         display: block;
+        font-size: 0.65rem;
+        color: #aaa;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .summary-item p {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .booking-code-box {
+        text-align: center;
+        padding: 15px;
+        background: #fafafb;
+        border-radius: 8px;
+        border: 1px dashed #eee;
+        margin-top: 20px;
+    }
+
+    .booking-code-box h6 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        letter-spacing: 4px;
+        color: var(--p-gold);
+        margin-bottom: 0;
+        font-weight: 700;
+    }
+
+    .action-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 25px;
+        justify-content: center;
+    }
+
+    .btn-ticket {
+        padding: 10px 25px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 6px;
+        text-transform: uppercase;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-dark-main { background: var(--p-navy); color: white; border: none; }
+    .btn-gold-sub { background: var(--p-gold); color: white; border: none; }
+    .btn-outline-sub { background: white; color: #555; border: 1px solid #ddd; }
+
+    .btn-ticket:hover { transform: translateY(-2px); opacity: 0.9; }
+
+    .vip-status-mark {
+        display: inline-block;
+        padding: 2px 10px;
+        background: linear-gradient(45deg, var(--p-gold), #e8d5b5);
+        color: var(--p-navy);
+        border-radius: 4px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        margin-left: 10px;
+    }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 0.75rem;
+        color: #999;
     }
 </style>
 
-<div class="container py-5">
-    <div class="success-container">
-        <div class="success-card">
-            <div class="success-header">
-                <div class="success-icon">
-                    <i class="fas fa-check"></i>
+<div class="main-wrapper">
+    <div class="success-icon">
+        <i class="fas fa-check"></i>
+    </div>
+    <div class="title-area">
+        <h3>Đặt Lịch Thành Công</h3>
+        <p>Cảm ơn bạn đã lựa chọn dịch vụ tại SpaN5 Premium.</p>
+    </div>
+
+    <div class="compact-ticket">
+        <div class="ticket-section">
+            <div class="section-title">Thông tin dịch vụ</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <label>Dịch vụ</label>
+                    <p>@serviceName @if(isVip) { <span class="vip-status-mark">VIP</span> }</p>
                 </div>
-                <h2 class="font-playfair display-6 text-dark mb-2">Đặt Lịch Thành Công!</h2>
-                <p class="text-muted">Cảm ơn @Model.Customer.FullName đã tin tưởng SpaN5</p>
+                <div class="summary-item">
+                    <label>Tổng phí</label>
+                    <p class="text-gold">@Model.TotalAmount.ToString("N0") VNĐ</p>
+                </div>
+                <div class="summary-item">
+                    <label>Ngày hẹn</label>
+                    <p>@Model.StartTime.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="summary-item">
+                    <label>Giờ hẹn</label>
+                    <p>@Model.StartTime.ToString("HH:mm") (@service?.Duration phút)</p>
+                </div>
             </div>
 
-            <div class="p-4">
-                <h5 class="mb-4 text-center text-uppercase fw-bold" style="color: #d4af37; letter-spacing: 2px;">Thông Tin Lịch Hẹn</h5>
-                
-                <div class="booking-info-grid">
-                    <div class="info-item">
-                        <div class="info-label"><i class="fas fa-user me-2"></i> Khách hàng</div>
-                        <div class="info-value">@Model.Customer.FullName</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label"><i class="fas fa-phone me-2"></i> Số điện thoại</div>
-                        <div class="info-value">@Model.Customer.Phone</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label"><i class="fas fa-spa me-2"></i> Gói dịch vụ</div>
-                        <div class="info-value">@serviceName</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label"><i class="fas fa-calendar-alt me-2"></i> Ngày hẹn</div>
-                        <div class="info-value">@Model.StartTime.ToString("dd/MM/yyyy")</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label"><i class="fas fa-clock me-2"></i> Giờ hẹn</div>
-                        <div class="info-value">@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label"><i class="fas fa-money-bill-wave me-2"></i> Tổng cộng</div>
-                        <div class="info-value text-success">@Model.TotalAmount.ToString("N0") VNĐ</div>
-                    </div>
-                </div>
+            <div class="booking-code-box">
+                <p class="small text-muted mb-1">Mã lịch hẹn của bạn</p>
+                <h6>@Model.BookingCode</h6>
+            </div>
 
-                <div class="px-4">
-                    <div class="booking-code-box">
-                        <span class="info-label">Mã số Booking</span>
-                        <span class="code-text">@Model.BookingCode</span>
-                        <p class="small text-muted mt-2 mb-0">Vui lòng cung cấp mã này cho nhân viên lễ tân khi đến spa.</p>
-                    </div>
-                </div>
-
-                <!-- THÔNG BÁO THANH TOÁN TẠI QUẦY -->
-                <div class="mt-5 px-4 text-center">
-                    <div class="p-4 rounded-4" style="background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2);">
-                        <i class="fas fa-info-circle fa-2x mb-3" style="color: #d4af37;"></i>
-                        <h5 class="fw-bold mb-2">Thanh toán tại quầy</h5>
-                        <p class="text-muted mb-0">Quý khách vui lòng thanh toán trực tiếp tại quầy lễ tân sau khi sử dụng dịch vụ. Chúng tôi chấp nhận cả Tiền mặt và Chuyển khoản.</p>
-                    </div>
-                </div>
-
-                <div class="text-center mt-5 mb-4">
-                    <p class="text-muted small px-5">Chúng tôi đã gửi thông tin chi tiết qua email/SMS của bạn. Nhân viên sẽ liên hệ lại để xác nhận lịch hẹn trong ít phút.</p>
-                    <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a href="/" class="btn btn-outline-dark rounded-pill px-4">Về Trang Chủ</a>
-                        <a href="@Url.Action("Details", "Booking", new { bookingCode = Model.BookingCode })" class="btn btn-primary rounded-pill px-4"><i class="fas fa-tasks me-2"></i>Quản Lý Lịch Hẹn</a>
-                        <a href="/Booking" class="btn btn-gold text-white rounded-pill px-4" style="background-color: #d4af37;">Đặt Thêm Lịch</a>
-                        <button onclick="window.print()" class="btn btn-light rounded-pill px-4"><i class="fas fa-print me-2"></i>In phiếu</button>
-                    </div>
-                </div>
+            <div class="action-group">
+                <a href="/" class="btn btn-ticket btn-outline-sub">Trang Chủ</a>
+                <a href="@Url.Action("Details", "Booking", new { bookingCode = Model.BookingCode })" class="btn btn-ticket btn-dark-main">
+                    Chi tiết & Hủy
+                </a>
+                <a href="/Booking" class="btn btn-ticket btn-gold-sub">
+                    Đặt thêm lịch
+                </a>
             </div>
         </div>
+        
+        <div class="ticket-section bg-light py-4 text-center">
+            <p class="small text-muted mb-0">Địa chỉ: 123 Đường Tự Do, Quận 1, HCM <br> Hotline: 1900 123 456</p>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <p>Thông tin xác nhận đã được gửi đến email/SMS của quý khách. <br> Hẹn gặp lại quý khách vào ngày @Model.StartTime.ToString("dd/MM/yyyy")!</p>
     </div>
 </div>

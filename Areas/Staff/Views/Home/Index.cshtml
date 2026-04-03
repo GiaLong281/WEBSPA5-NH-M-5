@@ -19,6 +19,130 @@
     </div>
 </div>
 
+<!-- Simplified Stats -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="bg-white p-3 rounded-4 border shadow-sm d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="bg-gold-light p-2 rounded-circle me-3">
+                    <i class="fas fa-calendar-check text-gold"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">TỔNG LỊCH ĐANG CHỜ/PHỤC VỤ</h6>
+                    <div class="h4 mb-0 fw-bold text-gold">@Model.Count() <span class="small text-muted fw-normal" style="font-size: 0.8rem;">lượt đặt chỗ</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Dịch Vụ Section -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h5 class="font-playfair fw-bold mb-3"><i class="fas fa-tasks text-gold me-2"></i>Task Dịch Vụ</h5>
+        <div id="serviceTasks" class="accordion accordion-flush rounded-4 overflow-hidden shadow-sm border bg-white">
+            @{
+                // Lấy tất cả các dịch vụ từ ViewBag
+                var allServices = ViewBag.Services as IEnumerable<SpaN5.Models.Service> ?? new List<SpaN5.Models.Service>();
+            }
+            @if (!allServices.Any())
+            {
+                <div class="p-4 text-center text-muted">Chưa có dịch vụ nào trong hệ thống.</div>
+            }
+            @foreach (var service in allServices)
+            {
+                var details = Model
+                    .SelectMany(b => b.BookingDetails)
+                    .Where(bd => bd.ServiceId == service.ServiceId && bd.Booking.Status != SpaN5.Models.BookingStatus.Cancelled)
+                    .ToList();
+                
+                var inProgressCount = details.Count(bd => bd.Booking.Status == SpaN5.Models.BookingStatus.InProgress);
+                var maxCapacity = service.MaxCapacity > 0 ? service.MaxCapacity : 10;
+                
+                <div class="accordion-item border-bottom">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed py-3 px-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#svc-@service.ServiceId">
+                            <span class="d-flex align-items-center w-100">
+                                <i class="fas fa-spa text-gold me-3"></i>
+                                <span class="me-auto text-navy">@service.ServiceName</span>
+                                <span class="badge @(inProgressCount > 0 ? "bg-success" : "bg-light text-muted border") rounded-pill me-3" style="font-size: 0.75rem;">
+                                    @inProgressCount/@maxCapacity phòng đang dùng
+                                </span>
+                            </span>
+                        </button>
+                    </h2>
+                    <div id="svc-@service.ServiceId" class="accordion-collapse collapse" data-bs-parent="#serviceTasks">
+                        <div class="accordion-body bg-light bg-opacity-25 p-4">
+                            <!-- Room Grid -->
+                            <div class="detail-label mb-3 d-flex align-items-center">
+                                <span>TRẠNG THÁI PHÒNG</span>
+                                <div class="ms-auto d-flex gap-3 h6 mb-0" style="font-size: 0.65rem;">
+                                    <span><i class="fas fa-square text-success me-1"></i> Trống</span>
+                                    <span><i class="fas fa-square text-danger me-1"></i> Đang dùng</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mb-4">
+                                @for (int i = 1; i <= maxCapacity; i++)
+                                {
+                                    var currentOccupant = details.FirstOrDefault(bd => bd.RoomNumber == i && bd.Booking.Status == SpaN5.Models.BookingStatus.InProgress);
+                                    if (currentOccupant != null)
+                                    {
+                                        <div class="room-slot occupied" title="Phòng @i: @currentOccupant.Booking.Customer?.FullName">
+                                            <div class="room-number">@i</div>
+                                            <div class="room-status text-uppercase">BẬN</div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="room-slot empty" title="Phòng @i: Trống">
+                                            <div class="room-number">@i</div>
+                                            <div class="room-status text-uppercase">TRỐNG</div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <!-- Customers for this service -->
+                            <div class="detail-label mb-3">DANH SÁCH ĐĂNG KÝ</div>
+                            <div class="table-responsive rounded-3 border bg-white">
+                                <table class="table table-sm mb-0 align-middle">
+                                    <thead class="bg-light">
+                                        <tr class="text-muted small" style="font-size: 0.7rem;">
+                                            <th class="ps-3 py-2 border-0">KHÁCH HÀNG</th>
+                                            <th class="py-2 border-0">THỜI GIAN</th>
+                                            <th class="py-2 border-0">TRẠNG THÁI</th>
+                                            <th class="py-2 border-0">PHÒNG</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detail in details)
+                                        {
+                                            <tr style="font-size: 0.85rem;">
+                                                <td class="ps-3 py-2 fw-medium">@detail.Booking.Customer?.FullName</td>
+                                                <td class="py-2">@detail.Booking.StartTime.ToString("HH:mm")</td>
+                                                <td class="py-2">
+                                                    @if(detail.Booking.Status == SpaN5.Models.BookingStatus.InProgress) {
+                                                        <span class="text-success fw-bold"><i class="fas fa-play-circle me-1"></i>Đang phục vụ</span>
+                                                    } else {
+                                                        <span class="text-warning fw-bold"><i class="fas fa-clock me-1"></i>Chờ phục vụ</span>
+                                                    }
+                                                </td>
+                                                <td class="py-2 fw-bold @(detail.RoomNumber.HasValue ? "text-danger" : "text-muted")">
+                                                    @(detail.RoomNumber.HasValue ? "Phòng " + detail.RoomNumber : "-")
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
 @if (!Model.Any())
 {
     <div class="glass-card p-5 text-center mt-5 shadow-sm border-0 rounded-4">
@@ -183,6 +307,50 @@ else
     .step-modern.active::after { color: var(--gold); font-weight: 600; }
     .step-connector { flex: 1; height: 3px; background: #dee2e6; margin: 0 5px; z-index: 1; }
     .step-connector.active { background: var(--gold); }
+
+    /* Room Matrix Styles */
+    .room-slot {
+        width: 70px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        cursor: default;
+    }
+    .room-slot.empty {
+        background-color: #e8f5e9;
+        border-color: #a5d6a7;
+        color: #2e7d32;
+    }
+    .room-slot.occupied {
+        background-color: #ffebee;
+        border-color: #ef9a9a;
+        color: #c62828;
+        box-shadow: 0 4px 8px rgba(198, 40, 40, 0.1);
+        animation: pulse-red 2s infinite;
+    }
+    .room-number { font-size: 1.1rem; font-weight: 800; line-height: 1; }
+    .room-status { font-size: 0.55rem; font-weight: 700; margin-top: 2px; }
+
+    @@keyframes pulse-red {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: inherit;
+        box-shadow: none;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
 </style>
 
 <!-- Modal: Thêm dịch vụ -->

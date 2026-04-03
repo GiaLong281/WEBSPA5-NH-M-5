@@ -52,6 +52,8 @@ namespace SpaN5.Controllers
                 service.Duration,
                 service.Image,
                 service.VideoUrl,
+                service.IsVip,
+                service.MaxCapacity,
                 Materials = service.ServiceMaterials.Select(sm => new
                 {
                     sm.Material?.MaterialName,
@@ -65,8 +67,12 @@ namespace SpaN5.Controllers
 
         // API GET: /Booking/GetAvailableTimes?date=2024-05-20&serviceId=1
         [HttpGet]
-        public IActionResult GetAvailableTimes(string date, int serviceId)
+        public async Task<IActionResult> GetAvailableTimes(string date, int serviceId)
         {
+            var service = await _context.Services.FindAsync(serviceId);
+            // Bắt buộc sức chứa tối thiểu là 10 nếu đang để 0 hoặc null
+            int maxCapacity = (service?.MaxCapacity ?? 10) <= 0 ? 10 : service.MaxCapacity;
+
             // Lấy ra các khung giờ hoạt động tiêu chuẩn
             var standardSlots = new List<string>
             {
@@ -79,21 +85,31 @@ namespace SpaN5.Controllers
 
             if (DateTime.TryParse(date, out DateTime selectedDate))
             {
-                // Find start times that are booked on that day
-                var bookedBookings = _context.Bookings
+                var now = DateTime.Now;
+                // Chốt lại danh sách booking hợp lệ trong ngày cho dịch vụ này
+                var bookedBookings = await _context.Bookings
                     .Where(b => b.BookingDate.Date == selectedDate.Date && b.Status != BookingStatus.Cancelled)
+                    .Where(b => b.BookingDetails.Any(bd => bd.ServiceId == serviceId))
                     .Select(b => new { b.StartTime, b.EndTime })
-                    .ToList();
+                    .ToListAsync();
                 
                 foreach (var slot in standardSlots)
                 {
-                    DateTime slotTime = DateTime.Parse($"{date} {slot}");
-                    bool isBooked = bookedBookings.Any(b => slotTime >= b.StartTime && slotTime < b.EndTime);
+                    DateTime slotTime = DateTime.ParseExact($"{date} {slot}", "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
                     
+                    bool isPast = selectedDate.Date == now.Date && slotTime < now;
+                    // Một người chiếm chỗ từ StartTime đến EndTime (không bao gồm EndTime)
+                    int currentOccupancy = bookedBookings.Count(b => slotTime >= b.StartTime && slotTime < b.EndTime);
+                    
+                    bool isFull = currentOccupancy >= maxCapacity;
+
                     timeSlotsResponse.Add(new
                     {
                         time = slot,
-                        isBooked = isBooked
+                        isFull = isFull,
+                        isPast = isPast,
+                        remaining = isPast ? 0 : Math.Max(0, maxCapacity - currentOccupancy),
+                        total = maxCapacity
                     });
                 }
             }
@@ -101,7 +117,7 @@ namespace SpaN5.Controllers
             {
                 foreach (var slot in standardSlots)
                 {
-                    timeSlotsResponse.Add(new { time = slot, isBooked = false });
+                    timeSlotsResponse.Add(new { time = slot, isFull = false, remaining = maxCapacity, total = maxCapacity });
                 }
             }
 
@@ -133,28 +149,35 @@ namespace SpaN5.Controllers
                 }
 
                 var service = await _context.Services.FindAsync(model.ServiceId);
-                if (service == null) return NotFound("Không tìm thấy dịch vụ");
+                if (service == null) return Json(new { success = false, message = "Không tìm thấy dịch vụ" });
 
-                DateTime bookingDateTime = DateTime.Parse($"{model.Date} {model.Time}");
+                // Chuyển đổi ngày giờ an toàn
+                DateTime bookingDateTime;
+                try {
+                    bookingDateTime = DateTime.ParseExact($"{model.Date} {model.Time}", "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+                } catch {
+                    return Json(new { success = false, message = "Định dạng thời gian không hợp lệ." });
+                }
+
                 int duration = service.Duration > 0 ? service.Duration : 60;
                 DateTime bookingEndTime = bookingDateTime.AddMinutes(duration);
 
-                // KIỂM TRA TRÙNG LỊCH: Kiểm tra xem có booking nào chồng chéo khung giờ không
-                bool isOverlapping = await _context.Bookings.AnyAsync(b => 
-                    b.BookingDate.Date == bookingDateTime.Date &&
-                    b.Status != BookingStatus.Cancelled &&
-                    (
+                // KIỂM TRA SỨC CHỨA: Đếm số lượng booking đang chiếm chỗ
+                int currentOccupancy = await _context.Bookings
+                    .Where(b => b.BookingDate.Date == bookingDateTime.Date && b.Status != BookingStatus.Cancelled)
+                    .Where(b => b.BookingDetails.Any(bd => bd.ServiceId == model.ServiceId))
+                    .CountAsync(b => 
                         (bookingDateTime >= b.StartTime && bookingDateTime < b.EndTime) || 
                         (bookingEndTime > b.StartTime && bookingEndTime <= b.EndTime) ||
                         (bookingDateTime <= b.StartTime && bookingEndTime >= b.EndTime)
-                    )
-                );
+                    );
 
-                if (isOverlapping)
+                // Nếu sức chứa trong DB là 0 hoặc null, mặc định là 10
+                int maxCapacity = service.MaxCapacity > 0 ? service.MaxCapacity : 10;
+
+                if (currentOccupancy >= maxCapacity)
                 {
-                    ModelState.AddModelError(string.Empty, "Khung giờ này đã có người đặt hoặc bị trùng một phần thời gian dịch vụ. Vui lòng chọn khung giờ hoặc ngày khác.");
-                    ViewBag.Services = await _context.Services.Where(s => s.IsActive).ToListAsync();
-                    return View("Index", model); // Trả về lại trang đặt lịch với lỗi
+                    return Json(new { success = false, message = "Xin lỗi, khung giờ này cho dịch vụ này đã hết phòng. Vui lòng chọn khung giờ khác." });
                 }
 
                 // Tạo Booking
@@ -162,7 +185,7 @@ namespace SpaN5.Controllers
                 {
                     BookingCode = "BK" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                     CustomerId = customer.CustomerId,
-                    BranchId = 1, // Tạm fix nhánh 1 vì chưa có UI chọn Branch
+                    BranchId = 1, 
                     BookingDate = DateTime.Parse(model.Date),
                     StartTime = bookingDateTime,
                     EndTime = bookingEndTime,
@@ -183,12 +206,11 @@ namespace SpaN5.Controllers
                 _context.Bookings.Add(booking);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Success", new { bookingCode = booking.BookingCode });
+                return Json(new { success = true, redirectUrl = Url.Action("Success", new { bookingCode = booking.BookingCode }) });
             }
 
-            // Nếu model lỗi, tải lại danh sách dịch vụ
-            ViewBag.Services = await _context.Services.Where(s => s.IsActive).ToListAsync();
-            return View("Index", model);
+            var errors = string.Join("<br>", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            return Json(new { success = false, message = "Lỗi dữ liệu:<br>" + errors });
         }
 
         public async Task<IActionResult> Success(string bookingCode)
@@ -313,6 +335,37 @@ namespace SpaN5.Controllers
             if (customer == null) return NotFound();
 
             return View(customer);
+        }
+        // GET: Booking/ResetData
+        // TEMPORARY DEVELOPER TOOL: Resets all bookings and sets service capacities to 10.
+        public async Task<IActionResult> ResetData()
+        {
+            try
+            {
+                // 1. Clear all booking related data
+                var bookingDetails = await _context.BookingDetails.ToListAsync();
+                _context.BookingDetails.RemoveRange(bookingDetails);
+
+                var payments = await _context.Payments.ToListAsync();
+                _context.Payments.RemoveRange(payments);
+
+                var bookings = await _context.Bookings.ToListAsync();
+                _context.Bookings.RemoveRange(bookings);
+
+                // 2. Reset all services to MaxCapacity = 10
+                var services = await _context.Services.ToListAsync();
+                foreach(var s in services)
+                {
+                    s.MaxCapacity = 10;
+                }
+
+                await _context.SaveChangesAsync();
+                return Content("Đã Reset toàn bộ dữ liệu Lịch hẹn và cập nhật Sức chứa (10 phòng/suất). Bạn có thể quay lại trang Đặt lịch để thử lại.");
+            }
+            catch (Exception ex)
+            {
+                return Content("Lỗi khi Reset: " + ex.Message);
+            }
         }
     }
 }

@@ -38,6 +38,10 @@ namespace SpaN5.Areas.Staff.Controllers
                 .ThenBy(b => b.StartTime)
                 .ToListAsync();
 
+            // Lấy tất cả dịch vụ để hiển thị trong phần Task Dịch Vụ
+            var allServices = await _context.Services.Where(s => s.IsActive).ToListAsync();
+            ViewBag.Services = allServices;
+
             return View(bookings);
         }
 
@@ -127,12 +131,46 @@ namespace SpaN5.Areas.Staff.Controllers
 
             if (booking == null) return Json(new { success = false, message = "Không tìm thấy mã lịch." });
 
-            // Logic tự động gán staff nếu đang chuyển sang InProgress hoặc Confirmed
-            if (newStatus == BookingStatus.InProgress || newStatus == BookingStatus.Confirmed)
+            // Logic tự động gán staff và phòng nếu đang chuyển sang InProgress
+            if (newStatus == BookingStatus.InProgress)
             {
                 foreach(var detail in booking.BookingDetails)
                 {
                     if (detail.StaffId == null) detail.StaffId = staffId;
+                    
+                    if (detail.RoomNumber == null)
+                    {
+                        // Tìm các phòng đang bận cho dịch vụ này
+                        var occupiedRooms = await _context.BookingDetails
+                            .Where(bd => bd.ServiceId == detail.ServiceId && bd.Booking.Status == BookingStatus.InProgress)
+                            .Select(bd => bd.RoomNumber)
+                            .ToListAsync();
+
+                        // Tìm phòng trống đầu tiên từ 1-10
+                        for (int i = 1; i <= 10; i++)
+                        {
+                            if (!occupiedRooms.Contains(i))
+                            {
+                                detail.RoomNumber = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (newStatus == BookingStatus.Confirmed)
+            {
+                foreach(var detail in booking.BookingDetails)
+                {
+                    if (detail.StaffId == null) detail.StaffId = staffId;
+                }
+            }
+            else if (newStatus == BookingStatus.Completed || newStatus == BookingStatus.Cancelled)
+            {
+                // Giải phóng phòng khi hoàn tất hoặc hủy
+                foreach(var detail in booking.BookingDetails)
+                {
+                    detail.RoomNumber = null;
                 }
             }
 
@@ -206,8 +244,12 @@ namespace SpaN5.Areas.Staff.Controllers
 
             _context.Payments.Add(payment);
 
-            // 2. Chuyển trạng thái booking sang Completed
+            // 2. Chuyển trạng thái booking sang Completed và giải phóng phòng
             booking.Status = BookingStatus.Completed;
+            foreach(var detail in booking.BookingDetails)
+            {
+                detail.RoomNumber = null;
+            }
 
             await _context.SaveChangesAsync();
 

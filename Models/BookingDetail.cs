@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SpaN5.Models
 {
@@ -17,5 +17,6 @@ namespace SpaN5.Models
         public Staff? Staff { get; set; }
 
         public decimal PriceAtTime { get; set; }
+        public int? RoomNumber { get; set; }
     }
 }
