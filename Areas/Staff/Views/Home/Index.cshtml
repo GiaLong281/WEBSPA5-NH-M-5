@@ -256,7 +256,7 @@ else
                                 }
                                 else if (booking.Status == SpaN5.Models.BookingStatus.InProgress)
                                 {
-                                    <button onclick="showAddServiceModal(@booking.BookingId)" class="btn btn-outline-navy px-4 rounded-pill fw-bold">
+                                    <button onclick="showAddServiceModal(@booking.BookingId, '@booking.Customer?.FullName', '@(booking.BookingDetails.FirstOrDefault()?.RoomNumber)', '@booking.EndTime.ToString("HH:mm")')" class="btn btn-outline-navy px-4 rounded-pill fw-bold">
                                         <i class="fas fa-plus-circle me-2"></i> THÊM DỊCH VỤ
                                     </button>
                                     <button onclick="showPaymentModal(@booking.BookingId, @booking.TotalAmount)" class="btn btn-gold flex-fill py-3 rounded-pill fw-bold shadow">
@@ -351,23 +351,110 @@ else
         box-shadow: none;
         border-color: rgba(0,0,0,.125);
     }
+
+    /* Premium Modal Styles */
+    .glass-modal .modal-content {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        overflow: visible;
+    }
+    .modal-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 25px 10px;
+        position: relative;
+    }
+    .modal-plus-icon {
+        width: 32px;
+        height: 32px;
+        background-color: var(--p-gold);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        box-shadow: 0 4px 10px rgba(197, 168, 128, 0.3);
+    }
+    .modal-close-btn {
+        background: none;
+        border: none;
+        color: #adb5bd;
+        font-size: 1.2rem;
+        transition: color 0.2s;
+        cursor: pointer;
+        padding: 5px;
+        line-height: 1;
+    }
+    .modal-close-btn:hover { color: #dc3545; }
+    
+    .form-label-gold {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--p-gold);
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .custom-input {
+        background-color: #f8f9fa;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 12px 15px;
+        font-size: 0.9rem;
+        width: 100%;
+        margin-bottom: 20px;
+        color: #1a2b3c;
+        font-weight: 500;
+    }
+    .custom-input:focus {
+        outline: none;
+        border-color: var(--p-gold);
+        background-color: white;
+    }
+    .custom-input[readonly] { background-color: #f1f3f5; color: #6c757d; border-style: dashed; }
 </style>
 
-<!-- Modal: Thêm dịch vụ -->
+<!-- Modal: Thêm dịch vụ (Cập nhật theo phong cách Premium white) -->
 <div class="modal fade glass-modal" id="addServiceModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
-            <div class="modal-header bg-navy text-white border-0 py-3">
-                <h5 class="modal-title fw-bold font-playfair"><i class="fas fa-plus-circle text-gold me-2"></i>Thêm Dịch Vụ Mới</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header-custom">
+                <div class="modal-plus-icon"><i class="fas fa-plus"></i></div>
+                <button type="button" class="modal-close-btn" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body p-4 bg-white">
+            <div class="modal-body p-4 pt-2">
+                <div class="row mb-1">
+                    <div class="col-12">
+                        <label class="form-label-gold">TÊN KHÁCH HÀNG</label>
+                        <input type="text" id="modalCustomerName" class="custom-input" readonly>
+                    </div>
+                </div>
+                
+                <div class="row mb-1">
+                    <div class="col-6">
+                        <label class="form-label-gold">PHÒNG HIỆN TẠI</label>
+                        <input type="text" id="modalRoomNumber" class="custom-input" readonly>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label-gold">CHỌN THỜI GIAN</label>
+                        <select id="modalStartTime" class="custom-input form-select shadow-none">
+                            <!-- Populated with filtered times -->
+                        </select>
+                    </div>
+                </div>
+
                 <div class="mb-4">
-                    <label class="detail-label text-gold">CHỌN DỊCH VỤ PHÁT SINH</label>
-                    <select id="serviceSelector" class="form-select border-0 bg-light py-3 rounded-3 shadow-none">
+                    <label class="form-label-gold">CHỌN DỊCH VỤ PHÁT SINH</label>
+                    <select id="serviceSelector" class="custom-input form-select shadow-none">
                         <!-- Ajax populated -->
                     </select>
                 </div>
+
                 <div class="d-grid">
                     <button id="confirmAddService" class="btn btn-gold py-3 rounded-pill fw-bold shadow">
                         <i class="fas fa-check-circle me-2"></i> THÊM VÀO HÓA ĐƠN
@@ -470,8 +557,62 @@ else
             });
         }
 
-        function showAddServiceModal(bookingId) {
+        function showAddServiceModal(bookingId, customerName, roomNumber, currentEndTime) {
             currentBookingId = bookingId;
+            $('#modalCustomerName').val(customerName);
+            $('#modalRoomNumber').val('Phòng ' + (roomNumber || '1'));
+            
+            // Logic tạo danh sách giờ
+            const timeSelect = $('#modalStartTime');
+            timeSelect.empty();
+            
+            // Lấy giờ hiện tại
+            let now = new Date();
+            let currentHour = now.getHours();
+            let currentMin = now.getMinutes();
+
+            // Nếu currentEndTime được truyền vào (HH:mm), so sánh để lấy mốc lớn hơn
+            let startHour = 8; // Spa mở cửa từ 8h
+            if (currentEndTime) {
+                let parts = currentEndTime.split(':');
+                let endH = parseInt(parts[0]);
+                let endM = parseInt(parts[1]);
+                if (endH > currentHour || (endH === currentHour && endM > currentMin)) {
+                    startHour = endH;
+                } else {
+                    startHour = currentHour;
+                }
+            } else {
+                startHour = currentHour;
+            }
+
+            // Đảm bảo không nhỏ hơn 9h như ví dụ của user (nếu ví dụ yêu cầu cứng)
+            // Tuy nhiên, logic tổng quát là >= hiện tại/kết thúc lịch cũ
+            
+            for (let h = 8; h <= 21; h++) { // Giả định spa hoạt động 8h - 22h
+                let hourStr = h < 10 ? '0' + h : h;
+                
+                // 00 và 30
+                ['00', '30'].forEach(m => {
+                    let timeVal = `${hourStr}:${m}`;
+                    let isDisabled = false;
+                    
+                    // So sánh với mốc startHour
+                    let valH = parseInt(hourStr);
+                    let valM = parseInt(m);
+                    
+                    if (valH < startHour || (valH === startHour && valM < currentMin)) {
+                        isDisabled = true;
+                    }
+
+                    let option = `<option value="${timeVal}" ${isDisabled ? 'disabled style="color:#ccc"' : ''}>${timeVal}</option>`;
+                    timeSelect.append(option);
+                });
+            }
+
+            // Chọn giá trị khả dụng đầu tiên
+            timeSelect.find('option:not([disabled])').first().prop('selected', true);
+
             const selector = $('#serviceSelector');
             selector.html('<option>Đang tải...</option>');
             $.get('/Staff/Home/GetAllServices', function(services) {
