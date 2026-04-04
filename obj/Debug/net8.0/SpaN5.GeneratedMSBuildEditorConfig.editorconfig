@@ -9,319 +9,321 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = SpaN5
 build_property.RootNamespace = SpaN5
-build_property.ProjectDir = D:\PT ungdung\WEBSPA5-NH-M-5\
+build_property.ProjectDir = C:\Users\pc\OneDrive\Documents\GitHub\WEBSPA5-NH-M-5\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\PT ungdung\WEBSPA5-NH-M-5
+build_property.MSBuildProjectDirectory = C:\Users\pc\OneDrive\Documents\GitHub\WEBSPA5-NH-M-5
 build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Components/Layout.razor]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Components/Layout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Components/Pages.razor]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Components/Pages.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Components/Shared.razor]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Components/Shared.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Account/AccessDenied.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Account/AccessDenied.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Account/ChangePassword.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Account/ChangePassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxDaGFuZ2VQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Account/Login.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Account/Profile.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Account/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Account/Register.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/AuditLog.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/AuditLog.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cQXVkaXRMb2cuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/CreateService.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/CreateService.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cQ3JlYXRlU2VydmljZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/CreateStaff.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/CreateStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cQ3JlYXRlU3RhZmYuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/Dashboard.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/EditService.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/EditService.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cRWRpdFNlcnZpY2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/EditStaff.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/EditStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cRWRpdFN0YWZmLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageBookings.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageBookings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cTWFuYWdlQm9va2luZ3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageServices.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageServices.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cTWFuYWdlU2VydmljZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageStaff.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cTWFuYWdlU3RhZmYuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageSystem.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/ManageSystem.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cTWFuYWdlU3lzdGVtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Admin/Statistics.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Admin/Statistics.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5cU3RhdGlzdGljcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/AuditLog.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/AuditLog.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQXVkaXRMb2cuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/BookingDetails.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/BookingDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQm9va2luZ0RldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateBranch.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/CreateBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlQnJhbmNoLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateMaterial.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/CreateMaterial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlTWF0ZXJpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateService.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/CreateService.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlU2VydmljZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateStaff.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/CreateStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlU3RhZmYuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateStockTransaction.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/CreateStockTransaction.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlU3RvY2tUcmFuc2FjdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/CreateUser.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/CreateUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlVXNlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Dashboard.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditBranch.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/EditBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdEJyYW5jaC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditCustomer.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/EditCustomer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdEN1c3RvbWVyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditService.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/EditService.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFNlcnZpY2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditStaff.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/EditStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFN0YWZmLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/EditUser.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/EditUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFVzZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageBookings.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageBookings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlQm9va2luZ3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageBranches.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageBranches.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlQnJhbmNoZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageCustomers.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageCustomers.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlQ3VzdG9tZXJzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageMaterials.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageMaterials.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlTWF0ZXJpYWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageServices.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageServices.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlU2VydmljZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageStaff.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageStaff.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlU3RhZmYuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageStockTransactions.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageStockTransactions.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlU3RvY2tUcmFuc2FjdGlvbnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/ManageSystem.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/ManageSystem.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlU3lzdGVtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Settings.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Settings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU2V0dGluZ3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Admin/Statistics.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Admin/Statistics.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3RhdGlzdGljcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Booking/Calendar.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Booking/Calendar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xDYWxlbmRhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Booking/Cancel.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Booking/Cancel.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xDYW5jZWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Booking/Create.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Booking/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Booking/Details.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Booking/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Booking/MyBookings.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Booking/MyBookings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xNeUJvb2tpbmdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Booking/Upcoming.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Booking/Upcoming.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va2luZ1xVcGNvbWluZy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Branches/Details.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Branches/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnJhbmNoZXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Branches/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Branches/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnJhbmNoZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Branch/Details.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Branch/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnJhbmNoXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Branch/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Branch/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQnJhbmNoXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Customer/Profile.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Customer/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Home/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Home/Privacy.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Home/Terms.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Home/Terms.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxUZXJtcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Create.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/ServiceCategory/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Delete.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/ServiceCategory/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XERlbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Edit.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/ServiceCategory/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/ServiceCategory/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/ServiceCategory/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZUNhdGVnb3J5XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Services/Details.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Services/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Services/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Services/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2VydmljZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Shared/Error.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/StaffCalendar/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/StaffCalendar/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZDYWxlbmRhclxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/AddNote.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/AddNote.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcQWRkTm90ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Attendance.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/Attendance.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcQXR0ZW5kYW5jZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Calendar.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/Calendar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcQ2FsZW5kYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Dashboard.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Details.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Income.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/Income.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcSW5jb21lLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/Index.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Staff/MyBookings.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Staff/MyBookings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3RhZmZcTXlCb29raW5ncy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/_ViewImports.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/_ViewStart.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/PT ungdung/WEBSPA5-NH-M-5/Views/Shared/_Layout.cshtml]
+[C:/Users/pc/OneDrive/Documents/GitHub/WEBSPA5-NH-M-5/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-c8sm5rhs5u

@@ -482,6 +482,11 @@
                                                     <i class="fa-solid fa-gauge-high me-2"></i> Bảng điều khiển
                                                 </a>
                                             </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Admin" asp-action="ManageBookings">
+                                                    <i class="fa-solid fa-calendar-check me-2"></i> Quản lý lịch hẹn
+                                                </a>
+                                            </li>
                                         }
 
                                         @if (User.IsInRole("Staff"))

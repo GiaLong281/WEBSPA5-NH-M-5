@@ -689,7 +689,124 @@ public async Task<IActionResult> GetQuansByThanhPho(int maThanhPho)
 
             if (booking == null) return NotFound();
 
+            if (booking.BranchId > 0)
+            {
+                ViewBag.BranchStaffs = await _context.Staffs
+                    .Where(s => s.BranchId == booking.BranchId && s.Status == "active")
+                    .ToListAsync();
+            }
+
             return View(booking);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveBooking(int id)
+        {
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null) return NotFound();
+
+            if (booking.Status == BookingStatus.Pending)
+            {
+                var old = JsonSerializer.Serialize(booking);
+                booking.Status = BookingStatus.Confirmed;
+                _context.Update(booking);
+                await _context.SaveChangesAsync();
+                await _audit.LogAsync("Update", "Booking", id.ToString(), old, JsonSerializer.Serialize(booking));
+                TempData["SuccessMessage"] = "Đã xác nhận lịch hẹn thành công.";
+            }
+            
+            return RedirectToAction(nameof(BookingDetails), new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignStaff(int bookingId, int detailId, int staffId)
+        {
+            var detail = await _context.BookingDetails.Include(d => d.Booking).FirstOrDefaultAsync(d => d.DetailId == detailId);
+            if (detail == null || detail.BookingId != bookingId) return NotFound();
+
+            if (detail.Booking.Status == BookingStatus.Completed || detail.Booking.Status == BookingStatus.Cancelled)
+            {
+                TempData["ErrorMessage"] = "Không thể đổi nhân viên cho lịch hẹn này.";
+                return RedirectToAction(nameof(BookingDetails), new { id = bookingId });
+            }
+
+            var bookingDate = detail.Booking.BookingDate.Date;
+            var startTime = detail.Booking.StartTime;
+            var endTime = detail.Booking.EndTime;
+
+            bool isOverlapping = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .Where(b => b.BookingDate.Date == bookingDate && b.Status != BookingStatus.Cancelled && b.BookingId != bookingId)
+                .AnyAsync(b => b.BookingDetails.Any(bd => bd.StaffId == staffId) &&
+                               ((startTime >= b.StartTime && startTime < b.EndTime) ||
+                                (endTime > b.StartTime && endTime <= b.EndTime) ||
+                                (startTime <= b.StartTime && endTime >= b.EndTime)));
+
+            if (isOverlapping)
+            {
+                TempData["ErrorMessage"] = "Nhân viên này đã có lịch hẹn khác trong khoảng thời gian này.";
+                return RedirectToAction(nameof(BookingDetails), new { id = bookingId });
+            }
+
+            var old = JsonSerializer.Serialize(detail, new JsonSerializerOptions { ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles });
+            detail.StaffId = staffId;
+            _context.Update(detail);
+            await _context.SaveChangesAsync();
+            await _audit.LogAsync("Update", "BookingDetail", detailId.ToString(), old, JsonSerializer.Serialize(detail, new JsonSerializerOptions { ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+            
+            TempData["SuccessMessage"] = "Đã phân công nhân viên thành công.";
+            return RedirectToAction(nameof(BookingDetails), new { id = bookingId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RescheduleBooking(int bookingId, DateTime newDate, TimeSpan newStartTime)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails).ThenInclude(d => d.Service)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+                
+            if (booking == null) return NotFound();
+
+            var detail = booking.BookingDetails.FirstOrDefault();
+            if (detail == null) return NotFound();
+
+            int duration = detail.Service?.Duration ?? 60;
+            
+            DateTime startDT = newDate.Date.Add(newStartTime);
+            DateTime endDT = startDT.AddMinutes(duration);
+
+            if (detail.StaffId.HasValue)
+            {
+                int staffId = detail.StaffId.Value;
+                bool isOverlapping = await _context.Bookings
+                    .Include(b => b.BookingDetails)
+                    .Where(b => b.BookingDate.Date == newDate.Date && b.Status != BookingStatus.Cancelled && b.BookingId != bookingId)
+                    .AnyAsync(b => b.BookingDetails.Any(bd => bd.StaffId == staffId) &&
+                                   ((startDT >= b.StartTime && startDT < b.EndTime) ||
+                                    (endDT > b.StartTime && endDT <= b.EndTime) ||
+                                    (startDT <= b.StartTime && endDT >= b.EndTime)));
+
+                if (isOverlapping)
+                {
+                    TempData["ErrorMessage"] = "Không thể dời lịch vì nhân viên được phân công bị kẹt lịch khác trong khoảng thời gian mới.";
+                    return RedirectToAction(nameof(BookingDetails), new { id = bookingId });
+                }
+            }
+
+            var old = JsonSerializer.Serialize(booking, new JsonSerializerOptions { ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles });
+            booking.BookingDate = newDate.Date;
+            booking.StartTime = startDT;
+            booking.EndTime = endDT;
+            
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
+            await _audit.LogAsync("Update", "Booking", booking.BookingId.ToString(), old, JsonSerializer.Serialize(booking, new JsonSerializerOptions { ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles }));
+            
+            TempData["SuccessMessage"] = "Đã đổi lịch thành công. Hệ thống đã lưu lại thay đổi và gửi thông báo tới khách hàng.";
+            return RedirectToAction(nameof(BookingDetails), new { id = bookingId });
         }
 
         // ================= QUẢN LÝ HỆ THỐNG =================
