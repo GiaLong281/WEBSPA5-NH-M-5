@@ -225,20 +225,6 @@ namespace SpaN5.Controllers
             return RedirectToAction(nameof(Attendance));
         }
 
-        public async Task<IActionResult> Details(int id)
-        {
-            var staffId = GetStaffId();
-            if (staffId == null) return RedirectToAction("Login", "Account");
-
-            var booking = await _context.Bookings
-                .Include(b => b.BookingDetails)
-                .FirstOrDefaultAsync(b => b.BookingId == id &&
-                                          b.BookingDetails.Any(bd => bd.StaffId == staffId));
-            if (booking == null) return NotFound();
-
-            return RedirectToAction("Details", "Booking", new { id });
-        }
-
         // GET: Staff/AddNote/5
         public async Task<IActionResult> AddNote(int bookingId)
         {
@@ -317,18 +303,10 @@ namespace SpaN5.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
-<<<<<<< HEAD
-        // Bắt đầu dịch vụ (Confirmed/Pending -> InProgress)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> StartService(int bookingId)
-=======
-
         // Bắt đầu thực hiện (Confirmed -> InProgress)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StartBooking(int bookingId)
->>>>>>> 7b93b9f36f56b0833144fc5dbf4e1910d85e6dce
         {
             var staffId = GetStaffId();
             if (staffId == null) return RedirectToAction("Login", "Account");
@@ -337,37 +315,21 @@ namespace SpaN5.Controllers
                 .Include(b => b.BookingDetails)
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId &&
                                           b.BookingDetails.Any(bd => bd.StaffId == staffId));
-<<<<<<< HEAD
-
-            if (booking == null) return NotFound();
-
-            if (booking.Status != BookingStatus.Confirmed && booking.Status != BookingStatus.Pending)
-            {
-                TempData["ErrorMessage"] = "Chỉ có thể bắt đầu dịch vụ khi lịch đã được xác nhận.";
-=======
             if (booking == null) return NotFound();
 
             if (booking.Status != BookingStatus.Confirmed)
             {
                 TempData["ErrorMessage"] = "Chỉ có thể bắt đầu lịch đã xác nhận.";
->>>>>>> 7b93b9f36f56b0833144fc5dbf4e1910d85e6dce
                 return RedirectToAction(nameof(Dashboard));
             }
 
             booking.Status = BookingStatus.InProgress;
             await _context.SaveChangesAsync();
 
-<<<<<<< HEAD
-            await _audit.LogAsync("StartService", "Booking", booking.BookingId.ToString(), null,
-                System.Text.Json.JsonSerializer.Serialize(new { StartedAt = DateTime.Now }));
-
-            TempData["SuccessMessage"] = $"Đã bắt đầu dịch vụ cho lịch {booking.BookingCode}.";
-=======
             await _audit.LogAsync("Start", "Booking", booking.BookingId.ToString(), null,
                 System.Text.Json.JsonSerializer.Serialize(new { Status = "InProgress" }));
 
             TempData["SuccessMessage"] = $"Đã bắt đầu thực hiện lịch {booking.BookingCode}.";
->>>>>>> 7b93b9f36f56b0833144fc5dbf4e1910d85e6dce
             return RedirectToAction(nameof(Dashboard));
         }
 
@@ -435,7 +397,7 @@ namespace SpaN5.Controllers
 
 
         // GET: Staff/MyBookings
-        public async Task<IActionResult> MyBookings(string status = null, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> MyBookings(string? status = null, int page = 1, int pageSize = 10)
         {
             var staffId = GetStaffId();
             if (staffId == null) return RedirectToAction("Login", "Account");
