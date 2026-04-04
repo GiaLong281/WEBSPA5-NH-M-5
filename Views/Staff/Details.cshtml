@@ -1,0 +1,304 @@
+@model Booking
+@using SpaN5.Models
+
+@{
+    ViewData["Title"] = "Chi tiết lịch hẹn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var bookingDetail = Model.BookingDetails?.FirstOrDefault();
+    var service = bookingDetail?.Service;
+    var staff = bookingDetail?.Staff;
+    var customer = Model.Customer;
+    
+    var statusBadge = Model.Status switch
+    {
+        BookingStatus.Pending => "warning",
+        BookingStatus.Confirmed => "info",
+        BookingStatus.InProgress => "primary",
+        BookingStatus.Completed => "success",
+        BookingStatus.Cancelled => "danger",
+        _ => "secondary"
+    };
+    
+    var statusText = Model.Status switch
+    {
+        BookingStatus.Pending => "Chờ xác nhận",
+        BookingStatus.Confirmed => "Đã xác nhận",
+        BookingStatus.InProgress => "Đang thực hiện",
+        BookingStatus.Completed => "Hoàn thành",
+        BookingStatus.Cancelled => "Đã hủy",
+        _ => "Không xác định"
+    };
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="font-playfair text-gold mb-1">Chi tiết lịch hẹn</h1>
+            <p class="text-muted">Mã đơn: <span class="fw-bold">@Model.BookingCode</span></p>
+        </div>
+        <a asp-action="MyBookings" class="btn btn-outline-gold rounded-pill">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Thông tin chính -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold m-0">Thông tin chung</h5>
+                        <span class="badge bg-@statusBadge rounded-pill px-3 py-2">@statusText</span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold">Khách hàng</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="bg-soft p-2 rounded-circle me-3">
+                                    <i class="fas fa-user text-gold"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@(customer?.FullName ?? "N/A")</h6>
+                                    <div class="small text-muted">@(customer?.Phone ?? "N/A")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold">Dịch vụ</label>
+                            <div class="d-flex align-items-center mt-1">
+                                <div class="bg-soft p-2 rounded-circle me-3">
+                                    <i class="fas fa-spa text-gold"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@(service?.ServiceName ?? "N/A")</h6>
+                                    <div class="small text-muted">@(service?.Duration ?? 0) phút</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold">Lịch hẹn</label>
+                            <div class="mt-1">
+                                <h6 class="mb-0 fw-bold"><i class="far fa-calendar-alt me-2 text-gold"></i> @Model.BookingDate.ToString("dd/MM/yyyy")</h6>
+                                <div class="small text-muted"><i class="far fa-clock me-2 text-gold"></i> @Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small text-uppercase fw-bold">Vị trí</label>
+                            <div class="mt-1">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-map-marker-alt me-2 text-gold"></i> @(Model.Branch?.BranchName ?? "N/A")</h6>
+                                <div class="small text-muted">@(Model.Branch?.Address ?? "")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <hr class="my-4 op-1">
+                        <label class="text-muted small text-uppercase fw-bold">Ghi chú từ khách</label>
+                        <p class="mt-1 mb-0 border-start border-gold border-4 ps-3 py-1">@Model.Notes</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Hành động cho Staff -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Thao tác xử lý</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (Model.Status == BookingStatus.Pending)
+                        {
+                            <form asp-action="ConfirmBooking" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                <button type="submit" class="btn btn-gold rounded-pill px-4">
+                                    <i class="fas fa-check me-2"></i> Xác nhận lịch
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == BookingStatus.Confirmed)
+                        {
+                            <form asp-action="StartBooking" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                    <i class="fas fa-play me-2"></i> Bắt đầu thực hiện
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status == BookingStatus.Confirmed || Model.Status == BookingStatus.InProgress)
+                        {
+                            <form asp-action="CompleteBooking" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                <button type="submit" class="btn btn-success rounded-pill px-4">
+                                    <i class="fas fa-check-double me-2"></i> Hoàn thành
+                                </button>
+                            </form>
+                        }
+
+                        @if (Model.Status != BookingStatus.Completed && Model.Status != BookingStatus.Cancelled)
+                        {
+                            <button class="btn btn-outline-danger rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                <i class="fas fa-times me-2"></i> Hủy lịch
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Timeline Trạng thái -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                    <h5 class="fw-bold">Lịch sử trạng thái</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="timeline">
+                        <div class="timeline-item pb-4">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0 fw-bold">Lịch hẹn đã tạo</h6>
+                                <small class="text-muted">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item pb-4">
+                            <div class="timeline-marker @(Model.Status != BookingStatus.Pending ? "bg-success" : "bg-warning")"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0 fw-bold">@(Model.Status != BookingStatus.Pending ? "Đã xác nhận" : "Đang chờ xác nhận")</h6>
+                            </div>
+                        </div>
+
+                        @if (Model.Status == BookingStatus.InProgress)
+                        {
+                            <div class="timeline-item pb-4">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0 fw-bold">Đang thực hiện</h6>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.Status == BookingStatus.Completed)
+                        {
+                            <div class="timeline-item pb-4">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0 fw-bold">Đã hoàn thành</h6>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.Status == BookingStatus.Cancelled)
+                        {
+                            <div class="timeline-item pb-4">
+                                <div class="timeline-marker bg-danger"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0 fw-bold">Đã hủy</h6>
+                                    @if (!string.IsNullOrEmpty(Model.CancelReason))
+                                    {
+                                        <div class="small text-danger">Lý do: @Model.CancelReason</div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin thanh toán (Rút gọn cho Staff) -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Thanh toán</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Tổng cộng:</span>
+                        <span class="fw-bold text-gold fs-5">@Model.TotalAmount.ToString("N0") ₫</span>
+                    </div>
+                    @if (Model.Payments != null && Model.Payments.Any())
+                    {
+                        <div class="mt-3">
+                            <label class="text-muted small text-uppercase fw-bold mb-2">Lịch sử thanh toán</label>
+                            @foreach (var payment in Model.Payments)
+                            {
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-soft text-gold rounded-pill px-2">@payment.Method</span>
+                                    <span class="small fw-bold">@payment.Amount.ToString("N0") ₫</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted small italic">Chưa có thông tin thanh toán.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Hủy lịch -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form asp-action="CancelBooking" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Xác nhận hủy lịch hẹn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p>Bạn có chắc chắn muốn hủy lịch hẹn <strong>@Model.BookingCode</strong>?</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Lý do hủy (tùy chọn)</label>
+                        <textarea name="reason" class="form-control rounded-3" rows="3" placeholder="Nhập lý do..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">Xác nhận hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft { background: rgba(182, 138, 99, 0.08); }
+    .timeline { position: relative; }
+    .timeline-item { position: relative; padding-left: 30px; }
+    .timeline-item:not(:last-child)::after {
+        content: ""; position: absolute; left: 10px; top: 24px; bottom: 0;
+        width: 2px; background: #eee;
+    }
+    .timeline-marker {
+        position: absolute; left: 0; top: 4px; width: 20px; height: 20px;
+        border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px #eee;
+    }
+    .timeline-marker.bg-success { box-shadow: 0 0 0 2px #dcfce7; }
+    .timeline-marker.bg-warning { box-shadow: 0 0 0 2px #fef9c3; }
+    .timeline-marker.bg-danger { box-shadow: 0 0 0 2px #fee2e2; }
+    .timeline-marker.bg-primary { box-shadow: 0 0 0 2px #dbeafe; }
+</style>

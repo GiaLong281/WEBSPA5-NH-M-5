@@ -34,6 +34,7 @@
                 {
                     BookingStatus.Pending => "warning",
                     BookingStatus.Confirmed => "info",
+                    BookingStatus.InProgress => "primary",
                     BookingStatus.Completed => "success",
                     BookingStatus.Cancelled => "danger",
                     _ => "secondary"
@@ -42,6 +43,7 @@
                 {
                     BookingStatus.Pending => "Chờ xác nhận",
                     BookingStatus.Confirmed => "Đã xác nhận",
+                    BookingStatus.InProgress => "Đang thực hiện",
                     BookingStatus.Completed => "Hoàn thành",
                     BookingStatus.Cancelled => "Đã hủy",
                     _ => "Không xác định"
@@ -197,9 +199,18 @@
                         <div class="timeline-item">
                             <div class="timeline-marker @(Model.Status != BookingStatus.Pending ? "bg-success" : "bg-secondary")"></div>
                             <div class="timeline-content">
-                                <h6>@(Model.Status != BookingStatus.Pending ? "Đã xác nhận" : "Chờ xác nhận")</h6>
+                                <h6>@(Model.Status != BookingStatus.Pending ? (Model.Status == BookingStatus.InProgress ? "Đang thực hiện" : "Đã xác nhận") : "Chờ xác nhận")</h6>
                             </div>
                         </div>
+                        @if (Model.Status == BookingStatus.InProgress)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6>Đang thực hiện</h6>
+                                </div>
+                            </div>
+                        }
                         @if (Model.Status == BookingStatus.Completed)
                         {
                             <div class="timeline-item">

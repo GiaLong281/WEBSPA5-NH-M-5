@@ -677,6 +677,21 @@ public async Task<IActionResult> GetQuansByThanhPho(int maThanhPho)
             return View(bookings);
         }
 
+        public async Task<IActionResult> BookingDetails(int id)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Branch)
+                .Include(b => b.Customer)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
+                .Include(b => b.Payments)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null) return NotFound();
+
+            return View(booking);
+        }
+
         // ================= QUẢN LÝ HỆ THỐNG =================
         public IActionResult ManageSystem() => View();
 
