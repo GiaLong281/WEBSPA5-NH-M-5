@@ -20,15 +20,31 @@ namespace SpaN5.Controllers
             int branchId,
             DateTime date,
             TimeSpan time,
-            int serviceId)
+            string serviceIds)
         {
-            var service = await _context.Services.FindAsync(serviceId);
+            if (string.IsNullOrWhiteSpace(serviceIds))
+                return BadRequest("serviceIds không được để trống");
 
-            if (service == null || !service.IsActive)
-                return BadRequest("Dịch vụ không hợp lệ");
+            var ids = serviceIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => int.TryParse(x.Trim(), out var id) ? id : (int?)null)
+                .Where(x => x.HasValue)
+                .Select(x => x.GetValueOrDefault())
+                .Distinct()
+                .ToList();
 
+            if (!ids.Any())
+                return BadRequest("serviceIds không hợp lệ");
+
+            var services = await _context.Services
+                .Where(s => ids.Contains(s.ServiceId) && s.IsActive)
+                .ToListAsync();
+
+            if (!services.Any())
+                return BadRequest("Không có dịch vụ hợp lệ");
+
+            var totalDuration = services.Sum(s => s.Duration);
             var startDateTime = date.Date.Add(time);
-            var endDateTime = startDateTime.AddMinutes(service.Duration);
+            var endDateTime = startDateTime.AddMinutes(totalDuration);
 
             // giới hạn giờ làm
             if (time < new TimeSpan(8, 0, 0) || time > new TimeSpan(20, 0, 0))
@@ -68,13 +84,31 @@ namespace SpaN5.Controllers
         }
 
         [HttpGet("GetTimeSlots")]
-        public async Task<IActionResult> GetTimeSlots(int branchId, DateTime date, int serviceId)
+        public async Task<IActionResult> GetTimeSlots(int branchId, DateTime date, string serviceIds)
         {
             var branch = await _context.Branches.FindAsync(branchId);
             if (branch == null) return BadRequest("Chi nhánh không tồn tại");
 
-            var service = await _context.Services.FindAsync(serviceId);
-            if (service == null) return BadRequest("Dịch vụ không hợp lệ");
+            if (string.IsNullOrWhiteSpace(serviceIds))
+                return BadRequest("serviceIds không được để trống");
+
+            var ids = serviceIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => int.TryParse(x.Trim(), out var id) ? id : (int?)null)
+                .Where(x => x.HasValue)
+                .Select(x => x.GetValueOrDefault())
+                .Distinct()
+                .ToList();
+
+            if (!ids.Any())
+                return BadRequest("serviceIds không hợp lệ");
+
+            var services = await _context.Services
+                .Where(s => ids.Contains(s.ServiceId) && s.IsActive)
+                .ToListAsync();
+
+            if (!services.Any()) return BadRequest("Không có dịch vụ hợp lệ");
+
+            var totalDuration = services.Sum(s => s.Duration);
 
             // Kiểm tra ngày mở cửa
             if (!IsBranchOpenOnDate(branch, date))
@@ -96,7 +130,7 @@ namespace SpaN5.Controllers
             for (var t = openTime; t < closeTime; t = t.Add(step))
             {
                 var start = t;
-                var end = start.Add(TimeSpan.FromMinutes(service.Duration));
+                var end = start.Add(TimeSpan.FromMinutes(totalDuration));
                 if (end > closeTime) continue;
 
                 var currentStartDateTime = date.Date.Add(start);

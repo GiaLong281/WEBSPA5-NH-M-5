@@ -1,0 +1,210 @@
+@model List<SpaN5.Models.BookingDetail>
+@{
+    ViewData["Title"] = "Thu nhập & Hoa hồng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var bookings = Model ?? new List<SpaN5.Models.BookingDetail>();
+    var dailyIncome = ViewBag.DailyIncome as List<dynamic> ?? new List<dynamic>();
+    var commissionRate = (decimal)(ViewBag.CommissionRate ?? 0m);
+    var baseSalary = (decimal)(ViewBag.BaseSalary ?? 0m);
+    var months = ViewBag.Months as List<dynamic> ?? new List<dynamic>();
+}
+
+<link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" rel="preload" as="script">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h1 class="font-playfair text-gold">Thu nhập &amp; Hoa hồng</h1>
+            <p class="text-muted mb-0">Tháng @ViewBag.Month / @ViewBag.Year</p>
+        </div>
+        <form method="get" class="d-flex gap-2">
+            <select name="month" class="form-select w-auto">
+                @foreach (var m in months)
+                {
+                    <option value="@m.Value" selected="@(m.Value == ViewBag.Month ? "selected" : null)">@m.Name</option>
+                }
+            </select>
+            <select name="year" class="form-select w-auto">
+                @for (int y = DateTime.Now.Year - 2; y <= DateTime.Now.Year; y++)
+                {
+                    <option value="@y" selected="@(y == ViewBag.Year ? "selected" : null)">Năm @y</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-gold">Xem</button>
+        </form>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Tổng doanh thu</h5>
+                    <h3 class="mb-0">@((ViewBag.TotalRevenue ?? 0m).ToString("N0")) VNĐ</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Hoa hồng (@(commissionRate * 100)%)</h5>
+                    <h3 class="mb-0">@((ViewBag.TotalCommission ?? 0m).ToString("N0")) VNĐ</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Số dịch vụ đã hoàn thành</h5>
+                    <h3 class="mb-0">@ViewBag.BookingCount</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Lương cơ bản</h5>
+                    <h3 class="mb-0">@baseSalary.ToString("N0") VNĐ</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Tổng thu nhập</h5>
+                    <h3 class="mb-0">@((ViewBag.TotalIncome ?? 0m).ToString("N0")) VNĐ</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="mb-2">Hoa hồng / dịch vụ</h5>
+                    <h3 class="mb-0">@((ViewBag.BookingCount > 0 ? ((ViewBag.TotalCommission ?? 0m) / ViewBag.BookingCount).ToString("N0") : "0")) VNĐ</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-lg mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Thu nhập theo ngày trong tháng @ViewBag.Month/@ViewBag.Year</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="incomeChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Chi tiết dịch vụ đã hoàn thành</h5>
+            <span class="badge bg-secondary">@bookings.Count dịch vụ</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Mã lịch</th>
+                            <th>Dịch vụ</th>
+                            <th>Khách hàng</th>
+                            <th class="text-end">Giá trị</th>
+                            <th class="text-end">Hoa hồng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var bd in bookings.OrderByDescending(b => b.Booking.EndTime))
+                        {
+                            var commission = bd.PriceAtTime * commissionRate;
+                            <tr>
+                                <td>@bd.Booking.EndTime.ToString("dd/MM/yyyy")</td>
+                                <td>@bd.Booking.BookingCode</td>
+                                <td>@bd.Service?.ServiceName</td>
+                                <td>@(bd.Booking.Customer?.FullName ?? "Khách")</td>
+                                <td class="text-end">@bd.PriceAtTime.ToString("N0")</td>
+                                <td class="text-end text-success">@commission.ToString("N0")</td>
+                            </tr>
+                        }
+                        @if (!bookings.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    Chưa có dịch vụ nào hoàn thành trong tháng này
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="4" class="text-end">Tổng cộng:</td>
+                            <td class="text-end">@((ViewBag.TotalRevenue ?? 0m).ToString("N0")) VNĐ</td>
+                            <td class="text-end text-success">@((ViewBag.TotalCommission ?? 0m).ToString("N0")) VNĐ</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var dailyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(dailyIncome));
+        if (dailyData && dailyData.length > 0) {
+            var ctx = document.getElementById('incomeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dailyData.map(d => new Date(d.Date).getDate() + '/' + (new Date(d.Date).getMonth() + 1)),
+                    datasets: [
+                        {
+                            label: 'Doanh thu (VNĐ)',
+                            data: dailyData.map(d => d.Revenue),
+                            borderColor: '#c9a96e',
+                            backgroundColor: 'rgba(201, 169, 110, 0.2)',
+                            tension: 0.3,
+                            fill: true,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Hoa hồng (VNĐ)',
+                            data: dailyData.map(d => d.Commission),
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            tension: 0.3,
+                            fill: true,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw.toLocaleString() + ' VNĐ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>

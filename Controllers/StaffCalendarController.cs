@@ -19,23 +19,45 @@ namespace SpaN5.Controllers
 
         public async Task<IActionResult> Index(int? staffId)
         {
-            // Nếu là Admin, có thể chọn staff; nếu là Staff thì lấy chính mình
-            if (User.IsInRole("Admin"))
-            {
-                var staffs = await _context.Staffs
-                    .Include(s => s.Branch)
-                    .Select(s => new { s.StaffId, s.FullName, BranchName = s.Branch != null ? s.Branch.BranchName : "" })
-                    .ToListAsync();
-                
-                // Chuyển sang anonymous object hoặc ViewModel cụ thể để dùng trong View
-                ViewBag.Staffs = staffs;
-                ViewBag.SelectedStaffId = staffId;
-            }
-            else
+            // Nếu là Staff, chỉ được xem lịch của chính mình
+            if (User.IsInRole("Staff"))
             {
                 var currentStaffId = GetCurrentStaffId();
+                if (!currentStaffId.HasValue)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
                 ViewBag.SelectedStaffId = currentStaffId;
-                ViewBag.Staffs = null; // không cần dropdown
+                ViewBag.Staffs = null;
+            }
+            else // Admin
+            {
+                // Lấy danh sách tất cả nhân viên (kèm chi nhánh)
+                var staffs = await _context.Staffs
+                    .Include(s => s.Branch)
+                    .Select(s => new 
+                    { 
+                        s.StaffId, 
+                        s.FullName, 
+                        BranchName = s.Branch != null ? s.Branch.BranchName : "Chưa có chi nhánh" 
+                    })
+                    .ToListAsync();
+                
+                ViewBag.Staffs = staffs;
+                
+                // Nếu có staffId được chọn thì dùng, không thì lấy nhân viên đầu tiên
+                if (staffId.HasValue && staffs.Any(s => s.StaffId == staffId.Value))
+                {
+                    ViewBag.SelectedStaffId = staffId.Value;
+                }
+                else if (staffs.Any())
+                {
+                    ViewBag.SelectedStaffId = staffs.First().StaffId;
+                }
+                else
+                {
+                    ViewBag.SelectedStaffId = null;
+                }
             }
 
             return View();

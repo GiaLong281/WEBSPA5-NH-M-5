@@ -17,6 +17,8 @@ namespace SpaN5.Models
 
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> BookingDetails { get; set; }
+        public DbSet<CustomerNote> CustomerNotes { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
 
         public DbSet<Payment> Payments { get; set; }
 

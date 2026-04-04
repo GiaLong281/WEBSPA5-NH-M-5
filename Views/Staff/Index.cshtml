@@ -1,59 +1,27 @@
 @{
-    ViewData["Title"] = "Lịch biểu nhân viên";
+    ViewData["Title"] = "Lịch biểu của bạn";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var isAdmin = User.IsInRole("Admin");
     var selectedStaffId = ViewBag.SelectedStaffId as int?;
-    var staffs = ViewBag.Staffs as List<dynamic> ?? new List<dynamic>();
 }
 
 <div class="container-fluid py-4" style="margin-top: 70px;">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="font-playfair text-gold fw-bold mb-1">
-                <i class="fas fa-calendar-alt me-2"></i>Lịch biểu nhân viên
+                <i class="fas fa-calendar-alt me-2"></i>Lịch biểu của bạn
             </h1>
             <p class="text-muted mb-0">
-                <i class="fas fa-clock me-1"></i>Quản lý và theo dõi lịch trình chăm sóc khách hàng
+                <i class="fas fa-clock me-1"></i>Quản lý và xem lịch trình chăm sóc khách hàng
             </p>
         </div>
-
-        @if (isAdmin && staffs.Any())
-        {
-            <div class="bg-white p-2 rounded-4 shadow-sm border d-flex align-items-center gap-2">
-                <label for="staffFilter" class="small fw-bold text-muted px-2">
-                    <i class="fas fa-user-md me-1"></i>NHÂN VIÊN
-                </label>
-                <select id="staffFilter" class="form-select border-0 bg-light rounded-3" style="min-width: 220px;">
-                    @foreach (var s in staffs)
-                    {
-                        if (selectedStaffId == s.StaffId)
-                        {
-                            <option value="@s.StaffId" selected>@s.FullName (@s.BranchName)</option>
-                        }
-                        else
-                        {
-                            <option value="@s.StaffId">@s.FullName (@s.BranchName)</option>
-                        }
-                    }
-                </select>
-            </div>
-        }
     </div>
 
-    @if (!selectedStaffId.HasValue && !staffs.Any())
+    @if (!selectedStaffId.HasValue)
     {
         <div class="alert alert-warning text-center py-5 rounded-4">
             <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
-            <h4 class="mb-2">Chưa có nhân viên nào</h4>
-            <p class="mb-0">Vui lòng liên hệ quản trị viên để thêm nhân viên.</p>
-        </div>
-    }
-    else if (!selectedStaffId.HasValue && isAdmin)
-    {
-        <div class="alert alert-info text-center py-5 rounded-4">
-            <i class="fas fa-info-circle fa-3x mb-3 text-info"></i>
-            <h4 class="mb-2">Chọn nhân viên để xem lịch</h4>
-            <p class="mb-0">Sử dụng dropdown bên trên để chọn nhân viên cần xem lịch trình.</p>
+            <h4 class="mb-2">Không thể xác định nhân viên</h4>
+            <p class="mb-0">Vui lòng liên hệ quản trị viên để kiểm tra thông tin tài khoản.</p>
         </div>
     }
     else
@@ -265,18 +233,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            var staffFilter = document.getElementById('staffFilter');
             
             // Lấy StaffId an toàn
             var getCurrentStaffId = function() {
-                if (staffFilter && staffFilter.value) {
-                    var val = parseInt(staffFilter.value);
-                    if (!isNaN(val) && val > 0) return val;
-                }
-                
                 var selectedStaffId = @Html.Raw(Json.Serialize(selectedStaffId));
                 if (selectedStaffId && selectedStaffId > 0) return selectedStaffId;
-                
                 return null;
             };
 
@@ -390,13 +351,7 @@
                         document.getElementById('modalEnd').innerText = info.event.end.toLocaleDateString('vi-VN', options);
                     }
                     
-                    // Xác định URL chi tiết dựa trên role
-                    var isAdmin = @Json.Serialize(isAdmin);
-                    var detailUrl = isAdmin 
-                        ? `/Admin/BookingDetails/${props.bookingId || info.event.id}`
-                        : `/Staff/Details/${props.bookingId || info.event.id}`;
-                    
-                    document.getElementById('btnGoToBooking').href = detailUrl;
+                    document.getElementById('btnGoToBooking').href = `/Staff/Details/${props.bookingId || info.event.id}`;
                     
                     var modal = new bootstrap.Modal(document.getElementById('eventModal'));
                     modal.show();
@@ -418,14 +373,6 @@
             });
 
             calendar.render();
-
-            // Xử lý change filter cho Admin
-            if (staffFilter) {
-                staffFilter.addEventListener('change', function() {
-                    console.log('Staff changed to:', this.value);
-                    calendar.refetchEvents();
-                });
-            }
 
             // Helper function để lấy màu status
             function getStatusColor(status) {

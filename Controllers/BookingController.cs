@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
 using SpaN5.Models.ViewModels;
+using System.Linq;
 
 namespace SpaN5.Controllers
 {
@@ -51,12 +52,23 @@ namespace SpaN5.Controllers
                 var service = await _context.Services.FindAsync(serviceId.Value);
                 if (service != null && service.IsActive)
                 {
-                    model.SelectedServiceId = service.ServiceId;
+                    model.SelectedServiceIds.Add(service.ServiceId);
+                    model.SelectedServiceId = service.ServiceId; // tương thích cũ
                     model.ServiceName = service.ServiceName;
                     model.Duration = service.Duration;
                     model.Price = service.Price;
                 }
             }
+
+            ViewBag.AllServices = await _context.Services
+                .Where(s => s.IsActive)
+                .Select(s => new ServiceInfo
+                {
+                    ServiceId = s.ServiceId,
+                    ServiceName = s.ServiceName,
+                    Duration = s.Duration,
+                    Price = s.Price
+                }).ToListAsync();
 
             ViewBag.Services = await BuildServiceSelectList(model.SelectedServiceId);
 
@@ -87,13 +99,20 @@ namespace SpaN5.Controllers
                 return View(model);
             }
 
-            var service = await _context.Services.FindAsync(model.SelectedServiceId);
-            if (service == null || !service.IsActive)
+            // 1. Lấy danh sách dịch vụ đã chọn
+            var selectedServices = await _context.Services
+                .Where(s => model.SelectedServiceIds.Contains(s.ServiceId) && s.IsActive)
+                .ToListAsync();
+
+            if (!selectedServices.Any())
             {
-                ModelState.AddModelError("SelectedServiceId", "Dịch vụ không hợp lệ");
+                ModelState.AddModelError("SelectedServiceIds", "Vui lòng chọn ít nhất một dịch vụ.");
                 await LoadDropdowns(model);
                 return View(model);
             }
+
+            var totalDuration = selectedServices.Sum(s => s.Duration);
+            var totalPrice = selectedServices.Sum(s => s.Price);
 
             var branch = await _context.Branches.FindAsync(model.BranchId);
             if (branch == null || !branch.IsActive)
@@ -112,8 +131,10 @@ namespace SpaN5.Controllers
             }
 
             var startDateTime = model.BookingDate.Date.Add(model.StartTime);
-            var endDateTime = startDateTime.AddMinutes(service.Duration);
+            var endDateTime = startDateTime.AddMinutes(totalDuration);
             model.EndTime = endDateTime;
+            model.Duration = totalDuration;
+            model.Price = totalPrice;
 
             var openTime = branch.OpeningTime;
             var closeTime = branch.ClosingTime;
@@ -170,7 +191,7 @@ namespace SpaN5.Controllers
                 StartTime = startDateTime,
                 EndTime = endDateTime,
                 Status = BookingStatus.Pending,
-                TotalAmount = service.Price,
+                TotalAmount = totalPrice,
                 Notes = model.Notes,
                 CreatedAt = DateTime.Now
             };
@@ -178,15 +199,18 @@ namespace SpaN5.Controllers
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
 
-            var bookingDetail = new BookingDetail
+            foreach (var service in selectedServices)
             {
-                BookingId = booking.BookingId,
-                ServiceId = service.ServiceId,
-                StaffId = model.StaffId.Value,
-                PriceAtTime = service.Price
-            };
+                var bookingDetail = new BookingDetail
+                {
+                    BookingId = booking.BookingId,
+                    ServiceId = service.ServiceId,
+                    StaffId = model.StaffId.Value,
+                    PriceAtTime = service.Price
+                };
+                _context.BookingDetails.Add(bookingDetail);
+            }
 
-            _context.BookingDetails.Add(bookingDetail);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Đặt lịch thành công! Mã đơn hàng: {bookingCode}";
@@ -376,6 +400,16 @@ namespace SpaN5.Controllers
         private async Task LoadDropdowns(BookingViewModel model)
         {
             ViewBag.Services = await BuildServiceSelectList(model.SelectedServiceId);
+
+            ViewBag.AllServices = await _context.Services
+                .Where(s => s.IsActive)
+                .Select(s => new ServiceInfo
+                {
+                    ServiceId = s.ServiceId,
+                    ServiceName = s.ServiceName,
+                    Duration = s.Duration,
+                    Price = s.Price
+                }).ToListAsync();
 
             ViewBag.Branches = new SelectList(
                 await _context.Branches.Where(b => b.IsActive).ToListAsync(),

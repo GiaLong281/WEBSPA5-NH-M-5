@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
 using SpaN5.Services;
+using System.Linq;
 
 namespace SpaN5.Controllers
 {
@@ -63,6 +64,229 @@ namespace SpaN5.Controllers
             return View();
         }
 
+        // GET: Staff/Calendar
+        public async Task<IActionResult> Calendar(DateTime? date)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            ViewBag.SelectedStaffId = staffId;
+            return View("Index");
+        }
+
+        // GET: Staff/Attendance
+        public async Task<IActionResult> Attendance()
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var today = DateTime.Today;
+            var todayAttendance = await _context.Attendances
+                .FirstOrDefaultAsync(a => a.StaffId == staffId && a.Date == today);
+
+            var recentAttendances = await _context.Attendances
+                .Where(a => a.StaffId == staffId)
+                .OrderByDescending(a => a.Date)
+                .Take(30)
+                .ToListAsync();
+
+            ViewBag.TodayAttendance = todayAttendance;
+            ViewBag.RecentAttendances = recentAttendances;
+            return View();
+        }
+
+        // GET: Staff/Income
+        public async Task<IActionResult> Income(int? month, int? year)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var targetMonth = month ?? DateTime.Now.Month;
+            var targetYear = year ?? DateTime.Now.Year;
+
+            var startDate = new DateTime(targetYear, targetMonth, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var completedBookings = await _context.BookingDetails
+                .Include(bd => bd.Booking)
+                .ThenInclude(b => b.Customer)
+                .Include(bd => bd.Service)
+                .Where(bd => bd.StaffId == staffId &&
+                             bd.Booking.Status == BookingStatus.Completed &&
+                             bd.Booking.EndTime >= startDate &&
+                             bd.Booking.EndTime <= endDate)
+                .ToListAsync();
+
+            var commissionRateSetting = await _context.Settings
+                .FirstOrDefaultAsync(s => s.Key == "StaffCommissionRate");
+            var commissionRate = commissionRateSetting != null && decimal.TryParse(commissionRateSetting.Value, out var rate)
+                ? rate : 0.3m;
+
+            var baseSalarySetting = await _context.Settings
+                .FirstOrDefaultAsync(s => s.Key == "StaffBaseSalary");
+            var baseSalary = baseSalarySetting != null && decimal.TryParse(baseSalarySetting.Value, out var salary)
+                ? salary : 0m;
+
+            var totalRevenue = completedBookings.Sum(bd => bd.PriceAtTime);
+            var totalCommission = totalRevenue * commissionRate;
+            var totalIncome = totalCommission + baseSalary;
+
+            var dailyIncome = completedBookings
+                .GroupBy(bd => bd.Booking.EndTime.Date)
+                .Select(g => new { Date = g.Key, Revenue = g.Sum(b => b.PriceAtTime), Commission = g.Sum(b => b.PriceAtTime) * commissionRate })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            ViewBag.Month = targetMonth;
+            ViewBag.Year = targetYear;
+            ViewBag.CommissionRate = commissionRate;
+            ViewBag.TotalRevenue = totalRevenue;
+            ViewBag.TotalCommission = totalCommission;
+            ViewBag.TotalIncome = totalIncome;
+            ViewBag.BaseSalary = baseSalary;
+            ViewBag.BookingCount = completedBookings.Count;
+            ViewBag.DailyIncome = dailyIncome;
+
+            var months = Enumerable.Range(1, 12).Select(m => new { Value = m, Name = $"Tháng {m}" }).ToList();
+            ViewBag.Months = months;
+
+            return View(completedBookings);
+        }
+
+        // POST: Staff/CheckIn
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckIn(string? note)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var today = DateTime.Today;
+            var existing = await _context.Attendances
+                .FirstOrDefaultAsync(a => a.StaffId == staffId && a.Date == today);
+
+            if (existing != null && existing.CheckInTime.HasValue)
+            {
+                TempData["ErrorMessage"] = "Bạn đã check-in hôm nay rồi.";
+                return RedirectToAction(nameof(Attendance));
+            }
+
+            if (existing == null)
+            {
+                existing = new Attendance
+                {
+                    StaffId = staffId.Value,
+                    Date = today,
+                    CheckInTime = DateTime.Now,
+                    Note = note
+                };
+                _context.Attendances.Add(existing);
+            }
+            else
+            {
+                existing.CheckInTime = DateTime.Now;
+                if (!string.IsNullOrEmpty(note)) existing.Note = note;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Check-in thành công lúc {DateTime.Now:HH:mm:ss}";
+            return RedirectToAction(nameof(Attendance));
+        }
+
+        // POST: Staff/CheckOut
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckOut(string? note)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var today = DateTime.Today;
+            var attendance = await _context.Attendances
+                .FirstOrDefaultAsync(a => a.StaffId == staffId && a.Date == today);
+
+            if (attendance == null || !attendance.CheckInTime.HasValue)
+            {
+                TempData["ErrorMessage"] = "Bạn chưa check-in hôm nay.";
+                return RedirectToAction(nameof(Attendance));
+            }
+
+            if (attendance.CheckOutTime.HasValue)
+            {
+                TempData["ErrorMessage"] = "Bạn đã check-out rồi.";
+                return RedirectToAction(nameof(Attendance));
+            }
+
+            attendance.CheckOutTime = DateTime.Now;
+            if (!string.IsNullOrEmpty(note)) attendance.Note = note;
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Check-out thành công lúc {DateTime.Now:HH:mm:ss}";
+            return RedirectToAction(nameof(Attendance));
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == id &&
+                                          b.BookingDetails.Any(bd => bd.StaffId == staffId));
+            if (booking == null) return NotFound();
+
+            return RedirectToAction("Details", "Booking", new { id });
+        }
+
+        // GET: Staff/AddNote/5
+        public async Task<IActionResult> AddNote(int bookingId)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var booking = await _context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId &&
+                                          b.BookingDetails.Any(bd => bd.StaffId == staffId));
+            if (booking == null) return NotFound();
+
+            ViewBag.Booking = booking;
+            return View();
+        }
+
+        // POST: Staff/AddNote
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddNote(int bookingId, string note)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var booking = await _context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId &&
+                                          b.BookingDetails.Any(bd => bd.StaffId == staffId));
+            if (booking == null) return NotFound();
+
+            var customerNote = new CustomerNote
+            {
+                CustomerId = booking.CustomerId,
+                BookingId = bookingId,
+                StaffId = staffId.Value,
+                Note = note,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.CustomerNotes.Add(customerNote);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã lưu ghi chú khách hàng.";
+            return RedirectToAction(nameof(Details), new { id = bookingId });
+        }
+
         // Xác nhận lịch (Pending -> Confirmed)
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -90,6 +314,37 @@ namespace SpaN5.Controllers
                 System.Text.Json.JsonSerializer.Serialize(new { Status = "Confirmed" }));
 
             TempData["SuccessMessage"] = $"Đã xác nhận lịch {booking.BookingCode}.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        // Bắt đầu dịch vụ (Confirmed/Pending -> InProgress)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> StartService(int bookingId)
+        {
+            var staffId = GetStaffId();
+            if (staffId == null) return RedirectToAction("Login", "Account");
+
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId &&
+                                          b.BookingDetails.Any(bd => bd.StaffId == staffId));
+
+            if (booking == null) return NotFound();
+
+            if (booking.Status != BookingStatus.Confirmed && booking.Status != BookingStatus.Pending)
+            {
+                TempData["ErrorMessage"] = "Chỉ có thể bắt đầu dịch vụ khi lịch đã được xác nhận.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            booking.Status = BookingStatus.InProgress;
+            await _context.SaveChangesAsync();
+
+            await _audit.LogAsync("StartService", "Booking", booking.BookingId.ToString(), null,
+                System.Text.Json.JsonSerializer.Serialize(new { StartedAt = DateTime.Now }));
+
+            TempData["SuccessMessage"] = $"Đã bắt đầu dịch vụ cho lịch {booking.BookingCode}.";
             return RedirectToAction(nameof(Dashboard));
         }
 

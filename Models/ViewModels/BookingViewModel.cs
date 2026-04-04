@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace SpaN5.Models.ViewModels
 {
@@ -8,6 +9,9 @@ namespace SpaN5.Models.ViewModels
 
         [Required(ErrorMessage = "Vui lòng chọn dịch vụ")]
         public int SelectedServiceId { get; set; }
+
+        // Mới: hỗ trợ chọn nhiều dịch vụ
+        public List<int> SelectedServiceIds { get; set; } = new List<int>();
 
         [Required(ErrorMessage = "Vui lòng chọn chi nhánh")]
         public int BranchId { get; set; }
@@ -28,6 +32,13 @@ namespace SpaN5.Models.ViewModels
         public string? ServiceName { get; set; }
         public int Duration { get; set; }
         public decimal Price { get; set; }
+
+        public List<ServiceInfo> ServicesInfo { get; set; } = new();
+        public int TotalDuration => SelectedServiceIds.Count > 0 ?
+            ServicesInfo?.Where(s => SelectedServiceIds.Contains(s.ServiceId)).Sum(s => s.Duration) ?? 0 : 0;
+        public decimal TotalPrice => SelectedServiceIds.Count > 0 ?
+            ServicesInfo?.Where(s => SelectedServiceIds.Contains(s.ServiceId)).Sum(s => s.Price) ?? 0 : 0;
+
         public DateTime EndTime { get; set; }
 
         // Thông tin khách hàng
@@ -41,5 +52,13 @@ namespace SpaN5.Models.ViewModels
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         public string Phone { get; set; } = string.Empty;
+    }
+
+    public class ServiceInfo
+    {
+        public int ServiceId { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
+        public int Duration { get; set; }
+        public decimal Price { get; set; }
     }
 }

@@ -65,11 +65,25 @@
                             <div class="col-md-6">
                                 <h4 class="font-playfair text-gold mb-3">Thông tin đặt lịch</h4>
                                 <div class="mb-3">
-                                    <label asp-for="SelectedServiceId" class="form-label">Dịch vụ</label>
-                                    <select asp-for="SelectedServiceId" class="form-control" asp-items="ViewBag.Services" required>
-                                        <option value="">-- Chọn dịch vụ --</option>
-                                    </select>
-                                    <span asp-validation-for="SelectedServiceId" class="text-danger"></span>
+                                    <label class="form-label">Chọn dịch vụ</label>
+                                    <div class="input-group mb-2">
+                                        <select id="serviceSelector" class="form-control">
+                                            <option value="">-- Chọn dịch vụ --</option>
+                                            @foreach (var sv in (ViewBag.AllServices as List<ServiceInfo> ?? new List<ServiceInfo>()))
+                                            {
+                                                <option value="@sv.ServiceId" data-duration="@sv.Duration" data-price="@sv.Price">
+                                                    @sv.ServiceName (@sv.Duration phút - @sv.Price.ToString("N0")đ)
+                                                </option>
+                                            }
+                                        </select>
+                                        <button type="button" class="btn btn-outline-gold" id="addServiceBtn">+ Thêm</button>
+                                    </div>
+                                    <div id="selectedServicesList" class="list-group mb-2">
+                                        <!-- Danh sách dịch vụ đã chọn sẽ hiển thị ở đây -->
+                                    </div>
+                                    <div id="SelectedServiceIdsInputs"></div>
+                                    <input type="hidden" id="SelectedServiceIdsCombined" name="SelectedServiceIdsCombined" value="" />
+                                    <span asp-validation-for="SelectedServiceIds" class="text-danger"></span>
                                 </div>
 
                                 <div class="mb-3">
@@ -118,11 +132,6 @@
                             </div>
                         </div>
 
-                        <div class="alert alert-info" id="serviceInfo" style="display:none;">
-                            <p><strong>Thông tin dịch vụ:</strong></p>
-                            <p><span id="serviceName"></span> - <span id="serviceDuration"></span> phút - <span id="servicePrice"></span> VNĐ</p>
-                        </div>
-
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-gold rounded-pill px-5 py-2 fw-bold">ĐẶT LỊCH</button>
                         </div>
@@ -142,39 +151,85 @@
         $(document).ready(function () {
             var branchId = $('#BranchId');
             var bookingDate = $('#BookingDate');
-            var serviceId = $('#SelectedServiceId');
             var timeSlot = $('#timeSlot');
             var dateWarning = $('#dateWarning');
-
-            // Khi chọn dịch vụ, hiển thị thông tin
-            serviceId.change(async function () {
-                var id = $(this).val();
-                if (id) {
-                    try {
-                        const res = await fetch(`/api/ApiService/${id}`);
-                        const data = await res.json();
-                        $('#serviceInfo').show();
-                        $('#serviceName').text(data.serviceName);
-                        $('#serviceDuration').text(data.duration);
-                        $('#servicePrice').text(data.price.toLocaleString());
-                    } catch (error) {
-                        console.error('Lỗi tải dịch vụ:', error);
-                    }
-                } else {
-                        $('#serviceInfo').hide();
-                }
-                loadTimeSlots();
-            });
-
-            // Khi chọn chi nhánh hoặc ngày, load lại danh sách giờ
-            branchId.add(bookingDate).change(function () {
-                loadTimeSlots();
-            });
-
-            // Toggle hiển thị chọn nhân viên
             var autoAssignToggle = $('#autoAssignToggle');
             var staffSelectionContainer = $('#staffSelectionContainer');
             var staffSelect = $('#staffId');
+            var selectedServices = []; // { id, name, duration, price }
+
+            function updateSelectedServicesUI() {
+                var container = $('#selectedServicesList');
+                container.empty();
+
+                if (selectedServices.length === 0) {
+                    container.html('<div class="text-muted small">Chưa có dịch vụ nào được chọn</div>');
+                } else {
+                    var totalDuration = 0;
+                    var totalPrice = 0;
+
+                    selectedServices.forEach(function (sv) {
+                        totalDuration += sv.duration;
+                        totalPrice += sv.price;
+
+                        container.append(`
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ${sv.name} (${sv.duration} phút - ${sv.price.toLocaleString()}đ)
+                                <button type="button" class="btn btn-sm btn-danger remove-service" data-id="${sv.id}">Xóa</button>
+                            </div>
+                        `);
+                    });
+
+                    container.append(`
+                        <div class="list-group-item active bg-gold border-0 fw-bold">
+                            Tổng cộng: ${totalDuration} phút - ${totalPrice.toLocaleString()} VNĐ
+                        </div>
+                    `);
+                }
+
+                var inputsContainer = $('#SelectedServiceIdsInputs');
+                inputsContainer.empty();
+
+                // Tạo các field cho model binder List<int>
+                selectedServices.forEach(function (sv, idx) {
+                    inputsContainer.append(`<input type="hidden" name="SelectedServiceIds[${idx}]" value="${sv.id}" />`);
+                });
+
+                selectedServices.forEach(function (sv, idx) {
+                    inputsContainer.append(`<input type="hidden" name="SelectedServiceIds[${idx}]" value="${sv.id}" />`);
+                });
+
+                $('#SelectedServiceIdsCombined').val(selectedServices.map(function (s) { return s.id; }).join(','));
+                loadTimeSlots();
+            }
+
+            $('#addServiceBtn').click(function () {
+                var select = $('#serviceSelector');
+                var id = select.val();
+                if (!id) return;
+                var name = select.find('option:selected').text().split('(')[0].trim();
+                var duration = parseInt(select.find('option:selected').data('duration'));
+                var price = parseFloat(select.find('option:selected').data('price'));
+
+                if (selectedServices.some(function (s) { return s.id == id; })) {
+                    alert('Dịch vụ đã được chọn rồi!');
+                    return;
+                }
+
+                selectedServices.push({ id: parseInt(id), name: name, duration: duration, price: price });
+                updateSelectedServicesUI();
+                select.val('');
+            });
+
+            $(document).on('click', '.remove-service', function () {
+                var id = $(this).data('id');
+                selectedServices = selectedServices.filter(function (s) { return s.id != id; });
+                updateSelectedServicesUI();
+            });
+
+            branchId.add(bookingDate).change(function () {
+                loadTimeSlots();
+            });
 
             autoAssignToggle.change(function() {
                 if ($(this).is(':checked')) {
@@ -187,7 +242,6 @@
                 }
             });
 
-            // Khi chọn giờ, load lại danh sách nhân viên nếu đang chọn thủ công
             timeSlot.change(function() {
                 if (!autoAssignToggle.is(':checked')) {
                     loadAvailableStaff();
@@ -198,9 +252,9 @@
                 var branch = branchId.val();
                 var date = bookingDate.val();
                 var time = timeSlot.val();
-                var service = serviceId.val();
+                var serviceIds = $('#SelectedServiceIdsCombined').val();
 
-                if (!branch || !date || !time || !service) {
+                if (!branch || !date || !time || !serviceIds) {
                     staffSelect.html('<option value="">-- Hãy chọn giờ trước --</option>');
                     return;
                 }
@@ -208,16 +262,16 @@
                 staffSelect.html('<option value="">-- Đang tải nhân viên... --</option>');
 
                 try {
-                    const res = await fetch(`/api/ApiBooking/GetAvailableStaff?branchId=${branch}&date=${date}&time=${time}&serviceId=${service}`);
+                    const res = await fetch(`/api/ApiBooking/GetAvailableStaff?branchId=${branch}&date=${date}&time=${time}&serviceIds=${serviceIds}`);
                     const staffs = await res.json();
-                    
+
                     staffSelect.empty();
                     if (staffs.length === 0) {
                         staffSelect.append('<option disabled selected>Không có nhân viên rảnh</option>');
                         alert('Không có nhân viên rảnh trong khung giờ này. Vui lòng chọn giờ khác.');
                     } else {
                         staffSelect.append('<option value="">-- Chọn nhân viên --</option>');
-                        staffs.forEach(s => {
+                        staffs.forEach(function (s) {
                             staffSelect.append(`<option value="${s.staffId}">${s.fullName} (${s.position})</option>`);
                         });
                     }
@@ -230,16 +284,15 @@
             async function loadTimeSlots() {
                 var branch = branchId.val();
                 var date = bookingDate.val();
-                var service = serviceId.val();
+                var serviceIds = $('#SelectedServiceIdsCombined').val();
 
-                if (!branch || !date || !service) {
+                if (!branch || !date || !serviceIds) {
                     timeSlot.prop('disabled', true).html('<option value="">-- Vui lòng chọn đủ thông tin --</option>');
                     return;
                 }
 
-                // Kiểm tra ngày mở cửa (gọi API riêng nếu cần)
                 try {
-                    const res = await fetch(`/api/ApiBooking/GetTimeSlots?branchId=${branch}&date=${date}&serviceId=${service}`);
+                    const res = await fetch(`/api/ApiBooking/GetTimeSlots?branchId=${branch}&date=${date}&serviceIds=${serviceIds}`);
                     const slots = await res.json();
                     timeSlot.empty();
                     if (slots.length === 0) {
@@ -248,7 +301,7 @@
                         dateWarning.text('Chi nhánh có thể không mở cửa hoặc đã kín lịch.').show();
                     } else {
                         timeSlot.append('<option value="">-- Chọn giờ --</option>');
-                        slots.forEach(slot => {
+                        slots.forEach(function (slot) {
                             timeSlot.append(`<option value="${slot.value}">${slot.time}</option>`);
                         });
                         timeSlot.prop('disabled', false);
@@ -259,6 +312,9 @@
                     timeSlot.html('<option value="">-- Lỗi tải dữ liệu --</option>').prop('disabled', true);
                 }
             }
+
+            // Khởi tạo UI ban đầu
+            updateSelectedServicesUI();
         });
     </script>
 }
