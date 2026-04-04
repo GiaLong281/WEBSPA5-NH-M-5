@@ -1,53 +1,67 @@
-﻿@model SpaN5.Models.Branch
+@model SpaN5.Models.Branch
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Sửa chi nhánh";
+    ViewData["Title"] = Localizer["EditBranch"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container py-5" style="margin-top: 80px;">
-    <h1>Sửa chi nhánh</h1>
-    <form asp-action="EditBranch" method="post">
+    <h1 class="font-playfair text-gold mb-4">@Localizer["EditBranch"]</h1>
+    <form asp-action="EditBranch" method="post" enctype="multipart/form-data" class="card shadow-sm p-4">
         <input asp-for="BranchId" type="hidden" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="mb-3">
-            <label asp-for="BranchName" class="form-label"></label>
-            <input asp-for="BranchName" class="form-control" />
-            <span asp-validation-for="BranchName" class="text-danger"></span>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="BranchName" class="form-label"></label>
+                <input asp-for="BranchName" class="form-control" />
+                <span asp-validation-for="BranchName" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="BranchCode" class="form-label"></label>
+                <input asp-for="BranchCode" class="form-control" />
+            </div>
         </div>
-        <div class="mb-3">
-            <label asp-for="BranchCode" class="form-label"></label>
-            <input asp-for="BranchCode" class="form-control" />
-        </div>
+
         <div class="mb-3">
             <label asp-for="Address" class="form-label"></label>
             <input asp-for="Address" class="form-control" />
             <span asp-validation-for="Address" class="text-danger"></span>
         </div>
-        <div class="mb-3">
-            <label asp-for="District" class="form-label"></label>
-            <input asp-for="District" class="form-control" />
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="District" class="form-label"></label>
+                <input asp-for="District" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="City" class="form-label"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Phone" class="form-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
         </div>
-        <div class="mb-3">
-            <label asp-for="City" class="form-label"></label>
-            <input asp-for="City" class="form-control" />
-            <span asp-validation-for="City" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Phone" class="form-label"></label>
-            <input asp-for="Phone" class="form-control" />
-            <span asp-validation-for="Phone" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="GoogleMapLink" class="form-label"></label>
-            <input asp-for="GoogleMapLink" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="FacebookLink" class="form-label"></label>
-            <input asp-for="FacebookLink" class="form-control" />
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">@Localizer["BranchImage"]</label>
+                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                @if (!string.IsNullOrEmpty(Model.Image))
+                {
+                    <div class="mt-2">
+                        <img src="@Model.Image" alt="Current Image" style="max-height: 100px; border-radius: 8px;" />
+                        <div class="small text-muted mt-1">Current Image</div>
+                    </div>
+                }
+            </div>
         </div>
 
         <div class="row">
@@ -63,22 +77,36 @@
 
         <div class="mb-3">
             <label asp-for="Workday" class="form-label"></label>
-            <input asp-for="Workday" class="form-control" />
+            <input asp-for="Workday" class="form-control" placeholder="VD: Thứ 2 - Thứ 7" />
         </div>
+
         <div class="mb-3">
-            <label asp-for="Image" class="form-label"></label>
-            <input asp-for="Image" class="form-control" />
+            <label asp-for="GoogleMapLink" class="form-label"></label>
+            <input asp-for="GoogleMapLink" class="form-control" />
         </div>
+
+        <div class="mb-3">
+            <label asp-for="FacebookLink" class="form-label"></label>
+            <input asp-for="FacebookLink" class="form-control" />
+        </div>
+
         <div class="mb-3">
             <label asp-for="Description" class="form-label"></label>
             <textarea asp-for="Description" class="form-control" rows="3"></textarea>
         </div>
+
         <div class="form-check mb-3">
             <input asp-for="IsActive" class="form-check-input" />
             <label asp-for="IsActive" class="form-check-label"></label>
         </div>
 
-        <button type="submit" class="btn btn-primary">Lưu</button>
-        <a asp-action="ManageBranches" class="btn btn-secondary">Hủy</a>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-gold rounded-pill px-4">@Localizer["Save"]</button>
+            <a asp-action="ManageBranches" class="btn btn-outline-secondary rounded-pill px-4">@Localizer["Cancel"]</a>
+        </div>
     </form>
 </div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

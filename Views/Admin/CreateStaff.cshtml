@@ -35,10 +35,4 @@
         <button type="submit" class="btn btn-primary">Lưu</button>
         <a asp-action="ManageStaff" class="btn btn-secondary">Hủy</a>
     </form>
-    [HttpGet]
-public IActionResult CreateStaff()
-{
-    ViewBag.Branches = new SelectList(_context.Branches, "BranchId", "BranchName");
-    return View();
-}
 </div>

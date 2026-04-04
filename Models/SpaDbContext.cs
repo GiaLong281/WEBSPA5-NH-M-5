@@ -17,12 +17,17 @@ namespace SpaN5.Models
 
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> BookingDetails { get; set; }
+        public DbSet<CustomerNote> CustomerNotes { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
 
         public DbSet<Payment> Payments { get; set; }
 
         public DbSet<Material> Materials { get; set; }
         public DbSet<ServiceMaterial> ServiceMaterials { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
+
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Setting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,6 +99,21 @@ namespace SpaN5.Models
         entity.HasOne(c => c.DiaChi)
             .WithMany(d => d.Customers)
             .HasForeignKey(c => c.MaDiaChi);
+    });
+
+    modelBuilder.Entity<Review>(entity =>
+    {
+        entity.HasKey(r => r.ReviewId);
+
+        entity.HasOne(r => r.Service)
+              .WithMany(s => s.Reviews)
+              .HasForeignKey(r => r.ServiceId)
+              .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasOne(r => r.Customer)
+              .WithMany(c => c.Reviews)
+              .HasForeignKey(r => r.CustomerId)
+              .OnDelete(DeleteBehavior.Restrict);
     });
 }
         

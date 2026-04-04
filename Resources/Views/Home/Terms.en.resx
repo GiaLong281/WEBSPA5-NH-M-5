@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="TermsTitle"><value>Terms of Service</value></data>
+  <data name="Version"><value>Version 1.0 - Updated:</value></data>
+  <data name="Welcome"><value>Welcome to SpaN5. By using our services, you agree to comply with the terms below.</value></data>
+  <data name="Introduction"><value>1. Introduction</value></data>
+  <data name="IntroDesc"><value>SpaN5 website provides booking services, customer information management and online spa services. Using the website means you accept these terms.</value></data>
+  <data name="UserRights"><value>2. User Rights and Obligations</value></data>
+  <data name="UserRightsDesc1"><value>Users must provide accurate, truthful information when registering an account.</value></data>
+  <data name="UserRightsDesc2"><value>Do not use accounts for illegal purposes, harassment, or damage to the system.</value></data>
+  <data name="UserRightsDesc3"><value>Take responsibility for protecting login information.</value></data>
+  <data name="CompanyRights"><value>3. SpaN5 Rights and Obligations</value></data>
+  <data name="CompanyRightsDesc1"><value>Provide stable services, protect customer information.</value></data>
+  <data name="CompanyRightsDesc2"><value>Have the right to change, suspend services for maintenance.</value></data>
+  <data name="CompanyRightsDesc3"><value>Have the right to delete accounts that violate terms.</value></data>
+  <data name="DataSecurity"><value>4. Data Security</value></data>
+  <data name="DataSecurityDesc"><value>SpaN5 commits to protecting customer personal information according to its own privacy policy.</value></data>
+  <data name="Dispute"><value>5. Dispute Resolution</value></data>
+  <data name="DisputeDesc"><value>Any disputes will be resolved through negotiation. If unsuccessful, it will be resolved at the Ho Chi Minh City People's Court.</value></data>
+  <data name="Contact"><value>6. Contact</value></data>
+  <data name="ContactDesc"><value>If you have any questions, please contact: support@span5.com or hotline 0123 456 789.</value></data>
+</root>

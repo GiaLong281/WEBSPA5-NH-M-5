@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, ...</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, ...</value></resheader>
+  <data name="Home"><value>Trang chủ</value></data>
+  <data name="Services"><value>Dịch vụ</value></data>
+  <data name="AboutUs"><value>Về chúng tôi</value></data>
+  <data name="AdminDashboard"><value>Bảng điều khiển Admin</value></data>
+  <data name="StaffDashboard"><value>Bảng điều khiển Nhân viên</value></data>
+  <data name="Profile"><value>Hồ sơ cá nhân</value></data>
+  <data name="ChangePassword"><value>Đổi mật khẩu</value></data>
+  <data name="BookingHistory"><value>Lịch sử đặt lịch</value></data>
+  <data name="Logout"><value>Đăng xuất</value></data>
+  <data name="Login"><value>Đăng nhập</value></data>
+  <data name="Register"><value>Đăng ký</value></data>
+  <data name="FooterDescription"><value>Nơi mang lại sự thư giãn tuyệt đối cho tâm hồn và cơ thể bạn.</value></data>
+  <data name="Links"><value>Liên kết</value></data>
+  <data name="Terms"><value>Điều khoản sử dụng</value></data>
+</root>

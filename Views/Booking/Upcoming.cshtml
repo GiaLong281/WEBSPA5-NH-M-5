@@ -1,0 +1,125 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Lịch hẹn sắp tới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var now = ViewBag.Now as DateTime? ?? DateTime.Now;
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="font-playfair text-gold">Lịch hẹn của bạn</h1>
+        <a asp-action="Create" class="btn btn-gold rounded-pill">
+            <i class="fas fa-plus"></i> Đặt lịch mới
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+            <p>Bạn chưa có lịch hẹn nào sắp tới.</p>
+            <a asp-action="Create" class="btn btn-gold rounded-pill mt-2">Đặt lịch ngay</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var booking in Model)
+            {
+                var isToday = booking.BookingDate.Date == DateTime.Today;
+                var isOngoing = isToday && booking.StartTime.TimeOfDay <= now.TimeOfDay && booking.EndTime.TimeOfDay > now.TimeOfDay;
+                var cardClass = isOngoing ? "border-warning" : (isToday ? "border-info" : "");
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm hover-shadow transition-all @cardClass">
+                        <div class="card-header bg-white border-0 pt-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="badge @(booking.Status == BookingStatus.Pending ? "bg-warning text-dark" : 
+                                                    booking.Status == BookingStatus.Confirmed ? "bg-info" : 
+                                                    booking.Status == BookingStatus.InProgress ? "bg-primary" : "bg-secondary")">
+                                    @switch (booking.Status)
+                                    {
+                                        case BookingStatus.Pending: <span>Chờ xác nhận</span> break;
+                                        case BookingStatus.Confirmed: <span>Đã xác nhận</span> break;
+                                        case BookingStatus.InProgress: <span>Đang thực hiện</span> break;
+                                        default: <span>@booking.Status</span> break;
+                                    }
+                                </span>
+                                @if (isOngoing)
+                                {
+                                    <span class="badge bg-danger animate-pulse">Đang diễn ra</span>
+                                }
+                                else if (isToday)
+                                {
+                                    <span class="badge bg-success">Hôm nay</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title font-playfair">@booking.BookingCode</h5>
+                            <div class="mb-2">
+                                @foreach (var detail in booking.BookingDetails)
+                                {
+                                    <span class="badge bg-light text-dark me-1 mb-1">@detail.Service?.ServiceName</span>
+                                }
+                            </div>
+                            <div class="mb-2">
+                                <i class="fas fa-map-marker-alt text-gold me-2"></i> @booking.Branch?.BranchName
+                            </div>
+                            <div class="mb-2">
+                                <i class="far fa-calendar-alt text-gold me-2"></i>
+                                @booking.BookingDate.ToString("dddd, dd/MM/yyyy")
+                            </div>
+                            <div class="mb-3">
+                                <i class="far fa-clock text-gold me-2"></i>
+                                @booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")
+                            </div>
+                            <div class="text-muted small">
+                                <i class="fas fa-money-bill-wave"></i> @booking.TotalAmount.ToString("N0") VNĐ
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <div class="d-flex justify-content-between">
+                                @if (booking.Status != BookingStatus.Cancelled && booking.Status != BookingStatus.Completed)
+                                {
+                                    var cancelDeadline = booking.StartTime.AddHours(-24);
+                                    if (DateTime.Now < cancelDeadline)
+                                    {
+                                        <a asp-action="Cancel" asp-route-id="@booking.BookingId" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i> Hủy
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Hết hạn hủy</span>
+                                    }
+                                }
+                                <a asp-action="Details" asp-route-id="@booking.BookingId" class="btn btn-sm btn-outline-gold">
+                                    Chi tiết <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .animate-pulse {
+        animation: pulse 1.5s infinite;
+    }
+    @@keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+</style>

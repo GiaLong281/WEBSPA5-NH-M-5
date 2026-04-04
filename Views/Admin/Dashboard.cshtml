@@ -1,64 +1,151 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = Localizer["AdminDashboard"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container py-5" style="margin-top: 80px;">
-    <h1 class="font-playfair text-gold">Dashboard Admin</h1>
-    <div class="row mt-4">
-        <div class="col-md-3">
+
+<div class="container py-5">
+    <div class="mb-5">
+        <h1 class="font-playfair text-gold fw-bold">@Localizer["AdminDashboard"]</h1>
+        <p class="text-muted">Chào mừng trở lại! Hôm nay là @DateTime.Now.ToString("dd/MM/yyyy")</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-lg-3">
             <a asp-action="ManageCustomers" class="text-decoration-none">
-                <div class="card text-white bg-primary mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Khách hàng</h5>
-                        <p class="card-text display-4">@ViewBag.TotalCustomers</p>
+                <div class="admin-stat-card">
+                    <div class="admin-icon-box" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd;">
+                        <i class="fa-solid fa-users"></i>
                     </div>
+                    <div class="text-muted small fw-medium mb-1">@Localizer["Customers"]</div>
+                    <div class="fs-2 fw-bold text-dark">@ViewBag.TotalCustomers</div>
                 </div>
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-lg-3">
             <a asp-action="ManageBookings" class="text-decoration-none">
-                <div class="card text-white bg-success mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Lịch hẹn</h5>
-                        <p class="card-text display-4">@ViewBag.TotalBookings</p>
+                <div class="admin-stat-card">
+                    <div class="admin-icon-box" style="background: rgba(25, 135, 84, 0.1); color: #198754;">
+                        <i class="fa-solid fa-calendar-check"></i>
                     </div>
+                    <div class="text-muted small fw-medium mb-1">@Localizer["Bookings"]</div>
+                    <div class="fs-2 fw-bold text-dark">@ViewBag.TotalBookings</div>
                 </div>
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-lg-3">
             <a asp-action="ManageServices" class="text-decoration-none">
-                <div class="card text-white bg-warning mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Dịch vụ</h5>
-                        <p class="card-text display-4">@ViewBag.TotalServices</p>
+                <div class="admin-stat-card">
+                    <div class="admin-icon-box" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                        <i class="fa-solid fa-spa"></i>
                     </div>
+                    <div class="text-muted small fw-medium mb-1">@Localizer["Services"]</div>
+                    <div class="fs-2 fw-bold text-dark">@ViewBag.TotalServices</div>
                 </div>
             </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-lg-3">
             <a asp-action="ManageStaff" class="text-decoration-none">
-                <div class="card text-white bg-info mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Nhân viên</h5>
-                        <p class="card-text display-4">@ViewBag.TotalStaff</p>
+                <div class="admin-stat-card">
+                    <div class="admin-icon-box" style="background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+                        <i class="fa-solid fa-user-tie"></i>
                     </div>
+                    <div class="text-muted small fw-medium mb-1">@Localizer["Staff"]</div>
+                    <div class="fs-2 fw-bold text-dark">@ViewBag.TotalStaff</div>
                 </div>
             </a>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">Quản lý nhanh</div>
-                <div class="card-body">
-                    <a asp-action="ManageStaff" class="btn btn-outline-primary m-1">Quản lý nhân viên</a>
-                    <a asp-controller="ServiceCategory" asp-action="Index" class="btn btn-outline-primary m-1">
-                    <i class="fas fa-tags"></i> Quản lý loại dịch vụ </a>
-                    <a asp-action="ManageServices" class="btn btn-outline-primary m-1">Quản lý dịch vụ</a>
-                    <a asp-action="ManageBookings" class="btn btn-outline-primary m-1">Quản lý lịch hẹn</a>
-                    <a asp-action="Statistics" class="btn btn-outline-primary m-1">Thống kê</a>
-                    <a asp-action="AuditLog" class="btn btn-outline-primary m-1">Lịch sử thay đổi</a>
-                    <a asp-action="ManageSystem" class="btn btn-outline-primary m-1">Hệ thống</a>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="spa-card p-4 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="fw-bold mb-0">@Localizer["QuickManage"]</h5>
+                    <span class="badge bg-soft text-gold border border-gold border-opacity-10 px-3 py-2 rounded-pill">Quản trị viên</span>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a asp-action="ManageStaff" class="admin-quick-link">
+                            <i class="fa-solid fa-people-group text-gold"></i>
+                            <span>@Localizer["ManageStaff"]</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="CreateUser" class="admin-quick-link">
+                            <i class="fa-solid fa-user-plus text-gold"></i>
+                            <span>Tạo tài khoản mới</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="ServiceCategory" asp-action="Index" class="admin-quick-link">
+                            <i class="fa-solid fa-tags text-gold"></i>
+                            <span>@Localizer["ManageServiceCategory"]</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="ManageServices" class="admin-quick-link">
+                            <i class="fa-solid fa-broom-ball text-gold"></i>
+                            <span>@Localizer["ManageServices"]</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="ManageBookings" class="admin-quick-link">
+                            <i class="fa-solid fa-clipboard-list text-gold"></i>
+                            <span>@Localizer["ManageBookings"]</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="StaffCalendar" asp-action="Index" class="admin-quick-link">
+                            <i class="fa-solid fa-calendar-alt text-gold"></i>
+                            <span>Lịch biểu nhân viên</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="ManageMaterials" class="admin-quick-link">
+                            <i class="fa-solid fa-box-open text-gold"></i>
+                            <span>Quản lý vật tư</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="ManageStockTransactions" class="admin-quick-link">
+                            <i class="fa-solid fa-truck-ramp-box text-gold"></i>
+                            <span>Giao dịch kho</span>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="Statistics" class="admin-quick-link">
+                            <i class="fa-solid fa-chart-line text-gold"></i>
+                            <span>@Localizer["Statistics"]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="spa-card p-4 h-100">
+                <h5 class="fw-bold mb-4">Hệ thống & Cài đặt</h5>
+                <div class="d-grid gap-3">
+                    <a asp-action="ManageSystem" class="btn btn-gold rounded-pill py-3">
+                        <i class="fa-solid fa-gears me-2"></i> Quản lý hệ thống
+                    </a>
+                    <a asp-action="Settings" class="btn btn-outline-gold rounded-pill py-3">
+                        <i class="fa-solid fa-sliders me-2"></i> Cài đặt trang web
+                    </a>
+                    <a asp-action="AuditLog" class="btn bg-soft text-dark rounded-pill py-3 border">
+                        <i class="fa-solid fa-clock-rotate-left me-2"></i> @Localizer["ChangeLog"]
+                    </a>
                 </div>
             </div>
         </div>

@@ -1,0 +1,46 @@
+@model SpaN5.Models.Booking
+@{
+    ViewData["Title"] = "Hủy lịch hẹn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-danger text-white text-center py-3">
+                    <h3 class="mb-0">Xác nhận hủy lịch</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Bạn có chắc chắn muốn hủy lịch hẹn này?
+                    </div>
+                    <div class="mb-3">
+                        <p><strong>Mã đơn:</strong> @Model.BookingCode</p>
+                        <p><strong>Dịch vụ:</strong> 
+                            @foreach (var detail in Model.BookingDetails)
+                            {
+                                @detail.Service?.ServiceName
+                                <br />
+                            }
+                        </p>
+                        <p><strong>Chi nhánh:</strong> @Model.Branch?.BranchName</p>
+                        <p><strong>Ngày giờ:</strong> @Model.BookingDate.ToString("dd/MM/yyyy") - @Model.StartTime.ToString(@"HH\:mm")</p>
+                        <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("N0") VNĐ</p>
+                    </div>
+                    <form asp-action="Cancel" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.BookingId" />
+                        <div class="mb-3">
+                            <label class="form-label">Lý do hủy (tùy chọn)</label>
+                            <textarea name="reason" class="form-control" rows="3" placeholder="Vui lòng cho biết lý do hủy..."></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                            <a asp-action="MyBookings" class="btn btn-outline-secondary">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

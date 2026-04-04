@@ -1,0 +1,302 @@
+@model Booking
+@using SpaN5.Models
+
+@{
+    ViewData["Title"] = "Chi tiết lịch đặt";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">Chi tiết lịch đặt</h1>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @{
+                var bookingDetail = Model.BookingDetails?.FirstOrDefault();
+                var service = bookingDetail?.Service;
+                var staff = bookingDetail?.Staff;
+                var statusBadge = Model.Status switch
+                {
+                    BookingStatus.Pending => "warning",
+                    BookingStatus.Confirmed => "info",
+                    BookingStatus.InProgress => "primary",
+                    BookingStatus.Completed => "success",
+                    BookingStatus.Cancelled => "danger",
+                    _ => "secondary"
+                };
+                var statusText = Model.Status switch
+                {
+                    BookingStatus.Pending => "Chờ xác nhận",
+                    BookingStatus.Confirmed => "Đã xác nhận",
+                    BookingStatus.InProgress => "Đang thực hiện",
+                    BookingStatus.Completed => "Hoàn thành",
+                    BookingStatus.Cancelled => "Đã hủy",
+                    _ => "Không xác định"
+                };
+            }
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Mã đơn hàng</h6>
+                            <p class="lead"><strong>@Model.BookingCode</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Trạng thái</h6>
+                            <p>
+                                <span class="badge bg-@statusBadge">@statusText</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h5>Thông tin dịch vụ</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Tên dịch vụ</h6>
+                            <p>@(service?.ServiceName ?? "N/A")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Thời lượng</h6>
+                            <p>@(service?.Duration ?? 0) phút</p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h5>Thông tin lịch đặt</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Ngày đặt</h6>
+                            <p>@Model.BookingDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Thời gian</h6>
+                            <p>@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Chi nhánh</h6>
+                            <p>@(Model.Branch?.BranchName ?? "N/A")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Nhân viên</h6>
+                            <p>@(staff?.FullName ?? "Chưa chọn")</p>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Ghi chú</h6>
+                                <p>@Model.Notes</p>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <h5>Thông tin thanh toán</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Giá dịch vụ</h6>
+                            <p>@(bookingDetail?.PriceAtTime.ToString("N0") ?? "0") ₫</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Phí dịch vụ</h6>
+                            <p>0 ₫</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Tổng tiền</h6>
+                            <p class="lead"><strong>@Model.TotalAmount.ToString("N0") ₫</strong></p>
+                        </div>
+                    </div>
+
+                    @if (Model.Payments != null && Model.Payments.Any())
+                    {
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6 class="text-muted">Thanh toán</h6>
+                                <ul class="list-unstyled">
+                                    @foreach (var payment in Model.Payments)
+                                    {
+                                        <li>
+                                            <span class="badge bg-success">@payment.Method</span>
+                                            @payment.Amount.ToString("N0") ₫ - @payment.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+
+                @if (Model.Status != BookingStatus.Cancelled && Model.Status != BookingStatus.Completed)
+                {
+                    <button class="btn btn-danger" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#cancelModal"
+                            title="Hủy lịch đặt">
+                        <i class="bi bi-x-circle"></i> Hủy lịch
+                    </button>
+                }
+
+                @if (Model.Status == BookingStatus.Confirmed && Model.TotalAmount > 0)
+                {
+                    <a href="@Url.Action("Create", "Payment", new { bookingId = Model.BookingId })" 
+                       class="btn btn-success" 
+                       title="Thanh toán">
+                        <i class="bi bi-credit-card"></i> Thanh toán
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Timeline/Status -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lịch sử trạng thái</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6>Lịch đặt được tạo</h6>
+                                <small class="text-muted">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker @(Model.Status != BookingStatus.Pending ? "bg-success" : "bg-secondary")"></div>
+                            <div class="timeline-content">
+                                <h6>@(Model.Status != BookingStatus.Pending ? (Model.Status == BookingStatus.InProgress ? "Đang thực hiện" : "Đã xác nhận") : "Chờ xác nhận")</h6>
+                            </div>
+                        </div>
+                        @if (Model.Status == BookingStatus.InProgress)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6>Đang thực hiện</h6>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.Status == BookingStatus.Completed)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6>Hoàn thành</h6>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.Status == BookingStatus.Cancelled)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-danger"></div>
+                                <div class="timeline-content">
+                                    <h6>Đã hủy</h6>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="cancelModalLabel">Xác nhận hủy lịch đặt</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn hủy lịch đặt <strong>@Model.BookingCode</strong> không?</p>
+                <p class="text-muted small">Hành động này không thể được hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <form method="post" action="@Url.Action("Cancel", "Booking", new { id = Model.BookingId })" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        display: flex;
+        margin-bottom: 20px;
+    }
+
+    .timeline-item:not(:last-child) .timeline-marker::after {
+        content: '';
+        position: absolute;
+        width: 2px;
+        height: 30px;
+        background: #dee2e6;
+        top: 40px;
+        left: 10px;
+    }
+
+    .timeline-marker {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        margin-right: 15px;
+        position: relative;
+        flex-shrink: 0;
+        margin-top: 3px;
+    }
+
+    .timeline-content h6 {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .timeline-content small {
+        display: block;
+        margin-top: 3px;
+    }
+</style>

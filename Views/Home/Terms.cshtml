@@ -1,25 +1,27 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Điều khoản sử dụng";
+    ViewData["Title"] = Localizer["TermsTitle"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container py-5" style="margin-top:80px;">
-    <h1 class="font-playfair text-gold">Điều khoản sử dụng</h1>
-    <p>Phiên bản 1.0 - Cập nhật: @DateTime.Now.ToString("dd/MM/yyyy")</p>
-    <p>Chào mừng bạn đến với SpaN5. Khi sử dụng dịch vụ của chúng tôi, bạn đồng ý tuân thủ các điều khoản dưới đây.</p>
-    <h3>1. Giới thiệu</h3>
-    <p>Website SpaN5 cung cấp dịch vụ đặt lịch, quản lý thông tin khách hàng và các dịch vụ spa trực tuyến. Việc sử dụng website đồng nghĩa với việc bạn chấp nhận các điều khoản này.</p>
-    <h3>2. Quyền và nghĩa vụ của người dùng</h3>
-    <p>- Người dùng phải cung cấp thông tin chính xác, trung thực khi đăng ký tài khoản.</p>
-    <p>- Không sử dụng tài khoản cho mục đích bất hợp pháp, quấy rối, hoặc gây tổn hại đến hệ thống.</p>
-    <p>- Chịu trách nhiệm bảo mật thông tin đăng nhập.</p>
-    <h3>3. Quyền và nghĩa vụ của SpaN5</h3>
-    <p>- Cung cấp dịch vụ ổn định, bảo mật thông tin khách hàng.</p>
-    <p>- Có quyền thay đổi, tạm ngưng dịch vụ để bảo trì.</p>
-    <p>- Có quyền xóa tài khoản vi phạm điều khoản.</p>
-    <h3>4. Bảo mật thông tin</h3>
-    <p>SpaN5 cam kết bảo mật thông tin cá nhân của khách hàng theo chính sách bảo mật riêng.</p>
-    <h3>5. Giải quyết tranh chấp</h3>
-    <p>Mọi tranh chấp sẽ được giải quyết thông qua thương lượng. Nếu không thành công, sẽ được giải quyết tại Tòa án nhân dân thành phố Hồ Chí Minh.</p>
-    <h3>6. Liên hệ</h3>
-    <p>Nếu có thắc mắc, vui lòng liên hệ: support@span5.com hoặc hotline 0123 456 789.</p>
+    <h1 class="font-playfair text-gold">@Localizer["TermsTitle"]</h1>
+    <p><strong>@Localizer["Version"]</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+    <p>@Localizer["Welcome"]</p>
+    <h3>@Localizer["Introduction"]</h3>
+    <p>@Localizer["IntroDesc"]</p>
+    <h3>@Localizer["UserRights"]</h3>
+    <p>- @Localizer["UserRightsDesc1"]</p>
+    <p>- @Localizer["UserRightsDesc2"]</p>
+    <p>- @Localizer["UserRightsDesc3"]</p>
+    <h3>@Localizer["CompanyRights"]</h3>
+    <p>- @Localizer["CompanyRightsDesc1"]</p>
+    <p>- @Localizer["CompanyRightsDesc2"]</p>
+    <p>- @Localizer["CompanyRightsDesc3"]</p>
+    <h3>@Localizer["DataSecurity"]</h3>
+    <p>@Localizer["DataSecurityDesc"]</p>
+    <h3>@Localizer["Dispute"]</h3>
+    <p>@Localizer["DisputeDesc"]</p>
+    <h3>@Localizer["Contact"]</h3>
+    <p>@Localizer["ContactDesc"]</p>
 </div>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="Login"><value>Đăng nhập</value></data>
+  <data name="WelcomeBack"><value>Chào mừng trở lại!</value></data>
+  <data name="Username"><value>Tên đăng nhập</value></data>
+  <data name="EnterUsername"><value>Nhập tên đăng nhập</value></data>
+  <data name="Password"><value>Mật khẩu</value></data>
+  <data name="EnterPassword"><value>Nhập mật khẩu</value></data>
+  <data name="RememberMe"><value>Ghi nhớ đăng nhập</value></data>
+  <data name="NoAccount"><value>Chưa có tài khoản?</value></data>
+  <data name="SignUpNow"><value>Đăng ký ngay</value></data>
+  <data name="Register"><value>Đăng ký</value></data>
+  <data name="BeccomeMember"><value>Trở thành thành viên SpaN5</value></data>
+  <data name="FullName"><value>Họ và tên</value></data>
+  <data name="ExampleName"><value>Nguyễn Văn A</value></data>
+  <data name="Phone"><value>Số điện thoại</value></data>
+  <data name="ExamplePhone"><value>0123456789</value></data>
+  <data name="Email"><value>Email (tùy chọn)</value></data>
+  <data name="ExampleEmail"><value>example@email.com</value></data>
+  <data name="MinPassword"><value>Ít nhất 6 ký tự</value></data>
+  <data name="ConfirmPassword"><value>Xác nhận mật khẩu</value></data>
+  <data name="ReEnterPassword"><value>Nhập lại mật khẩu</value></data>
+  <data name="IAgree"><value>Tôi đã đọc và đồng ý với</value></data>
+  <data name="HaveAccount"><value>Đã có tài khoản?</value></data>
+  <data name="LoginNow"><value>Đăng nhập ngay</value></data>
+  <data name="Profile"><value>Hồ sơ cá nhân</value></data>
+  <data name="AccountInfo"><value>Thông tin tài khoản</value></data>
+  <data name="Role"><value>Vai trò</value></data>
+  <data name="Update"><value>Cập nhật</value></data>
+  <data name="ChangePass"><value>Đổi mật khẩu</value></data>
+  <data name="CurrentPassword"><value>Mật khẩu hiện tại</value></data>
+  <data name="NewPassword"><value>Mật khẩu mới</value></data>
+  <data name="ConfirmNewPassword"><value>Xác nhận mật khẩu mới</value></data>
+  <data name="AccessDenied"><value>Truy cập bị từ chối</value></data>
+  <data name="AccessDeniedMsg"><value>403 - Truy cập bị từ chối</value></data>
+  <data name="NoPermission"><value>Bạn không có quyền truy cập vào trang này.</value></data>
+  <data name="BackToHome"><value>Về trang chủ</value></data>
+</root>

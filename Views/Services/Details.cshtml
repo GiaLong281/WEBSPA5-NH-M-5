@@ -1,0 +1,188 @@
+@model SpaN5.Models.Service
+@{
+    ViewData["Title"] = Model.ServiceName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row">
+        <!-- Hình ảnh và thông tin cơ bản -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <img src="@(string.IsNullOrEmpty(Model.Image) ? "/images/default-service.jpg" : "/images/" + Model.Image)" 
+                     class="card-img-top rounded-3" style="object-fit: cover; height: 400px;" alt="@Model.ServiceName">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h1 class="font-playfair text-gold">@Model.ServiceName</h1>
+            <div class="mb-3">
+                <span class="badge bg-gold text-dark me-2">@Model.Category?.Name</span>
+                <span class="badge bg-light text-dark"><i class="far fa-clock"></i> @Model.Duration phút</span>
+            </div>
+            <div class="mb-4">
+                <h3 class="text-gold fw-bold">@Model.Price.ToString("N0")đ</h3>
+            </div>
+            <div class="mb-4">
+                <h5>Mô tả chi tiết</h5>
+                <p class="text-muted">@Model.Description</p>
+            </div>
+            <a href="/Booking/Create?serviceId=@Model.ServiceId" class="btn btn-gold rounded-pill px-4 py-2">
+                <i class="fas fa-calendar-alt"></i> Đặt lịch ngay
+            </a>
+        </div>
+    </div>
+
+    <!-- Phần đánh giá khách hàng -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="font-playfair mb-4">Đánh giá từ khách hàng</h3>
+            <div id="reviewsContainer">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-gold" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form gửi đánh giá (nếu đã đăng nhập và đã sử dụng dịch vụ) -->
+    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
+    {
+        <div class="row mt-4">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-gold text-white">
+                        <h5 class="mb-0">Đánh giá dịch vụ</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="reviewForm">
+                            <div class="mb-3">
+                                <label class="form-label">Đánh giá sao</label>
+                                <div class="rating-stars">
+                                    <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                                    <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
+                                    <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
+                                    <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
+                                    <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nhận xét</label>
+                                <textarea id="comment" class="form-control" rows="3" placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-gold rounded-pill">Gửi đánh giá</button>
+                        </form>
+                        <div id="reviewMessage" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle"></i> Vui lòng <a asp-controller="Account" asp-action="Login">đăng nhập</a> để gửi đánh giá.
+        </div>
+    }
+</div>
+
+<style>
+    .rating-stars {
+        display: inline-block;
+        direction: rtl;
+        font-size: 1.5rem;
+    }
+    .rating-stars input {
+        display: none;
+    }
+    .rating-stars label {
+        color: #ddd;
+        cursor: pointer;
+    }
+    .rating-stars input:checked ~ label,
+    .rating-stars label:hover,
+    .rating-stars label:hover ~ label {
+        color: #ffc107;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        const serviceId = @Model.ServiceId;
+
+        async function loadReviews() {
+            try {
+                const res = await fetch(`/api/ApiService/${serviceId}`);
+                const data = await res.json();
+                renderReviews(data.reviews);
+            } catch (error) {
+                console.error('Lỗi tải đánh giá:', error);
+                document.getElementById('reviewsContainer').innerHTML = '<div class="alert alert-danger">Không thể tải đánh giá.</div>';
+            }
+        }
+
+        function renderReviews(reviews) {
+            const container = document.getElementById('reviewsContainer');
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">Chưa có đánh giá nào. Hãy là người đầu tiên nhận xét!</p>';
+                return;
+            }
+
+            let html = '';
+            reviews.forEach(r => {
+                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                html += `
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="fw-bold">${r.customerName}</h6>
+                                <span class="text-gold">${stars}</span>
+                            </div>
+                            <p class="text-muted small">${new Date(r.createdAt).toLocaleDateString('vi-VN')}</p>
+                            <p>${r.comment || ''}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        document.getElementById('reviewForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const comment = document.getElementById('comment').value;
+
+            if (!rating) {
+                document.getElementById('reviewMessage').innerHTML = '<div class="alert alert-warning">Vui lòng chọn số sao.</div>';
+                return;
+            }
+
+            const data = {
+                serviceId: serviceId,
+                rating: parseInt(rating.value),
+                comment: comment
+            };
+
+            try {
+                const res = await fetch('/api/ApiReview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    document.getElementById('reviewMessage').innerHTML = '<div class="alert alert-success">Cảm ơn bạn đã đánh giá!</div>';
+                    document.getElementById('reviewForm').reset();
+                    loadReviews();
+                } else {
+                    document.getElementById('reviewMessage').innerHTML = `<div class="alert alert-danger">${result.message || 'Có lỗi xảy ra'}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('reviewMessage').innerHTML = '<div class="alert alert-danger">Không thể gửi đánh giá.</div>';
+            }
+        });
+
+        loadReviews();
+    </script>
+}

@@ -28,9 +28,24 @@ namespace SpaN5.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpPost]
+        public IActionResult SetLanguage(string culture, string returnUrl)
+        {
+            if (!string.IsNullOrEmpty(culture))
+            {
+                Response.Cookies.Append(
+                    Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.DefaultCookieName,
+                    Microsoft.AspNetCore.Localization.CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
+                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
+            }
+
+            return LocalRedirect(returnUrl ?? Url.Action("Index", "Home"));
+        }
+
         public IActionResult Terms()
-{
-    return View();
-}
+        {
+            return View();
+        }
     }
 }

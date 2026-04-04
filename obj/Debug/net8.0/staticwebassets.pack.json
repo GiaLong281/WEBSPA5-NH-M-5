@@ -1,0 +1,313 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\SpaN5.bundle.scp.css",
+      "PackagePath": "staticwebassets\\SpaN5.cax3iyrpt7.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\01b62ac7-7361-449d-a5e4-589e365a0263.jpg",
+      "PackagePath": "staticwebassets\\images\\01b62ac7-7361-449d-a5e4-589e365a0263.jpg"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\30064757482_14ca196a7c_b.jpg",
+      "PackagePath": "staticwebassets\\images\\30064757482_14ca196a7c_b.jpg"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\5wg6kjm22z7t-640x640.jpg",
+      "PackagePath": "staticwebassets\\images\\5wg6kjm22z7t-640x640.jpg"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\decb4559-d4be-4307-9fed-41215ed83c54_TB01646_696f2585248f4cd94585947d.jpg",
+      "PackagePath": "staticwebassets\\images\\decb4559-d4be-4307-9fed-41215ed83c54_TB01646_696f2585248f4cd94585947d.jpg"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\fb74efe0-3cb5-4443-95ad-ca43907008b9.png",
+      "PackagePath": "staticwebassets\\images\\fb74efe0-3cb5-4443-95ad-ca43907008b9.png"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\images.jpg",
+      "PackagePath": "staticwebassets\\images\\images.jpg"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_interior.png",
+      "PackagePath": "staticwebassets\\images\\spa_interior.png"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_massage.png",
+      "PackagePath": "staticwebassets\\images\\spa_massage.png"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_relaxing.png",
+      "PackagePath": "staticwebassets\\images\\spa_relaxing.png"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\images\\spa_room.png",
+      "PackagePath": "staticwebassets\\images\\spa_room.png"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\LICENSE",
+      "PackagePath": "staticwebassets\\lib\\bootstrap"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation\\LICENSE.md",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\LICENSE.md"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\pc\\OneDrive\\Documents\\GitHub\\WEBSPA5-NH-M-5\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.SpaN5.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.SpaN5.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.SpaN5.props",
+      "PackagePath": "build\\SpaN5.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.SpaN5.props",
+      "PackagePath": "buildMultiTargeting\\SpaN5.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.SpaN5.props",
+      "PackagePath": "buildTransitive\\SpaN5.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

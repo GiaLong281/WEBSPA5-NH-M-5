@@ -83,18 +83,14 @@ namespace SpaN5.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            if (!model.AcceptTerms)
+            if (ModelState.IsValid && model.AcceptTerms)
             {
-                // Kiểm tra username đã tồn tại
                 if (await _context.Users.AnyAsync(u => u.Username == model.Username))
                 {
                     ModelState.AddModelError("Username", "Tên đăng nhập đã được sử dụng.");
-                    ModelState.AddModelError("AcceptTerms", "Bạn phải đồng ý với điều khoản sử dụng");
                     return View(model);
                 }
 
-                // Tạo Customer mới
                 var customer = new Customer
                 {
                     FullName = model.FullName,
@@ -105,7 +101,6 @@ namespace SpaN5.Controllers
                 _context.Customers.Add(customer);
                 await _context.SaveChangesAsync();
 
-                // Tạo User mới
                 var user = new User
                 {
                     Username = model.Username,
@@ -119,7 +114,6 @@ namespace SpaN5.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Tự động đăng nhập sau khi đăng ký
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username),

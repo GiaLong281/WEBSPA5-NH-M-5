@@ -3,23 +3,78 @@
     ViewData["Title"] = "Quản lý lịch hẹn";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container py-5">
-    <h1>Quản lý lịch hẹn</h1>
-    <table class="table">
-        <thead><tr><th>ID</th><th>Khách hàng</th><th>Ngày đặt</th><th>Giờ</th><th>Chi nhánh</th><th>Trạng thái</th><th>Tổng tiền</th></tr></thead>
-        <tbody>
-            @foreach (var b in Model)
-            {
-                <tr>
-                    <td>@b.BookingId</td>
-                    <td>@b.Customer?.FullName</td>
-                    <td>@b.BookingDate.ToString("dd/MM/yyyy")</td>
-                    <td>@b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")</td>
-                    <td>@b.Branch?.BranchName</td>
-                    <td>@b.Status</td>
-                    <td>@b.TotalAmount.ToString("N0")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="font-playfair text-gold mb-0">Quản lý lịch hẹn</h1>
+        <div>
+            <span class="badge bg-light text-dark border p-2">Tổng số: @Model.Count()</span>
+        </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Khách hàng</th>
+                            <th>Chi tiết lịch</th>
+                            <th>Chi nhánh</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng tiền</th>
+                            <th class="pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in Model)
+                        {
+                            var statusBadge = b.Status switch
+                            {
+                                BookingStatus.Pending => "bg-warning text-dark",
+                                BookingStatus.Confirmed => "bg-info",
+                                BookingStatus.InProgress => "bg-primary",
+                                BookingStatus.Completed => "bg-success",
+                                BookingStatus.Cancelled => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+
+                            var statusText = b.Status switch
+                            {
+                                BookingStatus.Pending => "Chờ xác nhận",
+                                BookingStatus.Confirmed => "Đã xác nhận",
+                                BookingStatus.InProgress => "Đang thực hiện",
+                                BookingStatus.Completed => "Hoàn thành",
+                                BookingStatus.Cancelled => "Đã hủy",
+                                _ => b.Status.ToString()
+                            };
+
+                            <tr>
+                                <td class="ps-4 fw-bold text-muted">#@b.BookingId</td>
+                                <td>
+                                    <div class="fw-bold">@b.Customer?.FullName</div>
+                                    <div class="small text-muted">@b.Customer?.Phone</div>
+                                </td>
+                                <td>
+                                    <div><i class="far fa-calendar-alt text-gold me-2"></i>@b.BookingDate.ToString("dd/MM/yyyy")</div>
+                                    <div class="small text-muted"><i class="far fa-clock text-gold me-2"></i>@b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")</div>
+                                </td>
+                                <td>@b.Branch?.BranchName</td>
+                                <td>
+                                    <span class="badge @statusBadge rounded-pill">@statusText</span>
+                                </td>
+                                <td class="fw-bold text-dark">@b.TotalAmount.ToString("N0") ₫</td>
+                                <td class="pe-4 text-nowrap">
+                                    <a asp-action="BookingDetails" asp-route-id="@b.BookingId" class="btn btn-sm btn-outline-gold rounded-pill">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

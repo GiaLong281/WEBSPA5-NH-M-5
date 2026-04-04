@@ -1,18 +1,101 @@
-public async Task<IActionResult> Statistics()
-{
-    var payments = await _context.Payments
-        .Where(p => p.Status == PaymentStatus.Paid)
-        .ToListAsync();
-    var totalRevenue = payments.Sum(p => p.Amount);
+@{
+    ViewData["Title"] = "Thống kê";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-    var monthlyRevenue = payments
-        .GroupBy(p => new { p.CreatedAt.Year, p.CreatedAt.Month })
-        .Select(g => new { g.Key.Year, g.Key.Month, Total = g.Sum(p => p.Amount) })
-        .OrderByDescending(x => x.Year).ThenByDescending(x => x.Month)
-        .Take(12)
-        .ToList();
+<div class="container py-5">
+    <h1 class="mb-4">Thống kê doanh thu</h1>
 
-    ViewBag.TotalRevenue = totalRevenue;
-    ViewBag.MonthlyRevenue = monthlyRevenue ?? new List<object>();
-    return View();
+    <!-- Tổng doanh thu -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Tổng doanh thu</h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="text-success">@String.Format("{0:N0} VND", ViewBag.TotalRevenue ?? 0)</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ doanh thu theo tháng -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Doanh thu theo tháng (12 tháng gần nhất)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyRevenueChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dữ liệu doanh thu theo tháng
+            var monthlyData = @Html.Raw(Json.Serialize(ViewBag.MonthlyRevenue ?? new List<object>()));
+
+            // Chuẩn bị dữ liệu cho biểu đồ
+            var labels = [];
+            var data = [];
+
+            // Sắp xếp theo thứ tự thời gian (từ cũ đến mới)
+            monthlyData.sort(function(a, b) {
+                if (a.Year !== b.Year) {
+                    return a.Year - b.Year;
+                }
+                return a.Month - b.Month;
+            });
+
+            monthlyData.forEach(function(item) {
+                labels.push(item.Month + '/' + item.Year);
+                data.push(item.Total);
+            });
+
+            // Tạo biểu đồ
+            var ctx = document.getElementById('monthlyRevenueChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh thu (VND)',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('vi-VN') + ' VND';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString('vi-VN') + ' VND';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 }

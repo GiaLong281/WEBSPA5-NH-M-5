@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="PageTitle"><value>Trang Chủ</value></data>
+  <data name="MainHeading"><value>Nuông Chiều Bản Thân
+Đánh Thức Vẻ Đẹp</value></data>
+  <data name="MainDescription"><value>Trải nghiệm không gian thư giãn tuyệt đối và những liệu pháp tái tạo năng lượng hàng đầu tại SpaN5.</value></data>
+  <data name="BookNow"><value>Đặt Lịch Ngay</value></data>
+  <data name="YearsExperience"><value>10+ Năm</value></data>
+  <data name="ExperienceLabel"><value>Kinh nghiệm chăm sóc</value></data>
+  <data name="AboutUsTitle"><value>Về SpaN5</value></data>
+  <data name="BalanceSubtitle"><value>Nơi Cân Bằng Thân &amp; Tâm.</value></data>
+  <data name="AboutDescription"><value>Chúng tôi tin rằng sự thư giãn thực sự đến từ sự hòa hợp giữa cơ thể khỏe mạnh và tinh thần an yên. Với không gian thiên nhiên tĩnh lặng và các liệu pháp y học cổ truyền kết hợp hiện đại, SpaN5 mong muốn mang đến cho bạn những trải nghiệm đáng nhớ nhất.</value></data>
+  <data name="ProfessionalTherapists"><value>Kỹ thuật viên chuyên nghiệp, tận tâm</value></data>
+  <data name="OrganicProducts"><value>Sản phẩm hữu cơ organic 100%</value></data>
+  <data name="PrivateSpace"><value>Không gian tĩnh lặng, riêng tư</value></data>
+  <data name="ExploreServices"><value>Khám phá dịch vụ</value></data>
+  <data name="FeaturedServices"><value>Dịch Vụ Nổi Bật</value></data>
+  <data name="RejuvenationTherapies"><value>Những Liệu Trình Tái Tạo</value></data>
+  <data name="MassageTitle"><value>Massage Thư Giãn</value></data>
+  <data name="MassageDesc"><value>Xua tan căng thẳng cơ bắp bằng liệu pháp massage Thụy Điển kết hợp đá nóng thiên nhiên.</value></data>
+  <data name="FacialTitle"><value>Chăm Sóc Da Mặt</value></data>
+  <data name="FacialDesc"><value>Thanh lọc và trẻ hóa làn da với tinh chất hoa cúc và serum hữu cơ nhập khẩu từ Pháp.</value></data>
+  <data name="HerbalBathTitle"><value>Tắm Thảo Dược</value></data>
+  <data name="HerbalBathDesc"><value>Đào thải độc tố, kích thích tuần hoàn máu qua liệu trình ngâm mình với 15 loại thảo mộc quý.</value></data>
+  <data name="ViewDetails"><value>Xem chi tiết</value></data>
+  <data name="CustomerTestimonials"><value>Khách Hàng Nói Gì Về Chúng Tôi?</value></data>
+  <data name="TestimonialIntro"><value>Hơn 5000+ khách hàng đã trải nghiệm và hài lòng với dịch vụ tại SpaN5. Sự tin tưởng của quý khách là động lực to lớn nhất.</value></data>
+  <data name="TestimonialContent"><value>Sau một tuần làm việc căng thẳng, đến SpaN5 giống như bước vào một thế giới khác. Không gian tuyệt vời, mùi hương tinh dầu dịu nhẹ và kỹ thuật massage thì điêu luyện. Chắc chắn tôi sẽ quay lại thường xuyên.</value></data>
+  <data name="TestimonialAuthor"><value>Nguyễn Phương My</value></data>
+  <data name="TestimonialRole"><value>Doanh nhân</value></data>
+</root>

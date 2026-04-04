@@ -1,8 +1,197 @@
 @{
     ViewData["Title"] = "Lịch sử đặt lịch";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var completed = ViewBag.Completed as IEnumerable<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
+    var cancelled = ViewBag.Cancelled as IEnumerable<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
+    var all = ViewBag.All as IEnumerable<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
 }
+
 <div class="container py-5" style="margin-top: 80px;">
-    <h1 class="font-playfair text-gold">Lịch sử đặt lịch</h1>
-    <p>Danh sách các booking của bạn sẽ hiển thị ở đây.</p>
+    <h1 class="font-playfair text-gold mb-4">Lịch sử đặt lịch</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <ul class="nav nav-tabs mb-4" id="bookingTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">Tất cả (@all.Count())</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab">Đã hoàn thành (@completed.Count())</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab">Đã hủy (@cancelled.Count())</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Tab Tất cả -->
+        <div class="tab-pane fade show active" id="all" role="tabpanel">
+            @if (!all.Any())
+            {
+                <div class="alert alert-info">Bạn chưa có lịch hẹn nào. <a asp-action="Create">Đặt lịch ngay</a></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Dịch vụ</th>
+                                <th>Chi nhánh</th>
+                                <th>Ngày</th>
+                                <th>Giờ</th>
+                                <th>Trạng thái</th>
+                                <th>Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in all)
+                            {
+                                var serviceNames = string.Join(", ", booking.BookingDetails.Select(bd => bd.Service?.ServiceName));
+                                <tr>
+                                    <td>@booking.BookingCode</td>
+                                    <td>@serviceNames</td>
+                                    <td>@booking.Branch?.BranchName</td>
+                                    <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</td>
+                                    <td>
+                                        @switch (booking.Status)
+                                        {
+                                            case BookingStatus.Pending:
+                                                <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                                break;
+                                            case BookingStatus.Confirmed:
+                                                <span class="badge bg-info">Đã xác nhận</span>
+                                                break;
+                                            case BookingStatus.InProgress:
+                                                <span class="badge bg-primary">Đang thực hiện</span>
+                                                break;
+                                            case BookingStatus.Completed:
+                                                <span class="badge bg-success">Hoàn thành</span>
+                                                break;
+                                            case BookingStatus.Cancelled:
+                                                <span class="badge bg-danger">Đã hủy</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@booking.TotalAmount.ToString("N0") VNĐ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Tab Đã hoàn thành -->
+        <div class="tab-pane fade" id="completed" role="tabpanel">
+            @if (!completed.Any())
+            {
+                <div class="alert alert-info">Chưa có lịch hẹn nào hoàn thành.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Dịch vụ</th>
+                                <th>Chi nhánh</th>
+                                <th>Ngày</th>
+                                <th>Giờ</th>
+                                <th>Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in completed)
+                            {
+                                var serviceNames = string.Join(", ", booking.BookingDetails.Select(bd => bd.Service?.ServiceName));
+                                <tr>
+                                    <td>@booking.BookingCode</td>
+                                    <td>@serviceNames</td>
+                                    <td>@booking.Branch?.BranchName</td>
+                                    <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</td>
+                                    <td>@booking.TotalAmount.ToString("N0") VNĐ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Tab Đã hủy -->
+        <div class="tab-pane fade" id="cancelled" role="tabpanel">
+            @if (!cancelled.Any())
+            {
+                <div class="alert alert-info">Chưa có lịch hẹn nào bị hủy.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Dịch vụ</th>
+                                <th>Chi nhánh</th>
+                                <th>Ngày</th>
+                                <th>Giờ</th>
+                                <th>Lý do hủy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in cancelled)
+                            {
+                                var serviceNames = string.Join(", ", booking.BookingDetails.Select(bd => bd.Service?.ServiceName));
+                                <tr>
+                                    <td>@booking.BookingCode</td>
+                                    <td>@serviceNames</td>
+                                    <td>@booking.Branch?.BranchName</td>
+                                    <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@booking.StartTime.ToString(@"hh\:mm") - @booking.EndTime.ToString(@"hh\:mm")</td>
+                                    <td>@(booking.CancelReason ?? "Không có lý do")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Giữ tab hiện tại sau khi reload (tùy chọn)
+        var hash = window.location.hash;
+        if (hash) {
+            var tab = document.querySelector(`button[data-bs-target="${hash}"]`);
+            if (tab) {
+                var trigger = new bootstrap.Tab(tab);
+                trigger.show();
+            }
+        }
+        document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(button => {
+            button.addEventListener('shown.bs.tab', event => {
+                window.location.hash = event.target.getAttribute('data-bs-target');
+            });
+        });
+    </script>
+}

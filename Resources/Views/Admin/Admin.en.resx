@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="AdminDashboard"><value>Admin Dashboard</value></data>
+  <data name="Customers"><value>Customers</value></data>
+  <data name="Bookings"><value>Bookings</value></data>
+  <data name="Services"><value>Services</value></data>
+  <data name="Staff"><value>Staff</value></data>
+  <data name="QuickManage"><value>Quick Manage</value></data>
+  <data name="ManageStaff"><value>Manage Staff</value></data>
+  <data name="ManageServiceCategory"><value>Manage Service Category</value></data>
+  <data name="ManageServices"><value>Manage Services</value></data>
+  <data name="ManageBookings"><value>Manage Bookings</value></data>
+  <data name="Statistics"><value>Statistics</value></data>
+  <data name="ChangeLog"><value>Change Log</value></data>
+  <data name="System"><value>System</value></data>
+</root>

@@ -5,6 +5,13 @@
 }
 <div class="container py-5">
     <h1>Quản lý khách hàng</h1>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
     <a asp-action="CreateCustomer" class="btn btn-success mb-3">Thêm khách hàng</a>
     <table class="table">
         <thead>

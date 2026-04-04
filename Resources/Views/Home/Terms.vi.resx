@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="TermsTitle"><value>Điều khoản sử dụng</value></data>
+  <data name="Version"><value>Phiên bản 1.0 - Cập nhật:</value></data>
+  <data name="Welcome"><value>Chào mừng bạn đến với SpaN5. Khi sử dụng dịch vụ của chúng tôi, bạn đồng ý tuân thủ các điều khoản dưới đây.</value></data>
+  <data name="Introduction"><value>1. Giới thiệu</value></data>
+  <data name="IntroDesc"><value>Website SpaN5 cung cấp dịch vụ đặt lịch, quản lý thông tin khách hàng và các dịch vụ spa trực tuyến. Việc sử dụng website đồng nghĩa với việc bạn chấp nhận các điều khoản này.</value></data>
+  <data name="UserRights"><value>2. Quyền và nghĩa vụ của người dùng</value></data>
+  <data name="UserRightsDesc1"><value>Người dùng phải cung cấp thông tin chính xác, trung thực khi đăng ký tài khoản.</value></data>
+  <data name="UserRightsDesc2"><value>Không sử dụng tài khoản cho mục đích bất hợp pháp, quấy rối, hoặc gây tổn hại đến hệ thống.</value></data>
+  <data name="UserRightsDesc3"><value>Chịu trách nhiệm bảo mật thông tin đăng nhập.</value></data>
+  <data name="CompanyRights"><value>3. Quyền và nghĩa vụ của SpaN5</value></data>
+  <data name="CompanyRightsDesc1"><value>Cung cấp dịch vụ ổn định, bảo mật thông tin khách hàng.</value></data>
+  <data name="CompanyRightsDesc2"><value>Có quyền thay đổi, tạm ngưng dịch vụ để bảo trì.</value></data>
+  <data name="CompanyRightsDesc3"><value>Có quyền xóa tài khoản vi phạm điều khoản.</value></data>
+  <data name="DataSecurity"><value>4. Bảo mật thông tin</value></data>
+  <data name="DataSecurityDesc"><value>SpaN5 cam kết bảo mật thông tin cá nhân của khách hàng theo chính sách bảo mật riêng.</value></data>
+  <data name="Dispute"><value>5. Giải quyết tranh chấp</value></data>
+  <data name="DisputeDesc"><value>Mọi tranh chấp sẽ được giải quyết thông qua thương lượng. Nếu không thành công, sẽ được giải quyết tại Tòa án nhân dân thành phố Hồ Chí Minh.</value></data>
+  <data name="Contact"><value>6. Liên hệ</value></data>
+  <data name="ContactDesc"><value>Nếu có thắc mắc, vui lòng liên hệ: support@span5.com hoặc hotline 0123 456 789.</value></data>
+</root>
