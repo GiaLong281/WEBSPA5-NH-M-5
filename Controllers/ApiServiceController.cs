@@ -64,6 +64,7 @@ namespace SpaN5.Controllers
                     s.Duration,
                     s.Image,
                     s.IsActive,
+                    s.IsVip,
                     s.Description,
                     CategoryName = s.Category != null ? s.Category.Name : string.Empty
                 })

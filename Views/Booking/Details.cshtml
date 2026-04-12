@@ -1,302 +1,332 @@
-@model Booking
+@model SpaN5.Models.Booking
 @using SpaN5.Models
-
 @{
-    ViewData["Title"] = "Chi tiết lịch đặt";
+    ViewData["Title"] = "Chi Tiết Lịch Hẹn";
+    var firstDetail = Model.BookingDetails?.FirstOrDefault();
+    var service = firstDetail?.Service;
+    var staff = firstDetail?.Staff;
+    var serviceName = service?.ServiceName ?? "Dịch vụ đã chọn";
+    var isVip = service?.IsVip ?? false;
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8">
-            <h1 class="mb-4">Chi tiết lịch đặt</h1>
-
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            }
-
-            @{
-                var bookingDetail = Model.BookingDetails?.FirstOrDefault();
-                var service = bookingDetail?.Service;
-                var staff = bookingDetail?.Staff;
-                var statusBadge = Model.Status switch
-                {
-                    BookingStatus.Pending => "warning",
-                    BookingStatus.Confirmed => "info",
-                    BookingStatus.InProgress => "primary",
-                    BookingStatus.Completed => "success",
-                    BookingStatus.Cancelled => "danger",
-                    _ => "secondary"
-                };
-                var statusText = Model.Status switch
-                {
-                    BookingStatus.Pending => "Chờ xác nhận",
-                    BookingStatus.Confirmed => "Đã xác nhận",
-                    BookingStatus.InProgress => "Đang thực hiện",
-                    BookingStatus.Completed => "Hoàn thành",
-                    BookingStatus.Cancelled => "Đã hủy",
-                    _ => "Không xác định"
-                };
-            }
-
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Mã đơn hàng</h6>
-                            <p class="lead"><strong>@Model.BookingCode</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Trạng thái</h6>
-                            <p>
-                                <span class="badge bg-@statusBadge">@statusText</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <h5>Thông tin dịch vụ</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Tên dịch vụ</h6>
-                            <p>@(service?.ServiceName ?? "N/A")</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Thời lượng</h6>
-                            <p>@(service?.Duration ?? 0) phút</p>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <h5>Thông tin lịch đặt</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Ngày đặt</h6>
-                            <p>@Model.BookingDate.ToString("dd/MM/yyyy")</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Thời gian</h6>
-                            <p>@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</p>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Chi nhánh</h6>
-                            <p>@(Model.Branch?.BranchName ?? "N/A")</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Nhân viên</h6>
-                            <p>@(staff?.FullName ?? "Chưa chọn")</p>
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(Model.Notes))
-                    {
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <h6 class="text-muted">Ghi chú</h6>
-                                <p>@Model.Notes</p>
-                            </div>
-                        </div>
-                    }
-
-                    <hr />
-
-                    <h5>Thông tin thanh toán</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Giá dịch vụ</h6>
-                            <p>@(bookingDetail?.PriceAtTime.ToString("N0") ?? "0") ₫</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Phí dịch vụ</h6>
-                            <p>0 ₫</p>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Tổng tiền</h6>
-                            <p class="lead"><strong>@Model.TotalAmount.ToString("N0") ₫</strong></p>
-                        </div>
-                    </div>
-
-                    @if (Model.Payments != null && Model.Payments.Any())
-                    {
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <h6 class="text-muted">Thanh toán</h6>
-                                <ul class="list-unstyled">
-                                    @foreach (var payment in Model.Payments)
-                                    {
-                                        <li>
-                                            <span class="badge bg-success">@payment.Method</span>
-                                            @payment.Amount.ToString("N0") ₫ - @payment.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <div class="d-flex gap-2">
-                <a href="@Url.Action("MyBookings", "Booking")" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Quay lại
-                </a>
-
-                @if (Model.Status != BookingStatus.Cancelled && Model.Status != BookingStatus.Completed)
-                {
-                    <button class="btn btn-danger" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#cancelModal"
-                            title="Hủy lịch đặt">
-                        <i class="bi bi-x-circle"></i> Hủy lịch
-                    </button>
-                }
-
-                @if (Model.Status == BookingStatus.Confirmed && Model.TotalAmount > 0)
-                {
-                    <a href="@Url.Action("Create", "Payment", new { bookingId = Model.BookingId })" 
-                       class="btn btn-success" 
-                       title="Thanh toán">
-                        <i class="bi bi-credit-card"></i> Thanh toán
-                    </a>
-                }
-            </div>
-        </div>
-
-        <!-- Timeline/Status -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Lịch sử trạng thái</h5>
-                </div>
-                <div class="card-body">
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-primary"></div>
-                            <div class="timeline-content">
-                                <h6>Lịch đặt được tạo</h6>
-                                <small class="text-muted">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker @(Model.Status != BookingStatus.Pending ? "bg-success" : "bg-secondary")"></div>
-                            <div class="timeline-content">
-                                <h6>@(Model.Status != BookingStatus.Pending ? (Model.Status == BookingStatus.InProgress ? "Đang thực hiện" : "Đã xác nhận") : "Chờ xác nhận")</h6>
-                            </div>
-                        </div>
-                        @if (Model.Status == BookingStatus.InProgress)
-                        {
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-primary"></div>
-                                <div class="timeline-content">
-                                    <h6>Đang thực hiện</h6>
-                                </div>
-                            </div>
-                        }
-                        @if (Model.Status == BookingStatus.Completed)
-                        {
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-success"></div>
-                                <div class="timeline-content">
-                                    <h6>Hoàn thành</h6>
-                                </div>
-                            </div>
-                        }
-                        @if (Model.Status == BookingStatus.Cancelled)
-                        {
-                            <div class="timeline-item">
-                                <div class="timeline-marker bg-danger"></div>
-                                <div class="timeline-content">
-                                    <h6>Đã hủy</h6>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Cancel Modal -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="cancelModalLabel">Xác nhận hủy lịch đặt</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn hủy lịch đặt <strong>@Model.BookingCode</strong> không?</p>
-                <p class="text-muted small">Hành động này không thể được hoàn tác.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <form method="post" action="@Url.Action("Cancel", "Booking", new { id = Model.BookingId })" style="display: inline;">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    .timeline {
-        position: relative;
-        padding: 20px 0;
+    :root {
+        --p-navy: #12202d;
+        --p-gold: #b68a63;
+        --p-gold-light: #d9b48f;
+        --p-beige: #fdfaf7;
     }
 
-    .timeline-item {
+    body {
+        background-color: var(--p-beige);
+        font-family: 'Inter', sans-serif;
+        color: var(--p-navy);
+    }
+
+    .main-wrapper {
+        padding: 60px 20px;
+        min-height: 80vh;
         display: flex;
-        margin-bottom: 20px;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .timeline-item:not(:last-child) .timeline-marker::after {
-        content: '';
-        position: absolute;
-        width: 2px;
-        height: 30px;
-        background: #dee2e6;
-        top: 40px;
-        left: 10px;
+    .title-area {
+        text-align: center;
+        margin-bottom: 30px;
     }
 
-    .timeline-marker {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        margin-right: 15px;
-        position: relative;
-        flex-shrink: 0;
-        margin-top: 3px;
+    .title-area h2 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        color: var(--p-navy);
     }
 
-    .timeline-content h6 {
-        margin: 0;
-        font-size: 0.95rem;
+    .booking-code-pill {
+        display: inline-block;
+        background: #fff;
+        padding: 6px 18px;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid rgba(182,138,99,0.2);
+        color: var(--p-gold);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     }
 
-    .timeline-content small {
+    .compact-ticket {
+        background: white;
+        width: 100%;
+        max-width: 750px;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+        overflow: hidden;
+        border-top: 6px solid var(--p-gold);
+    }
+
+    .ticket-section {
+        padding: 40px;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--p-gold);
+        margin-bottom: 25px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-bottom: 25px;
+    }
+
+    .info-item label {
         display: block;
-        margin-top: 3px;
+        font-size: 0.7rem;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+
+    .info-item p {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+    .status-pending { background: #fffcf0; color: #b8860b; border: 1px solid #ffeeba; }
+    .status-confirmed { background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; }
+    .status-inprogress { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+    .status-completed { background: #12202d; color: white; }
+    .status-cancelled { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+
+    .vip-tag {
+        background: linear-gradient(45deg, var(--p-gold), #e8d5b5);
+        color: #fff;
+        padding: 4px 10px;
+        font-size: 0.65rem;
+        border-radius: 4px;
+        font-weight: 800;
+        margin-left: 10px;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-ticket {
+        flex: 1;
+        padding: 14px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 12px;
+        text-transform: uppercase;
+        transition: all 0.3s;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn-cancel {
+        background: #fff;
+        color: #dc3545;
+        border: 1px solid #f8d7da;
+    }
+    .btn-cancel:hover { background: #fff5f5; border-color: #dc3545; }
+
+    .btn-main {
+        background: var(--p-navy);
+        color: white;
+        border: none;
+    }
+    .btn-main:hover { background: #1e2a38; transform: translateY(-2px); color: #fff; }
+
+    .btn-outline-gold {
+        background: transparent;
+        color: var(--p-gold);
+        border: 1px solid var(--p-gold);
+    }
+    .btn-outline-gold:hover { background: var(--p-gold); color: #fff; }
+
+    .timeline-area {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px dashed #eee;
+    }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 0.8rem;
+        color: #bbb;
     }
 </style>
+
+<div class="main-wrapper">
+    <div class="title-area" data-aos="fade-down">
+        <h2>Chi Tiết Lịch Hẹn @if(isVip) { <span class="vip-tag">ROYAL VIP</span> }</h2>
+        <div class="booking-code-pill">Mã đơn: @Model.BookingCode</div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger mb-4 w-100" style="max-width: 750px;">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="compact-ticket" data-aos="zoom-in">
+        <div class="ticket-section pb-2">
+            <div class="section-title">
+                <span>Thông tin dịch vụ</span>
+                <span class="status-badge status-@Model.Status.ToString().ToLower()">
+                    @Model.Status switch {
+                        BookingStatus.Pending => "CHỜ XÁC NHẬN",
+                        BookingStatus.Confirmed => "ĐÃ XÁC NHẬN",
+                        BookingStatus.InProgress => "ĐANG THỰC HIỆN",
+                        BookingStatus.Completed => "HOÀN THÀNH",
+                        BookingStatus.Cancelled => "ĐÃ HỦY",
+                        _ => Model.Status.ToString().ToUpper()
+                    }
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-item">
+                    <label>Dịch vụ</label>
+                    <p>@serviceName</p>
+                </div>
+                <div class="info-item">
+                    <label>Thời lượng</label>
+                    <p>@(service?.Duration ?? 0) phút</p>
+                </div>
+                <div class="info-item">
+                    <label>Ngày hẹn</label>
+                    <p>@Model.BookingDate.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="info-item">
+                    <label>Thời gian</label>
+                    <p>@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</p>
+                </div>
+                <div class="info-item">
+                    <label>Nhân viên</label>
+                    <p>@(staff?.FullName ?? "Đang chỉ định...")</p>
+                </div>
+                <div class="info-item">
+                    <label>Chi nhánh</label>
+                    <p>@(Model.Branch?.BranchName ?? "SpaN5 Premium")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="ticket-section" style="background: #fafafb; border-top: 1px dashed #eee;">
+            <div class="section-title">Thông tin thanh toán</div>
+            <div class="info-row">
+                <div class="info-item">
+                    <label>Khách hàng</label>
+                    <p>@Model.Customer?.FullName</p>
+                </div>
+                <div class="info-item text-end">
+                    <label>Số điện thoại</label>
+                    <p>@Model.Customer?.Phone</p>
+                </div>
+                <div class="info-item col-12" style="grid-column: span 2;">
+                    <label>Tổng chi phí</label>
+                    <p class="text-gold fs-4 fw-bold">@Model.TotalAmount.ToString("N0") ₫</p>
+                </div>
+                
+                @if (Model.Payments != null && Model.Payments.Any())
+                {
+                    var payment = Model.Payments.OrderByDescending(p => p.CreatedAt).FirstOrDefault();
+                    <div class="info-item">
+                        <label>Trạng thái thanh toán</label>
+                        <p class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>ĐÃ THANH TOÁN</p>
+                    </div>
+                    <div class="info-item text-end">
+                        <label>Phương thức</label>
+                        <p>@(payment?.Method == SpaN5.Models.PaymentMethod.Cash ? "Tiền mặt" : "Chuyển khoản")</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="info-item">
+                        <label>Trạng thái thanh toán</label>
+                        <p class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-1"></i>CHƯA THANH TOÁN</p>
+                    </div>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="info-item mb-4">
+                    <label>Ghi chú</label>
+                    <p class="small text-muted fst-italic">@Model.Notes</p>
+                </div>
+            }
+
+            <div class="action-group">
+                @if (Model.Status != BookingStatus.Cancelled && Model.Status != BookingStatus.Completed)
+                {
+                    <button onclick="confirmCancel()" class="btn-ticket btn-cancel">Hủy lịch</button>
+                    @if (Model.Status == BookingStatus.Confirmed && Model.TotalAmount > 0)
+                    {
+                        <a href="@Url.Action("Create", "Payment", new { bookingId = Model.BookingId })" class="btn-ticket btn-main">Thanh toán ngay</a>
+                    }
+                }
+                <a href="/Booking" class="btn-ticket btn-outline-gold">Đặt lịch mới</a>
+                <a href="/" class="btn-ticket btn-main">TRANG CHỦ</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <p>SpaN5 Luxury - Kiến tạo vẻ đẹp tự nhiên<br> Hotline: 1900 123 456 | Email: contact@span5.com</p>
+    </div>
+</div>
+
+<form id="cancelForm" method="post" action="@Url.Action("Cancel", "Booking")" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.BookingId" />
+    <input type="hidden" name="bookingCode" value="@Model.BookingCode" />
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmCancel() {
+        Swal.fire({
+            title: 'Hủy lịch hẹn?',
+            text: "Lưu ý: Hành động này không thể hoàn tác.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#12202d',
+            confirmButtonText: 'Đồng ý hủy',
+            cancelButtonText: 'Quay lại',
+            background: '#fff',
+            borderRadius: '15px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('cancelForm').submit();
+            }
+        })
+    }
+</script>

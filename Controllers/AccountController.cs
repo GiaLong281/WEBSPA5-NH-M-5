@@ -46,20 +46,20 @@ namespace SpaN5.Controllers
                     if (result == PasswordVerificationResult.Success)
                     {
                         // Tạo claims
-                        var claims = new List<Claim>
+                        var claims = new List<System.Security.Claims.Claim>
                         {
-                            new Claim(ClaimTypes.Name, user.Username),
-                            new Claim(ClaimTypes.Role, user.Role),
-                            new Claim("FullName", user.FullName ?? user.Username),
-                            new Claim("UserId", user.Id.ToString())
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Username),
+                            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role),
+                            new System.Security.Claims.Claim("FullName", user.FullName ?? user.Username),
+                            new System.Security.Claims.Claim("UserId", user.Id.ToString())
                         };
                         if (user.Customer != null)
-                            claims.Add(new Claim("CustomerId", user.Customer.CustomerId.ToString()));
+                            claims.Add(new System.Security.Claims.Claim("CustomerId", user.Customer.CustomerId.ToString()));
                         if (user.Staff != null)
-                            claims.Add(new Claim("StaffId", user.Staff.StaffId.ToString()));
+                            claims.Add(new System.Security.Claims.Claim("StaffId", user.Staff.StaffId.ToString()));
 
-                        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                        var principal = new ClaimsPrincipal(identity);
+                        var identity = new System.Security.Claims.ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var principal = new System.Security.Claims.ClaimsPrincipal(identity);
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                             new AuthenticationProperties { IsPersistent = model.RememberMe });
 
@@ -114,16 +114,16 @@ namespace SpaN5.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                var claims = new List<Claim>
+                var claims = new List<System.Security.Claims.Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("FullName", user.FullName),
-                    new Claim("UserId", user.Id.ToString()),
-                    new Claim("CustomerId", customer.CustomerId.ToString())
+                    new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Username),
+                    new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role),
+                    new System.Security.Claims.Claim("FullName", user.FullName),
+                    new System.Security.Claims.Claim("UserId", user.Id.ToString()),
+                    new System.Security.Claims.Claim("CustomerId", customer.CustomerId.ToString())
                 };
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var principal = new ClaimsPrincipal(identity);
+                var identity = new System.Security.Claims.ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new System.Security.Claims.ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                 return RedirectToAction("Index", "Home");

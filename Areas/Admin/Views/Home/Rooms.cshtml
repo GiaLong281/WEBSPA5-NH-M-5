@@ -1,0 +1,145 @@
+@model IEnumerable<SpaN5.Models.Service>
+@{
+    ViewData["Title"] = "Sơ đồ Phòng Dịch vụ";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var activeDetails = ViewBag.ActiveDetails as List<SpaN5.Models.BookingDetail> ?? new List<SpaN5.Models.BookingDetail>();
+}
+
+<style>
+    .service-section {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+    }
+    .service-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed var(--accent-blue);
+    }
+    .service-icon {
+        width: 48px; height: 48px; border-radius: 14px;
+        background: var(--primary-blue);
+        color: white;
+        display: flex; align-items: center; justify-content: center;
+        margin-right: 15px; font-size: 1.2rem;
+    }
+    .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 15px;
+    }
+    .room-item {
+        border-radius: 16px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid var(--accent-blue);
+        position: relative;
+        cursor: pointer;
+        background: #fff;
+    }
+    .room-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    
+    .room-item.occupied {
+        border-color: #FF5B5B;
+        background: #FFF5F5;
+    }
+    .room-item.available {
+        border-color: #00B050;
+        background: #F6FFF9;
+    }
+    
+    .room-number { font-weight: 800; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+    .room-status { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .room-client { font-size: 0.75rem; font-weight: 600; margin-top: 8px; color: var(--text-main); }
+    
+    .occupancy-badge {
+        font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+        background: var(--accent-blue); color: var(--primary-blue); margin-left: auto;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-800 mb-1">Hệ thống Sơ đồ Phòng</h2>
+        <p class="text-muted smaller mb-0">Theo dõi trạng thái occupancy theo từng khu vực dịch vụ.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-light rounded-pill px-3 fw-bold border-0 shadow-none"><i class="fa-solid fa-filter me-2"></i> Lọc tầng</button>
+        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="location.reload()"><i class="fa-solid fa-arrows-rotate me-2"></i> Làm mới</button>
+    </div>
+</div>
+
+@foreach (var svc in Model)
+{
+    var svcRooms = activeDetails.Where(d => d.ServiceId == svc.ServiceId).ToList();
+    <div class="service-section">
+        <div class="service-header">
+            <div class="service-icon"><i class="fa-solid fa-spa"></i></div>
+            <div>
+                <h4 class="fw-bold mb-0">@svc.ServiceName</h4>
+                <div class="text-muted smaller">Khu vực chuyên biệt @svc.ServiceName</div>
+            </div>
+            <div class="occupancy-badge">
+                @(svcRooms.Count)/10 Phòng đang bận
+            </div>
+        </div>
+        
+        <div class="room-grid">
+            @for (int i = 1; i <= 10; i++)
+            {
+                var room = svcRooms.FirstOrDefault(r => r.RoomNumber == i);
+                <div class="room-item @(room != null ? "occupied" : "available")" 
+                     onclick="showRoomQuickInfo('@svc.ServiceName', @i, '@(room?.Booking?.Customer?.FullName ?? "")')">
+                    <span class="room-number">P.@i.ToString("D2")</span>
+                    @if (room != null)
+                    {
+                        <div class="room-status text-danger">ĐANG PHỤC VỤ</div>
+                        <div class="room-client text-truncate">@room.Booking.Customer.FullName</div>
+                    }
+                    else
+                    {
+                        <div class="room-status text-success">CÒN TRỐNG</div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Quick Info Script -->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function showRoomQuickInfo(serviceName, roomNum, customer) {
+            if(customer) {
+                Swal.fire({
+                    title: `Phòng ${roomNum.toString().padStart(2, '0')} - ${serviceName}`,
+                    html: `<div class="p-3">
+                            <p class="mb-1 text-muted">Đang phục vụ khách hàng:</p>
+                            <h4 class="fw-bold text-primary">${customer}</h4>
+                          </div>`,
+                    icon: 'info',
+                    confirmButtonText: 'Đóng',
+                    confirmButtonColor: '#4318FF',
+                    customClass: {
+                        popup: 'rounded-4 border-0'
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: `Phòng ${roomNum.toString().padStart(2, '0')} - ${serviceName}`,
+                    text: 'Phòng hiện đang trống và sẵn sàng phục vụ khách mới.',
+                    icon: 'success',
+                    confirmButtonText: 'Đóng',
+                    confirmButtonColor: '#00B050'
+                });
+            }
+        }
+    </script>
+}

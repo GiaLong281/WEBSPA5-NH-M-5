@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace SpaN5.Controllers
 {
-    [Authorize(Roles = "Customer")]
     public class BookingController : Controller
     {
         private readonly SpaDbContext _context;
@@ -20,7 +19,11 @@ namespace SpaN5.Controllers
             _configuration = configuration;
         }
 
-        // GET: /Booking/Create?serviceId=...
+        // ==========================================
+        // PHẦN 1: QUY TRÌNH ĐẶT LỊCH (HEAD)
+        // ==========================================
+
+        [Authorize(Roles = "Customer,Admin,Staff")]
         [HttpGet]
         public async Task<IActionResult> Create(int? serviceId)
         {
@@ -31,7 +34,6 @@ namespace SpaN5.Controllers
                 AutoAssignStaff = true
             };
 
-            // Nếu đã đăng nhập, lấy thông tin từ Customer
             if (User.Identity?.IsAuthenticated == true)
             {
                 var customerId = GetCustomerId();
@@ -53,32 +55,18 @@ namespace SpaN5.Controllers
                 if (service != null && service.IsActive)
                 {
                     model.SelectedServiceIds.Add(service.ServiceId);
-                    model.SelectedServiceId = service.ServiceId; // tương thích cũ
+                    model.SelectedServiceId = service.ServiceId; 
                     model.ServiceName = service.ServiceName;
                     model.Duration = service.Duration;
                     model.Price = service.Price;
                 }
             }
 
-            ViewBag.AllServices = await _context.Services
-                .Where(s => s.IsActive)
-                .Select(s => new ServiceInfo
-                {
-                    ServiceId = s.ServiceId,
-                    ServiceName = s.ServiceName,
-                    Duration = s.Duration,
-                    Price = s.Price
-                }).ToListAsync();
-
-            ViewBag.Services = await BuildServiceSelectList(model.SelectedServiceId);
-
-            ViewBag.Branches = new SelectList(
-                await _context.Branches.Where(b => b.IsActive).ToListAsync(),
-                "BranchId", "BranchName");
-
+            await LoadDropdowns(model);
             return View(model);
         }
 
+        [Authorize(Roles = "Customer,Admin,Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookingViewModel model)
@@ -92,14 +80,11 @@ namespace SpaN5.Controllers
             var customerId = GetCustomerId();
             if (customerId == null)
             {
-                // Nếu chưa đăng nhập, có thể tạo guest booking (tuỳ chọn)
-                // Ở đây vì controller có [Authorize] nên sẽ không vào đây, giữ nguyên để an toàn
                 ModelState.AddModelError("", "Vui lòng đăng nhập để đặt lịch.");
                 await LoadDropdowns(model);
                 return View(model);
             }
 
-            // 1. Lấy danh sách dịch vụ đã chọn
             var selectedServices = await _context.Services
                 .Where(s => model.SelectedServiceIds.Contains(s.ServiceId) && s.IsActive)
                 .ToListAsync();
@@ -113,8 +98,8 @@ namespace SpaN5.Controllers
 
             var totalDuration = selectedServices.Sum(s => s.Duration);
             var totalPrice = selectedServices.Sum(s => s.Price);
-
             var branch = await _context.Branches.FindAsync(model.BranchId);
+            
             if (branch == null || !branch.IsActive)
             {
                 ModelState.AddModelError("BranchId", "Chi nhánh không hợp lệ");
@@ -122,37 +107,10 @@ namespace SpaN5.Controllers
                 return View(model);
             }
 
-            // Kiểm tra ngày mở cửa
-            if (!IsBranchOpenOnDate(branch, model.BookingDate))
-            {
-                ModelState.AddModelError("BookingDate", $"Chi nhánh không hoạt động vào ngày {model.BookingDate:dd/MM/yyyy}.");
-                await LoadDropdowns(model);
-                return View(model);
-            }
-
             var startDateTime = model.BookingDate.Date.Add(model.StartTime);
             var endDateTime = startDateTime.AddMinutes(totalDuration);
-            model.EndTime = endDateTime;
-            model.Duration = totalDuration;
-            model.Price = totalPrice;
 
-            var openTime = branch.OpeningTime;
-            var closeTime = branch.ClosingTime;
-            if (openTime == closeTime || closeTime <= openTime)
-            {
-                openTime = new TimeSpan(8, 0, 0);
-                closeTime = new TimeSpan(20, 0, 0);
-            }
-
-            // Kiểm tra giờ trong khung mở cửa
-            if (startDateTime.TimeOfDay < openTime || endDateTime.TimeOfDay > closeTime)
-            {
-                ModelState.AddModelError("StartTime", $"Giờ đặt phải trong khoảng {openTime:hh\\:mm} - {closeTime:hh\\:mm}.");
-                await LoadDropdowns(model);
-                return View(model);
-            }
-
-            // Xử lý nhân viên (Tự động hoặc Thủ công)
+            // Gán nhân viên
             if (model.AutoAssignStaff)
             {
                 model.StaffId = await FindAvailableStaff(model.BranchId, model.BookingDate, startDateTime, endDateTime);
@@ -171,23 +129,15 @@ namespace SpaN5.Controllers
                     await LoadDropdowns(model);
                     return View(model);
                 }
-
-                if (!await IsStaffAvailable(model.StaffId.Value, model.BookingDate, startDateTime, endDateTime))
-                {
-                    ModelState.AddModelError("StaffId", "Nhân viên bạn chọn đã có lịch trùng trong thời gian này.");
-                    await LoadDropdowns(model);
-                    return View(model);
-                }
             }
 
             var bookingCode = $"BK{DateTime.Now:yyyyMMddHHmmss}{new Random().Next(100, 999)}";
-
             var booking = new Booking
             {
                 BookingCode = bookingCode,
                 CustomerId = customerId.Value,
                 BranchId = model.BranchId,
-                BookingDate = model.BookingDate,
+                BookingDate = model.BookingDate.Date,
                 StartTime = startDateTime,
                 EndTime = endDateTime,
                 Status = BookingStatus.Pending,
@@ -201,264 +151,255 @@ namespace SpaN5.Controllers
 
             foreach (var service in selectedServices)
             {
-                var bookingDetail = new BookingDetail
+                _context.BookingDetails.Add(new BookingDetail
                 {
                     BookingId = booking.BookingId,
                     ServiceId = service.ServiceId,
-                    StaffId = model.StaffId.Value,
+                    StaffId = model.StaffId,
                     PriceAtTime = service.Price
-                };
-                _context.BookingDetails.Add(bookingDetail);
+                });
             }
-
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Đặt lịch thành công! Mã đơn hàng: {bookingCode}";
             return RedirectToAction(nameof(Upcoming));
         }
 
-        // Helper kiểm tra ngày mở cửa
-        private bool IsBranchOpenOnDate(Branch branch, DateTime date)
+        // ==========================================
+        // PHẦN 2: CÁC API & TÍNH NĂNG MỚI (LONG)
+        // ==========================================
+
+        [HttpGet]
+        public async Task<IActionResult> Index(int? serviceId)
         {
-            if (string.IsNullOrEmpty(branch.Workday))
-                return true; 
-
-            var workday = branch.Workday.ToLower();
-            if (workday.Contains("cả tuần") || workday.Contains("all") || workday.Contains("mọi ngày") || workday.Contains("hàng ngày"))
-                return true;
-
-            var dayOfWeek = date.DayOfWeek;
-            var isMatch = dayOfWeek switch
-            {
-                DayOfWeek.Monday => workday.Contains("thứ 2") || workday.Contains("t2") || workday.Contains("monday"),
-                DayOfWeek.Tuesday => workday.Contains("thứ 3") || workday.Contains("t3") || workday.Contains("tuesday"),
-                DayOfWeek.Wednesday => workday.Contains("thứ 4") || workday.Contains("t4") || workday.Contains("wednesday"),
-                DayOfWeek.Thursday => workday.Contains("thứ 5") || workday.Contains("t5") || workday.Contains("thursday"),
-                DayOfWeek.Friday => workday.Contains("thứ 6") || workday.Contains("t6") || workday.Contains("friday"),
-                DayOfWeek.Saturday => workday.Contains("thứ 7") || workday.Contains("t7") || workday.Contains("saturday"),
-                DayOfWeek.Sunday => workday.Contains("chủ nhật") || workday.Contains("cn") || workday.Contains("sunday"),
-                _ => true
-            };
+            var services = await _context.Services.Where(s => s.IsActive).ToListAsync();
+            ViewBag.Services = services;
+            ViewBag.Staffs = await _context.Staffs.Where(s => s.Status == "active").ToListAsync();
             
-            if (!isMatch && !(workday.Contains("thứ") || workday.Contains("t2") || workday.Contains("t3") || workday.Contains("cn") || workday.Contains("day")))
-            {
-                return true;
-            }
-            
-            return isMatch;
+            var model = new BookingViewModel();
+            if (serviceId.HasValue) model.ServiceId = serviceId.Value;
+            return View(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetServiceDetails(int id)
+        {
+            var service = await _context.Services
+                .Include(s => s.ServiceMaterials).ThenInclude(sm => sm.Material)
+                .FirstOrDefaultAsync(s => s.ServiceId == id);
+
+            if (service == null) return Json(new { success = false, message = "Không tìm thấy" });
+
+            return Json(new { success = true, data = new {
+                service.ServiceId, service.ServiceName, service.Description, service.Price,
+                service.Duration, service.Image, service.VideoUrl, service.IsVip, service.MaxCapacity,
+                Materials = service.ServiceMaterials.Select(sm => new { sm.Material?.MaterialName, sm.Quantity, sm.Material?.Unit }).ToList()
+            }});
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableTimes(string date, int serviceId)
+        {
+            var service = await _context.Services.FindAsync(serviceId);
+            int maxCapacity = (service?.MaxCapacity ?? 10) <= 0 ? 10 : service.MaxCapacity;
+            var standardSlots = new[] { "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00" };
+            
+            var response = new List<object>();
+            if (DateTime.TryParse(date, out DateTime selectedDate))
+            {
+                var now = DateTime.Now;
+                var booked = await _context.Bookings
+                    .Where(b => b.BookingDate.Date == selectedDate.Date && b.Status != BookingStatus.Cancelled)
+                    .Where(b => b.BookingDetails.Any(bd => bd.ServiceId == serviceId))
+                    .Select(b => new { b.StartTime, b.EndTime }).ToListAsync();
+
+                foreach (var slot in standardSlots)
+                {
+                    DateTime slotTime = DateTime.ParseExact($"{date} {slot}", "yyyy-MM-dd HH:mm", null);
+                    int current = booked.Count(b => slotTime >= b.StartTime && slotTime < b.EndTime);
+                    bool isPast = selectedDate.Date == now.Date && slotTime < now;
+                    response.Add(new { time = slot, isFull = current >= maxCapacity, isPast = isPast, remaining = Math.Max(0, maxCapacity - current), total = maxCapacity });
+                }
+            }
+            return Json(new { success = true, times = response });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitBooking(BookingViewModel model)
+        {
+            if (!ModelState.IsValid) {
+                var errors = string.Join("<br/>", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return Json(new { success = false, message = errors });
+            }
+
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == model.Phone) 
+                           ?? new Customer { FullName = model.FullName, Phone = model.Phone, Email = model.Email };
+            
+            if (customer.CustomerId == 0) { _context.Customers.Add(customer); await _context.SaveChangesAsync(); }
+
+            var service = await _context.Services.FindAsync(model.ServiceId);
+            if (service == null) return Json(new { success = false, message = "Lỗi dịch vụ" });
+
+            DateTime start = model.BookingDate.Date.Add(model.StartTime);
+            DateTime end = start.AddMinutes(service.Duration);
+
+            int? finalStaffId = null;
+            if (model.AutoAssignStaff)
+            {
+                // Simple auto-assign: first active staff
+                var firstActiveStaff = await _context.Staffs.FirstOrDefaultAsync(s => s.Status == "active");
+                if (firstActiveStaff != null) finalStaffId = firstActiveStaff.StaffId;
+            }
+            else
+            {
+                finalStaffId = model.StaffId;
+            }
+
+            var booking = new Booking {
+                BookingCode = "BK" + DateTime.Now.ToString("yyyyMMddHHmmss"),
+                CustomerId = customer.CustomerId, BranchId = 1, BookingDate = start.Date,
+                StartTime = start, EndTime = end, Status = BookingStatus.Pending,
+                TotalAmount = service.Price, Notes = model.Notes, CreatedAt = DateTime.Now,
+                BookingDetails = new List<BookingDetail> { 
+                    new BookingDetail { 
+                        ServiceId = service.ServiceId, 
+                        PriceAtTime = service.Price,
+                        StaffId = finalStaffId,
+                        RoomNumber = model.RoomNumber,
+                        Status = DetailStatus.Pending
+                    } 
+                }
+            };
+
+            _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, redirectUrl = Url.Action("Success", new { bookingCode = booking.BookingCode }) });
+        }
+
+        // ==========================================
+        // PHẦN 3: QUẢN LÝ LỊCH HẸN (MY BOOKINGS)
+        // ==========================================
 
         public async Task<IActionResult> Upcoming()
         {
-            var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
-
+            var id = GetCustomerId();
+            if (id == null) return RedirectToAction("Login", "Account");
             var now = DateTime.Now;
-            var today = DateTime.Today;
-
-            var bookings = await _context.Bookings
-                .Include(b => b.Branch)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
-                .Where(b => b.CustomerId == customerId &&
-                            b.Status != BookingStatus.Cancelled &&
-                            b.Status != BookingStatus.Completed &&
-                            (b.BookingDate.Date > today ||
-                             (b.BookingDate.Date == today && b.EndTime > now)))
-                .OrderBy(b => b.BookingDate)
-                .ThenBy(b => b.StartTime)
-                .ToListAsync();
-
-            ViewBag.Now = now;
+            var bookings = await _context.Bookings.Include(b => b.Branch).Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .Where(b => b.CustomerId == id && b.Status != BookingStatus.Cancelled && b.Status != BookingStatus.Completed && (b.BookingDate > now.Date || (b.BookingDate == now.Date && b.EndTime > now)))
+                .OrderBy(b => b.BookingDate).ThenBy(b => b.StartTime).ToListAsync();
             return View(bookings);
         }
 
         public async Task<IActionResult> MyBookings()
         {
-            var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
-
-            ViewBag.CancelHours = _configuration.GetValue<int>("Booking:CancelHoursBefore", 24);
-
-            var bookings = await _context.Bookings
-                .Include(b => b.Branch)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
-                .Where(b => b.CustomerId == customerId)
-                .OrderByDescending(b => b.BookingDate)
-                .ThenByDescending(b => b.StartTime)
-                .ToListAsync();
-
-            ViewBag.Completed = bookings.Where(b => b.Status == BookingStatus.Completed).ToList();
-            ViewBag.Cancelled = bookings.Where(b => b.Status == BookingStatus.Cancelled).ToList();
-            ViewBag.All = bookings;
-
+            var id = GetCustomerId();
+            if (id == null) return RedirectToAction("Login", "Account");
+            var items = await _context.Bookings.Include(b => b.Branch).Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .Where(b => b.CustomerId == id).OrderByDescending(b => b.BookingDate).ToListAsync();
+            ViewBag.Completed = items.Where(x => x.Status == BookingStatus.Completed).ToList();
+            ViewBag.Cancelled = items.Where(x => x.Status == BookingStatus.Cancelled).ToList();
             return View();
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(string bookingCode)
         {
-            var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
-
-            var booking = await _context.Bookings
-                .Include(b => b.Branch)
-                .Include(b => b.Customer)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
-                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
-                .Include(b => b.Payments)
-                .FirstOrDefaultAsync(b => b.BookingId == id && b.CustomerId == customerId);
-
-            if (booking == null)
-                return NotFound();
-
-            return View(booking);
+            var b = await _context.Bookings.Include(x => x.Branch).Include(x => x.Customer).Include(x => x.BookingDetails).ThenInclude(d => d.Service).Include(x => x.Payments)
+                .FirstOrDefaultAsync(x => x.BookingCode == bookingCode);
+            return b == null ? NotFound() : View(b);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Cancel(int id)
+        public async Task<IActionResult> Success(string bookingCode)
         {
-            var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
-
-            var booking = await _context.Bookings
-                .Include(b => b.BookingDetails)
-                    .ThenInclude(bd => bd.Service)
-                .Include(b => b.Branch)
-                .FirstOrDefaultAsync(b => b.BookingId == id && b.CustomerId == customerId);
-
-            if (booking == null) return NotFound();
-
-            var cancelHours = _configuration.GetValue<int>("Booking:CancelHoursBefore", 24);
-            var cancelDeadline = booking.BookingDate.Date.Add(booking.StartTime.TimeOfDay).AddHours(-cancelHours);
-
-            if (DateTime.Now > cancelDeadline)
-            {
-                TempData["ErrorMessage"] = "Không thể hủy lịch sau " + cancelDeadline.ToString("dd/MM/yyyy HH:mm");
-                return RedirectToAction(nameof(Upcoming));
-            }
-
-            if (booking.Status == BookingStatus.Completed || booking.Status == BookingStatus.Cancelled)
-            {
-                TempData["ErrorMessage"] = "Không thể hủy lịch này.";
-                return RedirectToAction(nameof(Upcoming));
-            }
-
-            return View(booking);
+            var b = await _context.Bookings.Include(x => x.Customer).Include(x => x.Payments).Include(x => x.BookingDetails).ThenInclude(d => d.Service)
+                .FirstOrDefaultAsync(x => x.BookingCode == bookingCode);
+            return b == null ? NotFound() : View(b);
         }
 
-        [HttpPost, ActionName("Cancel")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelConfirmed(int id, string? reason)
+        public async Task<IActionResult> Cancel(string bookingCode, string? reason)
         {
-            var customerId = GetCustomerId();
-            if (customerId == null) return RedirectToAction("Login", "Account");
-
-            var booking = await _context.Bookings
-                .FirstOrDefaultAsync(b => b.BookingId == id && b.CustomerId == customerId);
-
-            if (booking == null) return NotFound();
-
-            booking.Status = BookingStatus.Cancelled;
-            booking.CancelledAt = DateTime.Now;
-            booking.CancelReason = reason;
-
+            var b = await _context.Bookings.FirstOrDefaultAsync(x => x.BookingCode == bookingCode);
+            if (b == null) return NotFound();
+            b.Status = BookingStatus.Cancelled; b.CancelledAt = DateTime.Now; b.CancelReason = reason;
             await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Lịch hẹn đã được hủy.";
-            return RedirectToAction(nameof(Upcoming));
+            return RedirectToAction(nameof(Details), new { bookingCode });
         }
 
-        private async Task<int?> FindAvailableStaff(int branchId, DateTime date, DateTime startTime, DateTime endTime)
+        // ==========================================
+        // PHẦN 4: TIỆN ÍCH & THANH TOÁN
+        // ==========================================
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessPayment(string bookingCode, PaymentMethod method)
         {
-            var staffs = await _context.Staffs
-                .Where(s => s.BranchId == branchId && s.Status == "active")
-                .Select(s => s.StaffId)
-                .ToListAsync();
-
-            foreach (var staffId in staffs)
-            {
-                if (await IsStaffAvailable(staffId, date, startTime, endTime))
-                    return staffId;
-            }
-
-            return null;
+            var b = await _context.Bookings.FirstOrDefaultAsync(x => x.BookingCode == bookingCode);
+            if (b == null) return NotFound();
+            _context.Payments.Add(new Payment { BookingId = b.BookingId, Amount = b.TotalAmount, Method = method, Status = PaymentStatus.Paid, CreatedAt = DateTime.Now });
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Success", new { bookingCode });
         }
 
-        private async Task<bool> IsStaffAvailable(int staffId, DateTime date, DateTime startTime, DateTime endTime)
+        public async Task<IActionResult> ResetData()
         {
-            return !await _context.BookingDetails
-                .Include(bd => bd.Booking)
-                .Where(bd => bd.StaffId == staffId &&
-                             bd.Booking.BookingDate.Date == date.Date &&
-                             bd.Booking.Status != BookingStatus.Cancelled)
-                .AnyAsync(bd =>
-                    bd.Booking.StartTime < endTime &&
-                    bd.Booking.EndTime > startTime);
+            _context.BookingDetails.RemoveRange(await _context.BookingDetails.ToListAsync());
+            _context.Payments.RemoveRange(await _context.Payments.ToListAsync());
+            _context.Bookings.RemoveRange(await _context.Bookings.ToListAsync());
+            foreach(var s in await _context.Services.ToListAsync()) s.MaxCapacity = 10;
+            await _context.SaveChangesAsync();
+            return Content("Đã Reset dữ liệu thành công.");
         }
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
 
         private async Task LoadDropdowns(BookingViewModel model)
         {
-            ViewBag.Services = await BuildServiceSelectList(model.SelectedServiceId);
-
-            ViewBag.AllServices = await _context.Services
-                .Where(s => s.IsActive)
-                .Select(s => new ServiceInfo
-                {
-                    ServiceId = s.ServiceId,
-                    ServiceName = s.ServiceName,
-                    Duration = s.Duration,
-                    Price = s.Price
-                }).ToListAsync();
-
-            ViewBag.Branches = new SelectList(
-                await _context.Branches.Where(b => b.IsActive).ToListAsync(),
-                "BranchId", "BranchName", model.BranchId);
-
-            if (model.BranchId > 0)
-            {
-                ViewBag.Staffs = await _context.Staffs
-                    .Where(s => s.BranchId == model.BranchId && s.Status == "active")
-                    .Select(s => new
-                    {
-                        s.StaffId,
-                        s.FullName,
-                        s.Position
-                    })
-                    .ToListAsync();
-            }
+            var srv = await _context.Services.Include(s => s.Category).Where(s => s.IsActive).ToListAsync();
+            ViewBag.Services = srv; // Dùng cho Index/Create Luxury UI
+            ViewBag.AllServices = srv.Select(s => new ServiceInfo 
+            { 
+                ServiceId = s.ServiceId, 
+                ServiceName = s.ServiceName, 
+                Duration = s.Duration, 
+                Price = s.Price 
+            }).ToList();
+            
+            ViewBag.Branches = new SelectList(await _context.Branches.Where(b => b.IsActive).ToListAsync(), "BranchId", "BranchName", model.BranchId);
         }
 
         private async Task<List<SelectListItem>> BuildServiceSelectList(int? selectedId = null)
         {
-            var services = await _context.Services
-                .Include(s => s.Category)
-                .Where(s => s.IsActive)
-                .OrderBy(s => s.Category.Name)
-                .ThenBy(s => s.ServiceName)
-                .ToListAsync();
+            var srv = await _context.Services.Include(s => s.Category).Where(s => s.IsActive).ToListAsync();
+            return srv.Select(s => new SelectListItem 
+            { 
+                Value = s.ServiceId.ToString(), 
+                Text = $"{s.ServiceName} ({s.Duration}m - {s.Price:N0}đ)", 
+                Group = new SelectListGroup { Name = s.Category?.Name ?? "Khác" }, 
+                Selected = selectedId == s.ServiceId 
+            }).ToList();
+        }
 
-            var items = new List<SelectListItem>();
-            foreach (var s in services)
+        private async Task<int?> FindAvailableStaff(int branchId, DateTime date, DateTime start, DateTime end)
+        {
+            var staffs = await _context.Staffs.Where(s => s.BranchId == branchId && s.Status == "active").ToListAsync();
+            foreach (var s in staffs)
             {
-                items.Add(new SelectListItem
-                {
-                    Value = s.ServiceId.ToString(),
-                    Text = $"{s.ServiceName} ({s.Duration} phút — {s.Price:N0}đ)",
-                    Group = new SelectListGroup { Name = s.Category?.Name ?? "Khác" },
-                    Selected = selectedId.HasValue && selectedId.Value == s.ServiceId
-                });
+                bool busy = await _context.BookingDetails.Include(bd => bd.Booking).Where(bd => bd.StaffId == s.StaffId && bd.Booking.BookingDate.Date == date.Date && bd.Booking.Status != BookingStatus.Cancelled)
+                    .AnyAsync(bd => bd.Booking.StartTime < end && bd.Booking.EndTime > start);
+                if (!busy) return s.StaffId;
             }
-            return items;
+            return null;
         }
 
         private int? GetCustomerId()
         {
-            var claim = User.FindFirst("CustomerId");
-            if (claim != null && int.TryParse(claim.Value, out int id))
-                return id;
-
-            return null;
+            if (User.Identity?.IsAuthenticated != true) return null;
+            var user = _context.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+            return user?.CustomerId;
         }
     }
 }

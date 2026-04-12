@@ -106,7 +106,7 @@ publish/
 ## lines below if you want to check them into source control.
 *.PublishSettings
 
-## Stress Testing Testing Results
+## Stress Testing Results
 *.loadtest
 
 ## Diagnostic Device log
@@ -160,6 +160,7 @@ appsettings.Development.json
 appsettings.Local.json
 
 ## SQLite databases
-*.db
+# *.db (Hiện đang track SPA5.db nên không ignore mẫu này)
 *.db-shm
 *.db-wal
+

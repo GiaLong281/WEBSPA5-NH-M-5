@@ -1,0 +1,240 @@
+@model SpaN5.Models.Booking
+@{
+    ViewData["Title"] = "Đặt Lịch Thành Công";
+    var firstDetail = Model.BookingDetails.FirstOrDefault();
+    var service = firstDetail?.Service;
+    var serviceName = service?.ServiceName ?? "Dịch vụ đã chọn";
+    var isVip = service?.IsVip ?? false;
+}
+
+<style>
+    :root {
+        --p-navy: #1a2b3c;
+        --p-gold: #c5a880;
+        --p-gold-light: #e8d5b5;
+        --p-beige: #f9f7f4;
+    }
+
+    body {
+        background-color: var(--p-beige);
+        font-family: 'Inter', sans-serif;
+        color: var(--p-navy);
+    }
+
+    .main-wrapper {
+        padding: 50px 20px;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .success-icon {
+        width: 60px;
+        height: 60px;
+        background: #f0fff4;
+        color: #2f855a;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        border: 2px solid #c6f6d5;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    @@keyframes scaleIn {
+        from { transform: scale(0); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .title-area {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .title-area h3 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: var(--p-navy);
+        margin-bottom: 5px;
+        font-size: 1.8rem;
+    }
+
+    .title-area p {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .compact-ticket {
+        background: white;
+        width: 100%;
+        max-width: 650px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        overflow: hidden;
+        border-top: 4px solid var(--p-gold);
+    }
+
+    .ticket-section {
+        padding: 30px;
+    }
+
+    .section-title {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--p-gold);
+        margin-bottom: 20px;
+        border-bottom: 1px solid #f8f8f8;
+        padding-bottom: 8px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .summary-item label {
+        display: block;
+        font-size: 0.65rem;
+        color: #aaa;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .summary-item p {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+
+    .booking-code-box {
+        text-align: center;
+        padding: 15px;
+        background: #fafafb;
+        border-radius: 8px;
+        border: 1px dashed #eee;
+        margin-top: 20px;
+    }
+
+    .booking-code-box h6 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        letter-spacing: 4px;
+        color: var(--p-gold);
+        margin-bottom: 0;
+        font-weight: 700;
+    }
+
+    .action-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 25px;
+        justify-content: center;
+    }
+
+    .btn-ticket {
+        padding: 10px 25px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 6px;
+        text-transform: uppercase;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-dark-main { background: var(--p-navy); color: white; border: none; }
+    .btn-gold-sub { background: var(--p-gold); color: white; border: none; }
+    .btn-outline-sub { background: white; color: #555; border: 1px solid #ddd; }
+
+    .btn-ticket:hover { transform: translateY(-2px); opacity: 0.9; }
+
+    .vip-status-mark {
+        display: inline-block;
+        padding: 2px 10px;
+        background: linear-gradient(45deg, var(--p-gold), #e8d5b5);
+        color: var(--p-navy);
+        border-radius: 4px;
+        font-size: 0.6rem;
+        font-weight: 800;
+        margin-left: 10px;
+    }
+
+    .footer-note {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 0.75rem;
+        color: #999;
+    }
+</style>
+
+<div class="main-wrapper">
+    <div class="success-icon">
+        <i class="fas fa-check"></i>
+    </div>
+    <div class="title-area">
+        <h3>Đặt Lịch Thành Công</h3>
+        <p>Cảm ơn bạn đã lựa chọn dịch vụ tại SpaN5 Premium.</p>
+    </div>
+
+    <div class="compact-ticket">
+        <div class="ticket-section">
+            <div class="section-title">Thông tin dịch vụ</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <label>Khách hàng</label>
+                    <p>@Model.Customer?.FullName</p>
+                </div>
+                <div class="summary-item">
+                    <label>Số điện thoại</label>
+                    <p>@Model.Customer?.Phone</p>
+                </div>
+                <div class="summary-item">
+                    <label>Dịch vụ</label>
+                    <p>@serviceName @if(isVip) { <span class="vip-status-mark">VIP</span> }</p>
+                </div>
+                <div class="summary-item">
+                    <label>Tổng phí</label>
+                    <p class="text-gold">@Model.TotalAmount.ToString("N0") VNĐ</p>
+                </div>
+                <div class="summary-item">
+                    <label>Ngày hẹn</label>
+                    <p>@Model.StartTime.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="summary-item">
+                    <label>Giờ hẹn</label>
+                    <p>@Model.StartTime.ToString("HH:mm") (@service?.Duration phút)</p>
+                </div>
+            </div>
+
+            <div class="booking-code-box">
+                <p class="small text-muted mb-1">Mã lịch hẹn của bạn</p>
+                <h6>@Model.BookingCode</h6>
+            </div>
+
+            <div class="action-group">
+                <a href="/" class="btn btn-ticket btn-outline-sub">Trang Chủ</a>
+                <a href="@Url.Action("Details", "Booking", new { bookingCode = Model.BookingCode })" class="btn btn-ticket btn-dark-main">
+                    Chi tiết & Hủy
+                </a>
+                <a href="/Booking" class="btn btn-ticket btn-gold-sub">
+                    Đặt thêm lịch
+                </a>
+            </div>
+        </div>
+        
+        <div class="ticket-section bg-light py-4 text-center">
+            <p class="small text-muted mb-0">Địa chỉ: 123 Đường Tự Do, Quận 1, HCM <br> Hotline: 1900 123 456</p>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <p>Thông tin xác nhận đã được gửi đến email/SMS của quý khách. <br> Hẹn gặp lại quý khách vào ngày @Model.StartTime.ToString("dd/MM/yyyy")!</p>
+    </div>
+</div>

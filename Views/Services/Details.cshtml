@@ -8,9 +8,18 @@
     <div class="row">
         <!-- Hình ảnh và thông tin cơ bản -->
         <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm">
-                <img src="@(string.IsNullOrEmpty(Model.Image) ? "/images/default-service.jpg" : "/images/" + Model.Image)" 
-                     class="card-img-top rounded-3" style="object-fit: cover; height: 400px;" alt="@Model.ServiceName">
+            <div class="card border-0 shadow-sm position-relative">
+                @{
+                    var imageUrl = (Model.Image ?? "").StartsWith("http") 
+                        ? Model.Image 
+                        : (string.IsNullOrEmpty(Model.Image) ? "/images/no-image.jpg" : "/images/" + Model.Image);
+                    
+                    var tierBadge = "";
+                    if (Model.IsVip) { tierBadge = "<span class='badge-luxury position-absolute top-0 start-0 m-3 z-3'><i class='fas fa-crown'></i> Luxury</span>"; }
+                    else if (Model.Price >= 700000) { tierBadge = "<span class='badge-pro position-absolute top-0 start-0 m-3 z-3'><i class='fas fa-star'></i> Pro</span>"; }
+                }
+                @Html.Raw(tierBadge)
+                <img src="@imageUrl" class="card-img-top rounded-3" style="object-fit: cover; height: 400px;" alt="@Model.ServiceName">
             </div>
         </div>
         <div class="col-md-6">
@@ -26,9 +35,57 @@
                 <h5>Mô tả chi tiết</h5>
                 <p class="text-muted">@Model.Description</p>
             </div>
-            <a href="/Booking/Create?serviceId=@Model.ServiceId" class="btn btn-gold rounded-pill px-4 py-2">
+            <a href="/Booking/Index?serviceId=@Model.ServiceId" class="btn btn-gold rounded-pill px-4 py-2">
                 <i class="fas fa-calendar-alt"></i> Đặt lịch ngay
             </a>
+        </div>
+    </div>
+
+    <!-- Quy trình & Video -->
+    <div class="row mt-5 pt-3 border-top">
+        <div class="col-lg-6 mb-4">
+            <h3 class="font-playfair text-gold mb-4"><i class="fas fa-list-ol"></i> Quy trình chuẩn Premium</h3>
+            <div class="process-timeline mt-4">
+                <div class="d-flex mb-4">
+                    <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">1</div>
+                    <div>
+                        <h5 class="fw-bold">Thăm khám & Tư vấn</h5>
+                        <p class="text-muted">Chuyên gia soi da và lắng nghe nhu cầu cá nhân hóa phác đồ điều trị, lựa chọn hương liệu thư giãn phù hợp.</p>
+                    </div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">2</div>
+                    <div>
+                        <h5 class="fw-bold">Làm sạch & Thư giãn khởi động</h5>
+                        <p class="text-muted">Rũ bỏ mệt mỏi với các bước ngâm chân thảo mộc, xông hơi và làm sạch sâu dịu nhẹ bề mặt da.</p>
+                    </div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">3</div>
+                    <div>
+                        <h5 class="fw-bold">Trải nghiệm dịch vụ chuyên sâu</h5>
+                        <p class="text-muted">Thực hiện liệu pháp chính (massage, chăm sóc chuyên sâu) với tinh chất thiên nhiên và thiết bị công nghệ cao.</p>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">4</div>
+                    <div>
+                        <h5 class="fw-bold">Nghỉ ngơi & Thưởng trà</h5>
+                        <p class="text-muted">Nhâm nhi trà nhan sắc và dùng điểm tâm nhẹ tại không gian Lounge sang trọng trước khi ra về.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <h3 class="font-playfair text-gold mb-4"><i class="fas fa-play-circle"></i> Trải nghiệm không gian</h3>
+            <div class="rounded-4 overflow-hidden shadow-sm border border-1" style="height: 400px; background: #000;">
+                @{
+                    var videoUrl = !string.IsNullOrEmpty(Model.VideoUrl) 
+                        ? Model.VideoUrl 
+                        : "https://www.youtube.com/embed/VCQrC5IaboA?autoplay=0&rel=0";
+                }
+                <iframe width="100%" height="100%" src="@videoUrl" title="Video Quy Trình" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
         </div>
     </div>
 

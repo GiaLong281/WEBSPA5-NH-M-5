@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpaN5.Models
 {
@@ -22,8 +22,7 @@ namespace SpaN5.Models
 
         public decimal TotalAmount { get; set; }
 
-                public string? Notes { get; set; }
-
+        public string? Notes { get; set; }
         public DateTime? CancelledAt { get; set; }
         public string? CancelReason { get; set; }
 

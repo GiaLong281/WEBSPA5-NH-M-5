@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\SpaN5.props" />
-</Project>

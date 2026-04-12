@@ -1,0 +1,202 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Lịch trình cá nhân";
+    Layout = "~/Areas/Staff/Views/Shared/_StaffLayout.cshtml";
+
+    int totalCa = ViewBag.TotalCa != null ? (int)ViewBag.TotalCa : 0;
+    int caHoanThanh = ViewBag.CaHoanThanh != null ? (int)ViewBag.CaHoanThanh : 0;
+    int eff = ViewBag.Efficiency != null ? (int)ViewBag.Efficiency : 0;
+    var nextBooking = ViewBag.NextBooking as SpaN5.Models.Booking;
+}
+
+<style>
+    /* Headers */
+    .date-header { font-size: 0.75rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
+    .page-main-title { font-size: 1.8rem; font-weight: 700; color: var(--serene-navy); letter-spacing: -0.5px; margin: 0;}
+
+    /* Toggle Switch */
+    .toggle-group { display: flex; background: #e2e8f0; border-radius: 20px; padding: 3px; width: fit-content; }
+    .toggle-btn { background: transparent; border: none; padding: 4px 16px; font-size: 0.8rem; font-weight: 600; color: #64748b; border-radius: 16px; transition: 0.2s;}
+    .toggle-btn.active { background: white; color: var(--serene-navy); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 20px; margin-top: 2rem; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; z-index: 0; }
+    
+    .timeline-item { position: relative; margin-bottom: 1.5rem; width: 100%; display: flex; gap: 20px; align-items: stretch;}
+    .timeline-node { width: 14px; height: 14px; border-radius: 50%; background: #e2e8f0; border: 3px solid white; position: absolute; left: -26px; top: 12px; z-index: 1;}
+
+    .timeline-card { 
+        background: white; border: 1px solid var(--serene-border); border-radius: 12px; padding: 16px; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02); flex: 1; transition: all 0.2s; cursor: pointer; text-decoration: none; display: block; color: inherit;
+    }
+    .timeline-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
+
+    /* Active State Timeline */
+    .timeline-item.active .timeline-node { border-color: var(--serene-blue); background: white; box-shadow: 0 0 0 4px #e0f2fe; }
+    .timeline-item.active .timeline-card { border: 2px solid var(--serene-blue); background: #f8fafc; box-shadow: 0 8px 16px rgba(14, 165, 233, 0.1); }
+    
+    .t-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .t-time { font-size: 0.8rem; font-weight: 600; color: #94a3b8; }
+    .t-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+    .t-badge.done { background: #f1f5f9; color: #64748b; }
+    .t-badge.doing { background: #dbeafe; color: var(--serene-blue-strong); }
+    .t-badge.upcoming { background: #fef3c7; color: #d97706; }
+
+    .t-customer { font-size: 1.1rem; font-weight: 700; color: var(--serene-navy); margin-bottom: 6px; }
+    .t-detail { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 12px; }
+    
+    /* Right Pane Stats */
+    .eff-card { background: var(--serene-blue-strong); color: white; border-radius: 16px; padding: 20px; box-shadow: 0 10px 20px rgba(2, 132, 199, 0.2); margin-bottom: 20px;}
+    .eff-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; opacity: 0.9;}
+    .eff-val { font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 15px;}
+    .eff-progress { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin-bottom: 15px; position: relative; overflow: hidden;}
+    .eff-bar { height: 100%; background: white; border-radius: 3px;}
+    .eff-sub { font-size: 0.75rem; opacity: 0.9; }
+
+    .eff-stats { display: flex; text-align: center; background: white; border-radius: 12px; border: 1px solid var(--serene-border); overflow: hidden; margin-bottom: 20px;}
+    .eff-stats-box { flex: 1; padding: 12px; }
+    .eff-stats-box:first-child { border-right: 1px solid var(--serene-border); }
+    .eff-stats-val { font-size: 1.1rem; font-weight: 700; color: var(--serene-navy); }
+    .eff-stats-label { font-size: 0.65rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+
+    /* Next Prep Card */
+    .prep-card { background: white; border: 1px solid var(--serene-border); border-radius: 16px; padding: 20px; margin-bottom: 12px;}
+    .prep-title { font-size: 0.75rem; font-weight: 700; color: #d97706; display: flex; align-items: center; gap: 6px; margin-bottom: 12px; text-transform: uppercase;}
+    .prep-customer { display: flex; align-items: center; gap: 12px; margin-bottom: 15px;}
+    .prep-customer img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+    .prep-name { font-size: 0.95rem; font-weight: 700; color: var(--serene-navy); line-height: 1.2; margin-bottom: 2px;}
+    .prep-tier { font-size: 0.7rem; color: #64748b; }
+    
+    .prep-note { background: #f8fafc; border-left: 3px solid var(--serene-blue); padding: 12px; border-radius: 4px 8px 8px 4px; font-size: 0.8rem; color: #475569; font-style: italic;}
+
+    .small-info-card { background: white; border: 1px solid var(--serene-border); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;}
+    .small-info-card .label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 600; color: var(--serene-navy); }
+    .small-info-card .val { font-size: 1.1rem; font-weight: 700; color: var(--serene-navy); }
+
+    .fab-btn {
+        width: 50px; height: 50px; border-radius: 50%; background: var(--serene-blue-strong); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        border: none; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); margin-top: 20px; margin-left: auto; cursor: pointer;
+    }
+</style>
+
+<div class="row g-5">
+    <!-- Cột Trái: Lịch trình -->
+    <div class="col-lg-7 col-xl-8">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <div class="date-header">Hôm nay, @DateTime.Now.ToString("dd 'tháng' MM")</div>
+                <h1 class="page-main-title">Lịch trình cá nhân</h1>
+            </div>
+            <div class="toggle-group">
+                <button class="toggle-btn active">Ngày</button>
+                <button class="toggle-btn">Tuần</button>
+            </div>
+        </div>
+
+        <div class="timeline">
+            @if(!Model.Any()) {
+                <div class="text-muted p-4 text-center">Hôm nay chưa có lịch hẹn nào.</div>
+            }
+            @foreach(var b in Model) {
+                bool isDoing = b.Status == SpaN5.Models.BookingStatus.InProgress;
+                bool isDone = b.Status == SpaN5.Models.BookingStatus.Completed;
+                var bd = b.BookingDetails.FirstOrDefault();
+                
+                string badgeClass = isDone ? "done" : (isDoing ? "doing" : "upcoming");
+                string badgeText = isDone ? "ĐÃ HOÀN THÀNH" : (isDoing ? "ĐANG DIỄN RA" : "SẮP TỚI");
+                string url = isDoing ? $"/Staff/Home/ProcessBooking/{b.BookingId}" : "javascript:void(0)";
+
+                <div class="timeline-item @(isDoing ? "active" : "")">
+                    <div class="timeline-node"></div>
+                    <a href="@url" class="timeline-card">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="t-header">
+                                    <div class="t-time">@b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")</div>
+                                    <div class="t-badge @badgeClass">@badgeText</div>
+                                </div>
+                                <div class="t-customer">@b.Customer?.FullName</div>
+                                <div class="t-detail">
+                                    <span><i class="bi bi-flower1 me-1"></i> @(bd?.Service?.ServiceName ?? "Dịch vụ")</span>
+                                    <span><i class="bi bi-door-closed me-1"></i> Phòng @(bd?.RoomNumber?.ToString() ?? "Chưa gán")</span>
+                                </div>
+                            </div>
+                            
+                            @if(isDoing) {
+                                var remain = (int)Math.Max(0, b.EndTime.Subtract(DateTime.Now).TotalMinutes);
+                                <div class="text-end d-flex flex-column justify-content-center border-start ps-4 ms-2 border-opacity-25">
+                                    <div style="font-size: 0.65rem; font-weight: 600; color: var(--serene-blue-strong); text-transform: uppercase;">Thời gian còn lại</div>
+                                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--serene-blue-strong);">@remain Phút</div>
+                                </div>
+                            } else {
+                                <div class="text-end d-flex flex-column justify-content-center">
+                                    <i class="bi bi-chevron-right text-muted" style="font-size: 1.2rem; opacity: 0.3;"></i>
+                                </div>
+                            }
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Cột Phải: Hiệu suất & Chuẩn bị -->
+    <div class="col-lg-5 col-xl-4">
+        <!-- Hiệu suất Bar -->
+        <div class="eff-card">
+            <div class="eff-title">Hiệu suất hôm nay</div>
+            <div class="eff-val">@eff%</div>
+            <div class="eff-progress">
+                <div class="eff-bar" style="width: @eff%;"></div>
+            </div>
+            <div class="eff-sub">Còn @(totalCa - caHoanThanh) ca nữa để đạt mục tiêu ngày.</div>
+        </div>
+
+        <div class="eff-stats shadow-sm">
+            <div class="eff-stats-box">
+                <div class="eff-stats-val">@caHoanThanh / @totalCa</div>
+                <div class="eff-stats-label">Đã hoàn thành</div>
+            </div>
+            <div class="eff-stats-box" style="background: #f8fafc;">
+                <div class="eff-stats-val text-muted">@totalCa Ca</div>
+                <div class="eff-stats-label">Mục tiêu</div>
+            </div>
+        </div>
+
+        <!-- Chuẩn bị tiếp theo -->
+        @if(nextBooking != null) {
+            <div class="prep-card shadow-sm">
+                <div class="prep-title"><i class="bi bi-play-circle-fill"></i> Chuẩn bị tiếp theo</div>
+                <div class="prep-customer">
+                    <div class="avatar-sm d-flex align-items-center justify-content-center bg-light fw-bold text-secondary" style="width: 40px; height: 40px; border-radius: 8px;">
+                        @(nextBooking.Customer?.FullName?.FirstOrDefault().ToString() ?? "C")
+                    </div>
+                    <div>
+                        <div class="prep-name">@nextBooking.Customer?.FullName</div>
+                        <div class="prep-tier">Khách thân thiết</div>
+                    </div>
+                </div>
+                <div class="prep-note">
+                    <div class="fw-bold mb-1" style="font-size: 0.7rem; color: var(--serene-navy);">LƯU Ý DỊCH VỤ</div>
+                    "Ưu tiên lực vừa phải vùng vai gáy, không sử dụng tinh dầu sả chanh."
+                </div>
+            </div>
+        }
+
+        <!-- Mini Stats -->
+        <div class="small-info-card shadow-sm">
+            <div class="label"><i class="bi bi-emoji-smile text-primary"></i> Đánh giá TB</div>
+            <div class="val">4.9/5</div>
+        </div>
+
+        <div class="small-info-card shadow-sm">
+            <div class="label"><i class="bi bi-cash-stack text-success"></i> Tiền tip dự kiến</div>
+            <div class="val">450k</div>
+        </div>
+
+        <button class="fab-btn">
+            <i class="bi bi-plus"></i>
+        </button>
+    </div>
+</div>

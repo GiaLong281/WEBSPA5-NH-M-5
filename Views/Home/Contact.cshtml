@@ -1,0 +1,213 @@
+@model SpaN5.Models.ContactViewModel
+@{
+    ViewData["Title"] = "Liên Hệ";
+}
+
+<!-- Hero Section for Contact Page -->
+<section class="hero-section position-relative d-flex align-items-center justify-content-center overflow-hidden" style="height: 40vh; margin-top: -76px;">
+    <!-- Background Image -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0;">
+        <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Contact Spa" class="w-100 h-100" style="object-fit: cover; filter: brightness(0.5);">
+    </div>
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(26,43,60,0.8) 0%, rgba(26,43,60,0.4) 100%); z-index: 1;"></div>
+    
+    <div class="container position-relative text-center text-white" style="z-index: 2; margin-top: 50px;">
+        <span class="text-gold fw-bold text-uppercase letter-spacing-2 mb-3 d-inline-block" data-aos="fade-down">Kết Nối Với Chúng Tôi</span>
+        <h1 class="display-4 font-playfair mb-0 fw-bold" data-aos="fade-up">Liên Hệ SpaN5</h1>
+    </div>
+</section>
+
+<!-- Contact Form & Info Section -->
+<section class="py-5 position-relative" style="background-color: #faf9f7;">
+    <div class="container py-5">
+        <div class="row g-5">
+            <!-- Contact Info -->
+            <div class="col-lg-5" data-aos="fade-right">
+                <div class="bg-dark text-white p-5 rounded-4 shadow-lg h-100 position-relative overflow-hidden">
+                    <!-- Decor -->
+                    <i class="fas fa-leaf position-absolute text-white opacity-10" style="font-size: 15rem; bottom: -50px; right: -30px;"></i>
+                    
+                    <h3 class="font-playfair fw-bold mb-4 text-gold">Thông Tin Liên Hệ</h3>
+                    <p class="text-white-50 mb-5" style="line-height: 1.8;">
+                        Hãy để SpaN5 đồng hành cùng bạn trên hành trình chăm sóc sắc đẹp và tìm lại sự cân bằng trong cuộc sống. Chúng tôi luôn sẵn sàng lắng nghe và tư vấn.
+                    </p>
+                    
+                    <ul class="list-unstyled mb-5 position-relative z-index-1">
+                        <li class="d-flex mb-4 align-items-center">
+                            <div class="bg-gold-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                                <i class="fas fa-map-marker-alt text-gold fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Địa chỉ</h6>
+                                <span class="text-white-50">123 Đường Tự Do, Quận 1, TP HCM</span>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4 align-items-center">
+                            <div class="bg-gold-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                                <i class="fas fa-phone-alt text-gold fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Điện thoại</h6>
+                                <span class="text-white-50">+84 123 456 789<br/>+84 987 654 321</span>
+                            </div>
+                        </li>
+                        <li class="d-flex mb-4 align-items-center">
+                            <div class="bg-gold-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                                <i class="fas fa-envelope text-gold fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Email</h6>
+                                <span class="text-white-50">contact@span5.com</span>
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <div class="bg-gold-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                                <i class="fas fa-clock text-gold fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold">Giờ mở cửa</h6>
+                                <span class="text-white-50">08:00 - 22:00 Hàng ngày</span>
+                            </div>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-flex gap-3 position-relative z-index-1">
+                        <a href="#" class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="col-lg-7" data-aos="fade-left">
+                <div class="bg-white p-5 rounded-4 shadow-sm h-100 border-top border-gold border-5">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 border-0 shadow-sm" role="alert">
+                            <i class="fas fa-check-circle me-2 text-success"></i> @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <h3 class="font-playfair fw-bold mb-4 text-dark">Gửi Lời Nhắn</h3>
+                    
+                    <div class="contact-discount-banner d-flex align-items-center justify-content-between p-3 rounded-3 mb-4 flex-wrap gap-2" style="background-color: rgba(212, 175, 55, 0.1); border: 1px dashed #D4AF37;">
+                        <span class="text-dark fw-medium"><i class="fas fa-gift text-gold me-2"></i>Nhận ngay <strong>Ưu đãi 10%</strong> khi đặt lịch trước.</span>
+                        <a href="/Booking" class="btn btn-sm btn-gold rounded-pill px-3 fw-bold">Đặt Lịch Ngay</a>
+                    </div>
+
+                    <form asp-controller="Home" asp-action="Contact" method="post">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="FullName" class="form-control premium-input border-0 border-bottom rounded-0 px-0" placeholder="Họ và tên" required />
+                                    <label asp-for="FullName" class="px-0 text-muted">Họ và tên</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Phone" class="form-control premium-input border-0 border-bottom rounded-0 px-0" placeholder="Số điện thoại" required />
+                                    <label asp-for="Phone" class="px-0 text-muted">Số điện thoại</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <input asp-for="Email" type="email" class="form-control premium-input border-0 border-bottom rounded-0 px-0" placeholder="Email" required />
+                            <label asp-for="Email" class="px-0 text-muted">Email (Bắt buộc)</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <textarea asp-for="Message" class="form-control premium-input border-0 border-bottom rounded-0 px-0" placeholder="Nội dung" style="height: 120px; resize: none;" required></textarea>
+                            <label asp-for="Message" class="px-0 text-muted">Bạn cần chúng tôi hỗ trợ gì?</label>
+                        </div>
+
+                        <!-- Fake reCAPTCHA for presentation similar to image -->
+                        <div class="recaptcha-placeholder mb-4">
+                            <div class="chk-box"></div>
+                            <span style="font-size: 0.9rem; color: #555; margin-right: auto;">Tôi không phải là người máy</span>
+                            <div style="text-align: center; border-left: 1px solid #ccc; padding-left: 10px;">
+                                <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" style="width: 24px;" alt="recaptcha"/>
+                                <div style="font-size: 0.6rem; color: #777;">reCAPTCHA<br/>Bảo mật - Điều khoản</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-lg rounded-pill px-5 py-3 w-100 fw-bold letter-spacing-1 text-uppercase custom-hover-btn">
+                            Gửi Tin Nhắn <i class="fas fa-paper-plane ms-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Google Map Section (Moved from About) -->
+<section class="py-0 position-relative">
+    <div class="map-container overflow-hidden w-100" style="height: 500px;" data-aos="fade-in">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.494668100784!2d106.70114030000001!3d10.773374299999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f46e5de50ed%3A0x6338ab3ce48eb975!2s123%20%C4%90.%20T%E1%BB%B1%20Do%2C%20Qu%E1%BA%ADn%201%2C%20H%E1%BB%93%20Ch%C3%AD%20Minh%2C%20Vietnam!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    
+    <!-- Floating Address Card -->
+    <div class="position-absolute bg-white shadow-lg rounded-4 p-4 d-none d-md-block" style="bottom: 40px; left: 5%; z-index: 10; width: 320px; border-top: 4px solid #D4AF37;">
+        <div class="d-flex align-items-center mb-3">
+            <i class="fas fa-map-marker-alt text-gold fs-3 me-3"></i>
+            <h5 class="font-playfair fw-bold mb-0 text-dark">SpaN5 Premium</h5>
+        </div>
+        <p class="text-secondary mb-2"><i class="fas fa-building me-2"></i>123 Đường Tự Do</p>
+        <p class="text-secondary mb-3"><i class="fas fa-map me-2"></i>Quận 1, TP Hồ Chí Minh</p>
+        <a href="https://maps.google.com/?q=123+Đường+Tự+Do,+Quận+1,+TP+HCM" target="_blank" class="btn btn-outline-dark btn-sm rounded-pill px-4 hover-gold-btn">
+            Tìm Đường Ngay
+        </a>
+    </div>
+</section>
+
+<style>
+    .letter-spacing-1 { letter-spacing: 1px; }
+    .letter-spacing-2 { letter-spacing: 2px; }
+    .bg-gold-light {
+        background-color: rgba(212, 175, 55, 0.2);
+    }
+    
+    .premium-input:focus {
+        box-shadow: none !important;
+        border-color: #D4AF37 !important;
+        background-color: transparent !important;
+    }
+    .premium-input {
+        background-color: transparent !important;
+    }
+    
+    .custom-hover-btn {
+        transition: all 0.3s ease;
+    }
+    .custom-hover-btn:hover {
+        background-color: #D4AF37 !important;
+        border-color: #D4AF37 !important;
+        transform: translateY(-3px);
+    }
+    
+    .hover-gold-btn { transition: all 0.3s ease; }
+    .hover-gold-btn:hover { background-color: #D4AF37 !important; border-color: #D4AF37 !important; color: white !important; }
+    .z-index-1 { z-index: 1; }
+    
+    .recaptcha-placeholder {
+        border: 1px solid #e0e0e0;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 300px;
+    }
+    .recaptcha-placeholder .chk-box {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #ccc;
+        background: #fff;
+        margin-right: 12px;
+        border-radius: 2px;
+    }
+</style>

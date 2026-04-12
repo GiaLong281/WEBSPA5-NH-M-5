@@ -1,0 +1,104 @@
+@model SpaN5.Models.Staff
+@{
+    ViewData["Title"] = "Thêm Nhân sự";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var services = ViewBag.Services as List<SpaN5.Models.Service> ?? new List<SpaN5.Models.Service>();
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="glass-card p-4 shadow-sm" style="border-radius: 24px; border: 1px solid var(--accent-blue); background: var(--white);">
+            <div class="d-flex align-items-center mb-4">
+                <a href="/Admin/Staff" class="btn btn-light rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h3 class="fw-800 mb-0">Hồ sơ Nhân sự mới</h3>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <div class="row g-4">
+                    <!-- Thông tin cá nhân -->
+                    <div class="col-12">
+                        <div class="menu-label mb-2" style="font-size: 0.8rem;">Thông tin cá nhân</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Họ và tên</label>
+                        <input name="FullName" class="form-control rounded-3 border-0 bg-light py-2" placeholder="VD: Nguyễn Văn A" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Email</label>
+                        <input name="Email" type="email" class="form-control rounded-3 border-0 bg-light py-2" placeholder="example@spa.com" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Số điện thoại</label>
+                        <input name="Phone" class="form-control rounded-3 border-0 bg-light py-2" placeholder="09xxx" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Vị trí (Chức danh)</label>
+                        <select name="Position" class="form-select rounded-3 border-0 bg-light py-2" id="positionSelect">
+                            <option value="Technician">Kỹ thuật viên</option>
+                            <option value="Receptionist">Lễ tân</option>
+                            <option value="Manager">Quản lý</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-12" id="specField">
+                        <label class="form-label small fw-bold">Chuyên môn (Dịch vụ chính)</label>
+                        <select name="SpecializationId" class="form-select rounded-3 border-0 bg-light py-2">
+                            <option value="">-- Chọn dịch vụ --</option>
+                            @foreach(var s in services) {
+                                <option value="@s.ServiceId">@s.ServiceName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Thông tin tài khoản -->
+                    <div class="col-12 pt-3">
+                        <div class="menu-label mb-2" style="font-size: 0.8rem;">Thông tin tài khoản đăng nhập</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Tên đăng nhập</label>
+                        <input name="Username" class="form-control rounded-3 border-0 bg-light py-2" placeholder="Username" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Mật khẩu</label>
+                        <input name="Password" type="password" class="form-control rounded-3 border-0 bg-light py-2" placeholder="********" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Phân quyền hệ thống</label>
+                        <select name="Role" class="form-select rounded-3 border-0 bg-light py-2" id="roleSelect">
+                            <option value="Therapist">Therapist (Cho KTV)</option>
+                            <option value="Receptionist">Receptionist (Cho Lễ tân)</option>
+                            <option value="Admin">Admin (Quản trị)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 mt-5">
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow">
+                            Xác nhận lưu hồ sơ & Cấp tài khoản
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Tự động đồng bộ Position và Role cho tiện
+        $('#positionSelect').change(function() {
+            const val = $(this).val();
+            if(val === 'Technician') {
+                $('#roleSelect').val('Therapist');
+                $('#specField').show();
+            } else if(val === 'Receptionist') {
+                $('#roleSelect').val('Receptionist');
+                $('#specField').hide();
+            } else {
+                $('#roleSelect').val('Admin');
+                $('#specField').hide();
+            }
+        });
+    </script>
+}

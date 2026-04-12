@@ -69,7 +69,7 @@
                                     <div class="input-group mb-2">
                                         <select id="serviceSelector" class="form-control">
                                             <option value="">-- Chọn dịch vụ --</option>
-                                            @foreach (var sv in (ViewBag.AllServices as List<ServiceInfo> ?? new List<ServiceInfo>()))
+                                            @foreach (var sv in (ViewBag.AllServices as List<SpaN5.Models.ViewModels.ServiceInfo> ?? new List<SpaN5.Models.ViewModels.ServiceInfo>()))
                                             {
                                                 <option value="@sv.ServiceId" data-duration="@sv.Duration" data-price="@sv.Price">
                                                     @sv.ServiceName (@sv.Duration phút - @sv.Price.ToString("N0")đ)

@@ -12,12 +12,15 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SpaN5.styles.css" asp-append-version="true" />
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     @await RenderSectionAsync("Styles", required: false)
 
@@ -34,119 +37,33 @@
             --ink: #12202d;
             --nav: rgba(248, 244, 239, 0.78);
             --shadow: 0 24px 60px rgba(18, 32, 45, 0.08);
-            --shadow-soft: 0 16px 40px rgba(18, 32, 45, 0.06);
             --radius-xl: 28px;
             --radius-lg: 22px;
             --radius-md: 16px;
-
-            /* Admin Theme */
-            --admin-primary: #12202d;
-            --admin-accent: #b68a63;
-            --admin-surface: #ffffff;
-            --admin-bg: #f8f9fa;
         }
 
-        .admin-stat-card {
-            background: var(--admin-surface);
-            border: 1px solid rgba(18, 32, 45, 0.05);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-            height: 100%;
-        }
-
-        .admin-stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(182, 138, 99, 0.12);
-            border-color: rgba(182, 138, 99, 0.2);
-        }
-
-        .admin-icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .admin-quick-link {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            color: var(--text);
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .admin-quick-link:hover {
-            background: rgba(182, 138, 99, 0.05);
-            border-color: var(--gold);
-            color: var(--gold);
-            transform: scale(1.02);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        html { scroll-behavior: smooth; }
         body.spa-theme {
-            background:
-                radial-gradient(circle at top left, rgba(182, 138, 99, 0.11), transparent 28%),
-                radial-gradient(circle at right 15%, rgba(217, 180, 143, 0.13), transparent 24%),
-                linear-gradient(180deg, #fffdfb 0%, #fbf7f2 100%);
+            background: linear-gradient(180deg, #fffdfb 0%, #fbf7f2 100%);
             color: var(--text);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
         }
 
-        .font-playfair {
-            font-family: 'Playfair Display', serif;
-        }
-
+        .font-playfair { font-family: 'Playfair Display', serif; }
         .text-gold { color: var(--gold) !important; }
         .bg-gold { background: linear-gradient(135deg, var(--gold), var(--gold-2)) !important; }
-        .bg-soft {
-            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.76));
-        }
-
-        .spa-shell {
-            min-height: 100vh;
-            position: relative;
-        }
 
         .spa-announcement {
             background: linear-gradient(90deg, #12202d 0%, #243645 50%, #1c2a36 100%);
             color: rgba(255,255,255,0.92);
             font-size: 0.92rem;
-            letter-spacing: 0.01em;
-        }
-
-        .spa-announcement .badge {
-            background: rgba(255,255,255,0.10);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.12);
-            backdrop-filter: blur(10px);
         }
 
         .spa-navbar {
             backdrop-filter: blur(18px);
             background: var(--nav);
             border-bottom: 1px solid rgba(255,255,255,0.45);
-            box-shadow: 0 10px 30px rgba(18, 32, 45, 0.04);
-            transition: all 0.3s ease;
-        }
-
-        .navbar-scrolled .spa-navbar {
-            background: rgba(251, 247, 242, 0.92);
-            box-shadow: 0 12px 40px rgba(18, 32, 45, 0.08);
         }
 
         .spa-brand {
@@ -155,402 +72,150 @@
             gap: 0.75rem;
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            letter-spacing: 0.03em;
             color: var(--ink) !important;
             text-decoration: none;
         }
 
         .brand-mark {
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 999px;
-            display: grid;
-            place-items: center;
-            color: #fff;
+            width: 2.75rem; height: 2.75rem; border-radius: 999px;
+            display: grid; place-items: center; color: #fff;
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
-            box-shadow: 0 12px 24px rgba(182, 138, 99, 0.28);
         }
 
         .nav-link {
-            color: #344054 !important;
-            font-weight: 500;
-            padding: 0.85rem 1rem !important;
-            border-radius: 999px;
+            color: #344054 !important; font-weight: 500;
+            padding: 0.8rem 1.2rem !important;
             transition: all .25s ease;
         }
 
-        .nav-link:hover,
-        .nav-link:focus {
-            background: rgba(182, 138, 99, 0.10);
-            color: var(--gold) !important;
-        }
-
-        .dropdown-menu {
-            border: 0;
-            border-radius: 18px;
-            padding: 0.65rem;
-            box-shadow: var(--shadow);
-        }
-
-        .dropdown-item {
-            border-radius: 12px;
-            padding: 0.72rem 0.9rem;
-            font-weight: 500;
-        }
-
-        .dropdown-item:hover {
-            background: rgba(182, 138, 99, 0.10);
-            color: var(--ink);
-        }
-
-        main[role="main"] {
-            padding-top: 136px;
-        }
+        .nav-link:hover { color: var(--gold) !important; }
 
         .btn-gold {
-            border: 0;
-            color: #fff;
+            border: 0; color: #fff;
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
-            box-shadow: 0 14px 30px rgba(182, 138, 99, 0.22);
-            transition: all .25s ease;
+            padding: 0.6rem 1.5rem;
+            border-radius: 999px;
+            transition: transform 0.2s ease;
         }
-
-        .btn-gold:hover {
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 18px 34px rgba(182, 138, 99, 0.28);
-        }
+        .btn-gold:hover { transform: translateY(-2px); color: #fff; }
 
         .btn-outline-gold {
-            border: 1px solid rgba(182, 138, 99, 0.25);
+            border: 1px solid var(--gold);
             color: var(--gold);
-            background: rgba(255,255,255,0.65);
-            backdrop-filter: blur(10px);
-            transition: all .25s ease;
-        }
-
-        .btn-outline-gold:hover {
-            background: var(--gold);
-            color: #fff;
-            border-color: var(--gold);
-            transform: translateY(-2px);
-        }
-
-        .section-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.82rem;
-            text-transform: uppercase;
-            letter-spacing: 0.22em;
-            color: var(--gold);
-            font-weight: 800;
-        }
-
-        .section-label::before {
-            content: "";
-            width: 1.5rem;
-            height: 1px;
-            background: linear-gradient(90deg, var(--gold), transparent);
-        }
-
-        .spa-card,
-        .feature-card,
-        .service-card,
-        .testimonial-card,
-        .glass-card {
-            background: rgba(255,255,255,0.78);
-            backdrop-filter: blur(18px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .spa-card,
-        .feature-card,
-        .service-card,
-        .testimonial-card {
-            transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
-        }
-
-        .spa-card:hover,
-        .feature-card:hover,
-        .service-card:hover,
-        .testimonial-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow);
-            border-color: rgba(182, 138, 99, 0.18);
-        }
-
-        .section-pad {
-            padding: 6rem 0;
-        }
-
-        .subtle-divider {
-            width: 72px;
-            height: 3px;
+            padding: 0.6rem 1.5rem;
             border-radius: 999px;
-            background: linear-gradient(90deg, var(--gold), rgba(182, 138, 99, 0.15));
         }
+        .btn-outline-gold:hover { background: var(--gold); color: #fff; }
 
-        .footer-shell {
-            background:
-                radial-gradient(circle at top left, rgba(182, 138, 99, 0.12), transparent 30%),
-                linear-gradient(180deg, #15202b 0%, #0f1720 100%);
-            color: rgba(255,255,255,0.88);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .footer-shell::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.04'%3E%3Cpath d='M0 40h80M40 0v80'/%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.9;
-            pointer-events: none;
-        }
-
-        .footer-shell a {
-            color: rgba(255,255,255,0.76);
-            text-decoration: none;
-            transition: color .2s ease;
-        }
-
-        .footer-shell a:hover {
-            color: #fff;
-        }
-
-        .footer-links li + li {
-            margin-top: 0.55rem;
-        }
-
-        .social-link {
-            width: 42px;
-            height: 42px;
-            border-radius: 999px;
-            display: inline-grid;
-            place-items: center;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #fff !important;
-        }
-
-        .back-to-top {
-            position: fixed;
-            right: 18px;
-            bottom: 18px;
-            width: 48px;
-            height: 48px;
-            border: 0;
-            border-radius: 999px;
-            display: inline-grid;
-            place-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(12px);
-            transition: all .25s ease;
-            z-index: 1040;
-        }
-
-        .back-to-top.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+        main[role="main"] { padding-top: 140px; min-height: 70vh; }
 
         #spa-preloader {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background:
-                radial-gradient(circle at top, rgba(182, 138, 99, 0.12), transparent 32%),
-                linear-gradient(180deg, #ffffff 0%, #fbf7f2 100%);
+            position: fixed; inset: 0; z-index: 9999;
+            background: #fff; display: flex; align-items: center; justify-content: center;
         }
-
         .preloader-ring {
-            width: 88px;
-            height: 88px;
-            border-radius: 999px;
-            border: 2px solid rgba(182, 138, 99, 0.16);
-            border-top-color: var(--gold);
+            width: 60px; height: 60px; border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--gold); border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
         }
+        @@keyframes spin { to { transform: rotate(360deg); } }
 
-        @@keyframes spin {
-            to { transform: rotate(360deg); }
+        .footer-shell {
+            background: #12202d; color: #fff; padding: 4rem 0 2rem;
         }
+        .footer-links a { color: #aaa; text-decoration: none; transition: 0.2s; }
+        .footer-links a:hover { color: #fff; }
 
-        .fade-up {
-            animation: fadeUp .75s ease both;
+        .back-to-top {
+            position: fixed; right: 20px; bottom: 20px;
+            opacity: 0; visibility: hidden; transition: 0.3s;
         }
+        .back-to-top.show { opacity: 1; visibility: visible; }
 
-        @@keyframes fadeUp {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @@media (max-width: 991.98px) {
-            main[role="main"] {
-                padding-top: 124px;
-            }
-
-            .nav-link {
-                padding: 0.7rem 0.9rem !important;
-            }
-        }
+        /* Hide Google Translate Banner and popup */
+        body { top: 0 !important; }
+        .goog-te-banner-frame { display: none !important; }
+        .goog-tooltip { display: none !important; }
+        .goog-tooltip:hover { display: none !important; }
+        .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
     </style>
 </head>
 <body class="spa-theme">
 
-    <div id="spa-preloader" class="d-flex justify-content-center align-items-center">
-        <div class="text-center px-4">
-            <div class="preloader-ring"></div>
-            <h1 class="font-playfair display-5 fw-bold mb-2 text-gold">SpaN5</h1>
-            <p class="mb-0 text-muted">Đang mở không gian thư giãn...</p>
+    <div id="spa-preloader">
+        <div class="text-center">
+            <div class="preloader-ring mb-3 mx-auto"></div>
+            <h2 class="font-playfair text-gold">SpaN5</h2>
         </div>
     </div>
 
-    <div class="spa-shell d-flex flex-column min-vh-100">
-        <header class="fixed-top spa-header shadow-sm">
+    <div class="spa-shell">
+        <header class="fixed-top shadow-sm">
             <div class="spa-announcement py-2">
-                <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge rounded-pill px-3 py-2">Premium spa</span>
-                        <span class="small">Chăm sóc cơ thể và tinh thần trong một trải nghiệm mượt như lụa.</span>
-                    </div>
-                    <div class="small d-none d-md-flex align-items-center gap-3">
-                        <span><i class="fa-solid fa-location-dot me-1"></i> Việt Nam</span>
-                        <span><i class="fa-solid fa-phone me-1"></i> 0900 000 000</span>
-                        <span><i class="fa-solid fa-clock me-1"></i> 08:00 - 21:00</span>
+                <div class="container d-flex justify-content-between align-items-center">
+                    <span class="small d-none d-md-inline">Hệ thống Spa Chuyên nghiệp N5 Luxury</span>
+                    <div class="small">
+                        <i class="fa-solid fa-phone me-1"></i> 0900 000 000
+                        <span class="ms-3 d-none d-sm-inline"><i class="fa-solid fa-clock me-1"></i> 08:00 - 21:00</span>
                     </div>
                 </div>
             </div>
 
-            <nav class="navbar navbar-expand-lg spa-navbar">
+            <nav class="navbar navbar-expand-lg spa-navbar py-3">
                 <div class="container">
-                    <a class="spa-brand" asp-controller="Home" asp-action="Index" aria-label="SpaN5 Home">
+                    <a class="spa-brand" asp-controller="Home" asp-action="Index">
                         <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
                         <span class="fs-4">Spa<span class="text-gold">N5</span></span>
                     </a>
 
-                    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#spaNav" aria-controls="spaNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#spaNav">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
                     <div class="collapse navbar-collapse justify-content-end" id="spaNav">
-                        <ul class="navbar-nav align-items-lg-center gap-lg-1 py-3 py-lg-0">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#about">Giới thiệu</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Services" asp-action="Index">
-                                    @Localizer["Services"]
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#experience">Trải nghiệm</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Branches" asp-action="Index">Chi nhánh</a>
+                        <ul class="navbar-nav align-items-center gap-1">
+                            <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                            
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Dịch vụ</a>
+                                <ul class="dropdown-menu shadow border-0 mt-2">
+                                    <li><a class="dropdown-item" asp-controller="Services" asp-action="Index">Tất cả dịch vụ</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/Services/Details/1">Massage Thư Giãn</a></li>
+                                    <li><a class="dropdown-item" href="/Services/Details/2">Châm Sóc Da Mặt</a></li>
+                                    <li><a class="dropdown-item" href="/Services/Details/4"><i class="fas fa-crown text-gold me-1"></i> VIP Chăm Sóc Toàn Tâm</a></li>
+                                </ul>
                             </li>
 
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Branch" asp-action="Index">Quản lý chi nhánh</a>
-                                </li>
-                            }
+                            <li class="nav-item"><a class="nav-link" asp-controller="Branches" asp-action="Index">Chi nhánh</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="About">Về chúng tôi</a></li>
 
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <li class="nav-item dropdown ms-lg-2">
-                                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-circle-user"></i>
-                                        <span class="text-truncate" style="max-width: 150px;">@User.FindFirst("FullName")?.Value</span>
+                                <li class="nav-item dropdown ms-lg-3">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
+                                        <i class="fa-solid fa-circle-user fa-lg"></i>
+                                        <span>@User.FindFirst("FullName")?.Value</span>
                                     </a>
-
-                                    <ul class="dropdown-menu dropdown-menu-end">
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                                         @if (User.IsInRole("Admin"))
                                         {
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
-                                                    <i class="fa-solid fa-gauge-high me-2"></i> Bảng điều khiển
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Admin" asp-action="ManageBookings">
-                                                    <i class="fa-solid fa-calendar-check me-2"></i> Quản lý lịch hẹn
-                                                </a>
-                                            </li>
+                                            <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard"><i class="fa-solid fa-gauge me-2"></i>Quản trị</a></li>
                                         }
-
                                         @if (User.IsInRole("Staff"))
                                         {
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Staff" asp-action="Calendar">
-                                                    <i class="fa-solid fa-calendar-week me-2"></i> Lịch làm việc
-                                                </a>
-                                            </li>
+                                            <li><a class="dropdown-item" asp-area="Staff" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-calendar-check me-2"></i>Bảng làm việc</a></li>
                                         }
-
-                                        @if (User.IsInRole("Admin"))
-                                        {
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="StaffCalendar" asp-action="Index">
-                                                    <i class="fa-solid fa-calendar-week me-2"></i> Lịch làm việc
-                                                </a>
-                                            </li>
-                                        }
-
-                                        @if (User.IsInRole("Staff"))
-                                        {
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Staff" asp-action="MyBookings">
-                                                    <i class="fas fa-list me-2"></i> Lịch hẹn của tôi
-                                                </a>
-                                            </li>
-                                        }
-
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                                <i class="fa-solid fa-user me-2"></i> Hồ sơ
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
-                                                <i class="fa-solid fa-key me-2"></i> Đổi mật khẩu
-                                            </a>
-                                        </li>
-
+                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user me-2"></i>Hồ sơ</a></li>
                                         @if (User.IsInRole("Customer"))
                                         {
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Booking" asp-action="Upcoming">
-                                                    <i class="fa-solid fa-calendar-day me-2"></i> Lịch hẹn của tôi
-                                                </a>
-                                            </li>
-
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Booking" asp-action="MyBookings">
-                                                    <i class="fa-solid fa-clock-rotate-left me-2"></i> Lịch sử đặt lịch
-                                                </a>
-                                            </li>
+                                            <li><a class="dropdown-item" asp-controller="Booking" asp-action="Upcoming"><i class="fa-solid fa-calendar-day me-2"></i>Lịch sắp tới</a></li>
                                         }
-
                                         <li><hr class="dropdown-divider"></li>
-
                                         <li>
                                             <form asp-controller="Account" asp-action="Logout" method="post">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-                                                </button>
+                                                <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</button>
                                             </form>
                                         </li>
                                     </ul>
@@ -558,36 +223,17 @@
                             }
                             else
                             {
-                                <li class="nav-item ms-lg-2">
-                                    <a class="btn btn-outline-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
-                                </li>
-                                <li class="nav-item ms-lg-2">
-                                    <a class="btn btn-gold rounded-pill px-4 py-2" asp-controller="Account" asp-action="Register">Đăng ký</a>
-                                </li>
+                                <li class="nav-item ms-lg-3"><a class="btn btn-gold" asp-controller="Booking" asp-action="Index">Đặt lịch ngay</a></li>
                             }
 
                             <li class="nav-item dropdown ms-lg-2">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-globe"></i>
-                                    <span>@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToUpper()</span>
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="fa-solid fa-globe"></i></a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                                     <li>
-                                        <form method="post" asp-controller="Home" asp-action="SetLanguage">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="culture" value="vi-VN" />
-                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                            <button type="submit" class="dropdown-item">Tiếng Việt</button>
-                                        </form>
+                                        <button type="button" class="dropdown-item" onclick="changeGTranslateLang('vi')">Tiếng Việt</button>
                                     </li>
                                     <li>
-                                        <form method="post" asp-controller="Home" asp-action="SetLanguage">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="culture" value="en-US" />
-                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                            <button type="submit" class="dropdown-item">English</button>
-                                        </form>
+                                        <button type="button" class="dropdown-item" onclick="changeGTranslateLang('en')">English</button>
                                     </li>
                                 </ul>
                             </li>
@@ -597,128 +243,90 @@
             </nav>
         </header>
 
-        <main role="main" class="flex-grow-1">
+        <main role="main">
             @RenderBody()
         </main>
 
-        <footer class="footer-shell mt-auto">
-            <div class="container position-relative py-5">
-                <div class="row g-4 g-lg-5">
+        <footer class="footer-shell">
+            <div class="container">
+                <div class="row g-4">
                     <div class="col-lg-4">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
-                            <div>
-                                <h5 class="mb-0 text-white font-playfair fs-4">SpaN5</h5>
-                                <div class="text-white-50 small">Premium Beauty & Relaxation</div>
-                            </div>
-                        </div>
-                        <p class="text-white-50 mb-4">
-                            Không gian thư giãn được chăm chút như một bản nhạc chậm, nơi ánh sáng, mùi hương và dịch vụ cùng nhau tạo nên trải nghiệm dễ chịu hơn.
-                        </p>
-
-                        <div class="d-flex gap-2">
-                            <a class="social-link" href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                            <a class="social-link" href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                            <a class="social-link" href="#" aria-label="Tiktok"><i class="fa-brands fa-tiktok"></i></a>
+                        <h4 class="font-playfair text-gold mb-3">SpaN5</h4>
+                        <p class="text-white-50">Tận hưởng cuộc sống thư thái với dịch vụ Spa đẳng cấp Premium. Chúng tôi cam kết mang lại trải nghiệm tuyệt vời nhất cho bạn.</p>
+                        <div class="d-flex gap-3 small mt-4">
+                            <a href="#" class="text-white-50"><i class="fa-brands fa-facebook-f fa-lg"></i></a>
+                            <a href="#" class="text-white-50"><i class="fa-brands fa-instagram fa-lg"></i></a>
+                            <a href="#" class="text-white-50"><i class="fa-brands fa-tiktok fa-lg"></i></a>
                         </div>
                     </div>
-
-                    <div class="col-6 col-lg-2">
+                    <div class="col-6 col-lg-2 offset-lg-1">
                         <h6 class="text-white mb-3">Điều hướng</h6>
                         <ul class="list-unstyled footer-links">
                             <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                            <li><a href="#about">Giới thiệu</a></li>
-                            <li><a asp-controller="Services" asp-action="Index">@Localizer["Services"]</a></li>
+                            <li><a asp-controller="Services" asp-action="Index">Dịch vụ</a></li>
                             <li><a asp-controller="Branches" asp-action="Index">Chi nhánh</a></li>
                         </ul>
                     </div>
-
                     <div class="col-6 col-lg-2">
-                        <h6 class="text-white mb-3">Dành cho khách</h6>
+                        <h6 class="text-white mb-3">Mở rộng</h6>
                         <ul class="list-unstyled footer-links">
-                            <li><a asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
-                            <li><a asp-controller="Account" asp-action="Register">Đăng ký</a></li>
-                            <li><a asp-controller="Booking" asp-action="Create">Đặt lịch</a></li>
+                            <li><a href="#">Chính sách</a></li>
+                            <li><a href="#">Tuyển dụng</a></li>
+                            <li><a href="#">Liên hệ</a></li>
                         </ul>
                     </div>
-
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <h6 class="text-white mb-3">Liên hệ</h6>
-                        <div class="spa-card p-4 bg-soft">
-                            <div class="d-flex align-items-start gap-3 mb-3">
-                                <i class="fa-solid fa-location-dot text-gold mt-1"></i>
-                                <div>
-                                    <div class="fw-semibold text-dark">Địa chỉ</div>
-                                    <div class="text-muted">Cập nhật theo chi nhánh của bạn</div>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start gap-3 mb-3">
-                                <i class="fa-solid fa-phone text-gold mt-1"></i>
-                                <div>
-                                    <div class="fw-semibold text-dark">Hotline</div>
-                                    <div class="text-muted">0900 000 000</div>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start gap-3">
-                                <i class="fa-solid fa-envelope text-gold mt-1"></i>
-                                <div>
-                                    <div class="fw-semibold text-dark">Email</div>
-                                    <div class="text-muted">hello@span5.vn</div>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="text-white-50 small mb-2"><i class="fa-solid fa-location-dot me-2 text-gold"></i> 123 Nguyễn Trãi, Q1, TP.HCM</p>
+                        <p class="text-white-50 small mb-2"><i class="fa-solid fa-phone me-2 text-gold"></i> 0900 000 000</p>
+                        <p class="text-white-50 small"><i class="fa-solid fa-envelope me-2 text-gold"></i> hello@span5.vn</p>
                     </div>
                 </div>
-
-                <hr class="border-white border-opacity-10 my-4" />
-
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-                    <small class="text-white-50">© 2026 SpaN5. Thiết kế lại theo tinh thần sang, sạch và giàu khoảng thở.</small>
-                    <small class="text-white-50">Made for a smoother booking journey.</small>
+                <hr class="border-secondary my-4" />
+                <div class="text-center text-white-50 small">
+                    &copy; 2026 SpaN5 - Luxury Spa Experience. Dedicated to your wellness.
                 </div>
             </div>
         </footer>
 
-        <button id="backToTop" class="btn btn-gold back-to-top shadow" type="button" aria-label="Back to top">
-            <i class="fa-solid fa-arrow-up"></i>
-        </button>
+        <button id="backToTop" class="btn btn-gold shadow-lg"><i class="fa-solid fa-arrow-up"></i></button>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     <script>
-        window.addEventListener('load', function () {
-            const preloader = document.getElementById('spa-preloader');
-            if (preloader) {
-                preloader.style.transition = 'opacity 0.45s ease, visibility 0.45s ease';
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
-                setTimeout(() => preloader.remove(), 500);
-            }
+        $(window).on('load', function() {
+            $('#spa-preloader').fadeOut('slow', function() { $(this).remove(); });
+            if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true }); }
         });
 
-        (function () {
-            const nav = document.querySelector('.spa-navbar');
-            const backToTop = document.getElementById('backToTop');
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 300) { $('#backToTop').addClass('show'); }
+            else { $('#backToTop').removeClass('show'); }
+        });
 
-            const toggleScrollState = () => {
-                const scrolled = window.scrollY > 18;
-                if (nav) nav.parentElement.classList.toggle('navbar-scrolled', scrolled);
-                if (backToTop) backToTop.classList.toggle('show', window.scrollY > 500);
-            };
-
-            window.addEventListener('scroll', toggleScrollState, { passive: true });
-            toggleScrollState();
-
-            if (backToTop) {
-                backToTop.addEventListener('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-        })();
+        $('#backToTop').click(function() {
+            $('html, body').animate({scrollTop: 0}, 600);
+            return false;
+        });
     </script>
+    
+    <!-- Google Translate Script -->
+    <div id="google_translate_element" style="display:none;"></div>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({pageLanguage: 'vi', autoDisplay: false}, 'google_translate_element');
+        }
+        
+        function changeGTranslateLang(langCode) {
+            document.cookie = "googtrans=/vi/" + langCode + "; path=/; domain=" + window.location.hostname;
+            document.cookie = "googtrans=/vi/" + langCode + "; path=/;";
+            location.reload();
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

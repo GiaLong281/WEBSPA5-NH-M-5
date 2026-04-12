@@ -17,5 +17,11 @@ namespace SpaN5.Models
         public Staff? Staff { get; set; }
 
         public decimal PriceAtTime { get; set; }
+        public int? RoomNumber { get; set; }
+
+        public DetailStatus Status { get; set; } = DetailStatus.Pending;
+        
+        [StringLength(1000)]
+        public string? TechnicianNote { get; set; }
     }
 }

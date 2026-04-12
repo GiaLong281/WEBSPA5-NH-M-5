@@ -7,17 +7,15 @@ namespace SpaN5.Models.ViewModels
     {
         public int? ServiceId { get; set; }
 
-        [Required(ErrorMessage = "Vui lòng chọn dịch vụ")]
         public int SelectedServiceId { get; set; }
 
-        // Mới: hỗ trợ chọn nhiều dịch vụ
         public List<int> SelectedServiceIds { get; set; } = new List<int>();
 
-        [Required(ErrorMessage = "Vui lòng chọn chi nhánh")]
         public int BranchId { get; set; }
 
         public int? StaffId { get; set; }
         public bool AutoAssignStaff { get; set; } = true;
+        public int? RoomNumber { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn ngày")]
         [DataType(DataType.Date)]
@@ -45,9 +43,8 @@ namespace SpaN5.Models.ViewModels
         [Required(ErrorMessage = "Vui lòng nhập họ tên")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Vui lòng nhập email")]
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]

@@ -1,55 +1,60 @@
-// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+// SpaN5 Luxury JS Logic
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Preloader Logic
+    // 1. Preloader Logic
     const preloader = document.getElementById('spa-preloader');
     if (preloader) {
         window.addEventListener('load', function () {
             setTimeout(function() {
-                preloader.style.transition = 'opacity 0.5s ease';
                 preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
                 setTimeout(() => {
                     preloader.style.display = 'none';
-                    // Ensure no pointer events after hiding
-                    preloader.style.pointerEvents = 'none';
                 }, 500);
-            }, 800); // Đợi 800ms để người dùng thấy logo
+            }, 600); 
         });
     }
 
+    // 2. Navbar Scroll Logic
     const navbar = document.querySelector('.spa-navbar');
-    
-    // Add scroll effect for navbar
-    window.addEventListener('scroll', function () {
-        if (window.scrollY > 50) {
-            navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)";
-            navbar.style.padding = "10px 0";
-        } else {
-            navbar.style.boxShadow = "none";
-            navbar.style.padding = "15px 0";
-        }
-    });
+    if (navbar) {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        };
 
-    // Lazy load images
-    document.querySelectorAll('img[data-src]').forEach(img => {
-        img.setAttribute('src', img.getAttribute('data-src'));
-        img.onload = () => img.removeAttribute('data-src');
-    });
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial check
+    }
 
-    // Fade-in sections when scroll
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+    // 3. Smooth Scrolling for Anchor Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === "#") return;
+            
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                const navHeight = 80;
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
             }
         });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.section-fade').forEach(section => {
-        observer.observe(section);
     });
+
+    // 4. AOS Initialization (if available)
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+    }
 });

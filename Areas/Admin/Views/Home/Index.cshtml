@@ -1,0 +1,345 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Trung tâm điều khiển";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    var upcomingBookings = ViewBag.UpcomingBookings as List<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
+    var staffWorkflows = ViewBag.StaffWorkflows as List<SpaN5.Areas.Admin.Controllers.StaffWorkflowInfo> ?? new List<SpaN5.Areas.Admin.Controllers.StaffWorkflowInfo>();
+    var activeDetails = ViewBag.ActiveDetails as List<SpaN5.Models.BookingDetail> ?? new List<SpaN5.Models.BookingDetail>();
+    
+    decimal todayRevenue = ViewBag.TodayRevenue ?? 0;
+    int activeCount = ViewBag.ActiveServicesCount ?? 0;
+    int waitingCount = ViewBag.WaitingCount ?? 0;
+    var today = DateTime.Today;
+}
+
+<style>
+    /* Metric Cards */
+    .metric-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s ease;
+        border: 1px solid transparent;
+        height: 100%;
+    }
+    .metric-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+    
+    .m-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: var(--admin-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-right: 1.2rem;
+        color: var(--primary-blue);
+    }
+    
+    .m-info .m-label { color: var(--secondary-blue); font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+    .m-info .m-value { color: var(--text-main); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* Section Styling */
+    .dashboard-section { margin-top: 2rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+    .section-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0; }
+    
+    .glass-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+    }
+
+    /* Alerts */
+    .alert-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        background: var(--admin-bg);
+        border-left: 4px solid var(--primary-blue);
+    }
+    .alert-item.warning { border-left-color: #FFB800; }
+    .alert-item.danger { border-left-color: #FF5B5B; }
+    .alert-icon { font-size: 1.2rem; margin-right: 12px; }
+    .alert-text { font-size: 0.85rem; font-weight: 600; }
+
+    /* Tables */
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .admin-table th { 
+        padding: 16px 12px; 
+        color: var(--secondary-blue); 
+        font-size: 0.75rem; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        border-bottom: 2px solid var(--accent-blue);
+        text-align: left;
+    }
+    .admin-table td { 
+        padding: 16px 12px; 
+        font-size: 0.9rem; 
+        border-bottom: 1px solid var(--accent-blue); 
+        vertical-align: middle; 
+    }
+    
+    .status-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .status-pill.success { background: #E6F6ED; color: #00B050; }
+    .status-pill.primary { background: #E9EDF7; color: #4318FF; }
+    .status-pill.warning { background: #FFF8E6; color: #FFB800; }
+
+    /* Room Grid */
+    .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+    .room-item {
+        background: var(--white);
+        border: 2px solid var(--accent-blue);
+        border-radius: 18px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        cursor: pointer;
+    }
+    .room-item.occupied {
+        border-color: #FF5B5B;
+        background: #FFF5F5;
+    }
+    .room-item.occupied .room-icon { color: #FF5B5B; }
+    .room-item.available {
+        border-color: #00B050;
+        background: #F6FFF9;
+    }
+    .room-item.available .room-icon { color: #00B050; }
+    
+    .room-icon { font-size: 24px; margin-bottom: 8px; }
+    .room-number { font-weight: 800; font-size: 1.1rem; display: block; }
+    .room-status { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .room-client { font-size: 0.75rem; font-weight: 600; margin-top: 5px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .btn-action {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
+        transition: all 0.2s;
+    }
+    .btn-action:hover { background: #3311CC; transform: translateY(-2px); color: white; }
+</style>
+
+<!-- Welcome Row --><div class="row align-items-center mb-4"><div class="col"><h2 class="fw-bold mb-1" style="letter-spacing: -1px;">Xin chào, @(User.Identity.Name)!</h2><p class="text-muted small">Cập nhật lúc @DateTime.Now.ToString("HH:mm") - @DateTime.Now.ToString("dd/MM/yyyy")</p></div><div class="col-auto"><button class="btn btn-action" onclick="window.location.href='/Booking'"><i class="fa-solid fa-plus me-2"></i> Tạo Booking mới</button></div></div>
+
+<!-- Metrics Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #E7E9FF; color: var(--primary-blue);"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div class="m-info">
+                <div class="m-label">Doanh thu hôm nay</div>
+                <div class="m-value">@todayRevenue.ToString("N0")đ</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #E6F6ED; color: #00B050;"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="m-info">
+                <div class="m-label">Booking hoàn tất</div>
+                <div class="m-value">@upcomingBookings.Count(b => b.Status == SpaN5.Models.BookingStatus.Completed)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #FFF8E6; color: #FFB800;"><i class="fa-solid fa-users"></i></div>
+            <div class="m-info">
+                <div class="m-label">Khách đang đợi</div>
+                <div class="m-value">@waitingCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #FEEEEE; color: #FF5B5B;"><i class="fa-solid fa-spa"></i></div>
+            <div class="m-info">
+                <div class="m-label">Dịch vụ đang chạy</div>
+                <div class="m-value">@activeCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Operations & Analysis -->
+    <div class="col-lg-8">
+        <div class="glass-card h-100">
+            <div class="section-header">
+                <h3>Phân tích doanh thu & Booking</h3>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="dropdown">7 ngày qua <i class="fa-solid fa-chevron-down ms-1"></i></button>
+                    <ul class="dropdown-menu border-0 shadow mt-2">
+                        <li><a class="dropdown-item" href="#">30 ngày qua</a></li>
+                        <li><a class="dropdown-item" href="#">Tháng này</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="height: 300px; position: relative;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Smart Alerts & Staff -->
+    <div class="col-lg-4">
+        <div class="glass-card">
+            <div class="section-header">
+                <h3>Cảnh báo thông minh</h3>
+                <span class="badge bg-danger rounded-pill">03</span>
+            </div>
+            <div class="alert-list">
+                @if (waitingCount > 3) {
+                    <div class="alert-item danger">
+                        <i class="fa-solid fa-triangle-exclamation alert-icon text-danger"></i>
+                        <div class="alert-text">Khách đang đợi quá đông (@waitingCount khách). Cần thêm nhân sự hỗ trợ.</div>
+                    </div>
+                }
+                <div class="alert-item warning">
+                    <i class="fa-solid fa-clock alert-icon text-warning"></i>
+                    <div class="alert-text">Phòng VIP 02 đang trống hơn 2 giờ trong khung giờ vàng.</div>
+                </div>
+                <div class="alert-item">
+                    <i class="fa-solid fa-circle-info alert-icon text-primary"></i>
+                    <div class="alert-text">Kho nguyên vật liệu: Tinh dầu Sả chanh sắp hết (Tồn: 200ml).</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card mt-4">
+            <div class="section-header">
+                <h3>Đội ngũ kỹ thuật viên</h3>
+                <a href="#" class="small fw-bold text-decoration-none" style="color: var(--primary-blue);">Tất cả</a>
+            </div>
+            <div class="staff-list">
+                @foreach (var wf in staffWorkflows.Take(5)) {
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://ui-avatars.com/api/?name=@wf.Staff.FullName&background=random" class="rounded-pill me-3" width="36" />
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small">@wf.Staff.FullName</div>
+                            <div class="text-muted smaller" style="font-size: 0.7rem;">@wf.Staff.Specialization?.ServiceName</div>
+                        </div>
+                        <div class="status-pill @(wf.Staff.Status != "active" ? "secondary" : (wf.IsBusy ? "warning" : "success")) small" style="font-size: 0.6rem;">
+                            @if (wf.Staff.Status != "active") {
+                                <span>NGHỈ</span>
+                            } else {
+                                @(wf.IsBusy ? "ĐANG BẬN" : "SẴN SÀNG")
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-section mb-5">
+    <div class="glass-card">
+        <div class="section-header">
+            <h3>Hoạt động Booking gần đây</h3>
+            <a href="/Admin/Home/Bookings" class="btn btn-light btn-sm rounded-pill px-3 fw-bold border-0" style="background: var(--accent-blue); color: var(--primary-blue);">Xem tất cả</a>
+        </div>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Khách hàng</th>
+                        <th>Dịch vụ</th>
+                        <th>Thời gian</th>
+                        <th>Trạng thái</th>
+                        <th>Thanh toán</th>
+                        <th class="text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bk in Model.Take(6)) {
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@bk.Customer?.FullName</div>
+                                <div class="text-muted smaller" style="font-size: 0.75rem;">@bk.BookingCode</div>
+                            </td>
+                            <td><span class="fw-600">@bk.BookingDetails.FirstOrDefault()?.Service?.ServiceName</span></td>
+                            <td>
+                                <div class="fw-bold">@bk.StartTime.ToString("HH:mm")</div>
+                                <div class="text-muted smaller" style="font-size: 0.75rem;">@bk.BookingDate.ToString("dd/MM")</div>
+                            </td>
+                            <td>
+                                <span class="status-pill @(bk.Status == SpaN5.Models.BookingStatus.Completed ? "success" : (bk.Status == SpaN5.Models.BookingStatus.InProgress ? "primary" : "warning"))">
+                                    @bk.Status.ToString().ToUpper()
+                                </span>
+                            </td>
+                            <td class="fw-bold">@bk.TotalAmount.ToString("N0")đ</td>
+                            <td class="text-end">
+                                <button class="btn btn-light btn-sm rounded-circle shadow-none border-0" style="width: 32px; height: 32px;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Revenue Chart Implementation
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7', 'CN'],
+                datasets: [{
+                    label: 'Doanh thu (triệu VNĐ)',
+                    data: [12, 19, 15, 25, 22, 30, 28],
+                    borderColor: '#4318FF',
+                    backgroundColor: 'rgba(67, 24, 255, 0.05)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#4318FF',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { weight: 'bold' }, color: '#A3AED0' } },
+                    y: { grid: { borderDash: [5, 5], color: '#E9EDF7' }, ticks: { font: { weight: 'bold' }, color: '#A3AED0' } }
+                }
+            }
+        });
+    </script>
+}
