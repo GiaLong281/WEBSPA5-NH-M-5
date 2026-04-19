@@ -34,23 +34,34 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="font-playfair text-gold mb-1">Chi tiết lịch hẹn (Admin)</h1>
-            <p class="text-muted">Mã đơn: <span class="fw-bold text-dark">@Model.BookingCode</span></p>
+            <p class="text-muted small">Quản lý và điều phối dịch vụ khách hàng</p>
         </div>
-        <a asp-action="ManageBookings" class="btn btn-outline-gold rounded-pill">
-            <i class="fas fa-arrow-left me-2"></i> Quay lại danh sách
-        </a>
+        <div class="d-flex gap-2">
+            <a href="/Admin/Home/Index" class="btn btn-dark rounded-pill px-4 fw-bold">
+                <i class="fas fa-desktop me-2"></i> Về Lễ Tân
+            </a>
+            <a asp-action="ManageBookings" class="btn btn-outline-gold rounded-pill px-4">
+                <i class="fas fa-list me-2"></i> Danh sách
+            </a>
+        </div>
     </div>
 
     <div class="row g-4">
         <div class="col-lg-8">
             <!-- Thông tin chính -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
                 <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="fw-bold m-0"><i class="fas fa-info-circle text-gold me-2"></i> Thông tin tổng quan</h5>
-                        <span class="badge @statusBadge rounded-pill px-3 py-2">@statusText</span>
+                        <div class="d-flex gap-2 align-items-center">
+                             <button type="button" class="btn btn-sm btn-gold rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                                <i class="fas fa-plus me-1"></i> Thêm dịch vụ
+                            </button>
+                            <span class="badge @statusBadge rounded-pill px-3 py-2">@statusText</span>
+                        </div>
                     </div>
                 </div>
+                <!-- card-body contents... -->
                 <div class="card-body p-4">
                     <div class="row g-4">
                         <div class="col-md-6 text-break">
@@ -67,41 +78,17 @@
                             </div>
                         </div>
                         <div class="col-md-6 text-break">
-                            <label class="text-muted small text-uppercase fw-bold mb-2">Dịch vụ & Nhân viên</label>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-soft p-2 rounded-circle me-3">
-                                    <i class="fas fa-spa text-gold"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-0 fw-bold">@(service?.ServiceName ?? "N/A")</h6>
-                                    <div class="small text-muted mt-1 d-flex align-items-center gap-2">
-                                        Bởi:
-                                        @if (staff != null)
-                                        {
-                                            <span class="text-dark fw-bold">@staff.FullName</span>
-                                            @if (Model.Status == BookingStatus.Pending || Model.Status == BookingStatus.Confirmed || Model.Status == BookingStatus.InProgress)
-                                            {
-                                                <button type="button" class="btn btn-sm btn-link text-gold p-0 ms-2" data-bs-toggle="modal" data-bs-target="#assignStaffModal">
-                                                    <i class="fas fa-edit"></i> Đổi
-                                                </button>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            @if (Model.Status == BookingStatus.Pending || Model.Status == BookingStatus.Confirmed || Model.Status == BookingStatus.InProgress)
-                                            {
-                                                <button type="button" class="btn btn-sm btn-outline-gold rounded-pill px-2 py-0" data-bs-toggle="modal" data-bs-target="#assignStaffModal">
-                                                    Chưa phân công <i class="fas fa-plus ms-1"></i>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">Chưa phân công</span>
-                                            }
-                                        }
+                            <label class="text-muted small text-uppercase fw-bold mb-2">Trạng thái phục vụ</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach(var detail in Model.BookingDetails) {
+                                    <div class="badge bg-light text-dark border p-2 text-start d-flex align-items-center gap-2" style="min-width: 150px;">
+                                        <i class="fas fa-spa text-gold"></i>
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 0.75rem;">@detail.Service?.ServiceName</div>
+                                            <div class="smaller text-muted">@detail.Status</div>
+                                        </div>
                                     </div>
-                                    <div class="small text-muted mt-1">Thời lượng: @(service?.Duration ?? 0) phút</div>
-                                </div>
+                                }
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -138,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- Thanh toán Details -->
+            <!-- Thanh toán Details (same as before) -->
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
                     <h5 class="fw-bold m-0"><i class="fas fa-credit-card text-gold me-2"></i> Lịch sử thanh toán</h5>
@@ -184,7 +171,7 @@
         </div>
 
         <div class="col-lg-4">
-            <!-- Timeline Trạng thái -->
+            <!-- Timeline (same as before) -->
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
                     <h5 class="fw-bold"><i class="fas fa-history text-gold me-2"></i> Lịch sử trạng thái</h5>
@@ -258,9 +245,6 @@
                         <button class="btn btn-outline-secondary rounded-pill" onclick="window.print()">
                             <i class="fas fa-print me-2"></i> In hóa đơn/Phiếu hẹn
                         </button>
-                        <button class="btn btn-soft-danger rounded-pill mt-2">
-                             Liên hệ khách hàng
-                        </button>
                     </div>
                 </div>
             </div>
@@ -269,6 +253,47 @@
 </div>
 
 <!-- Modals -->
+<div class="modal fade" id="addServiceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Thêm dịch vụ cho khách</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-4">Chọn thêm dịch vụ để cập nhật vào đơn lịch hiện tại của @customer?.FullName</p>
+                <div class="row g-3">
+                    @if (ViewBag.AllServices != null)
+                    {
+                        foreach (var s in (IEnumerable<Service>)ViewBag.AllServices)
+                        {
+                            <div class="col-md-6">
+                                <div class="card border rounded-3 p-3 h-100 shadow-sm hover-elevate">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="fw-bold mb-1">@s.ServiceName</h6>
+                                            <div class="text-gold fw-bold">@s.Price.ToString("N0") ₫</div>
+                                            <div class="small text-muted">@s.Duration phút</div>
+                                        </div>
+                                        <form asp-action="AddServiceToBooking" method="post">
+                                            <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                            <input type="hidden" name="serviceId" value="@s.ServiceId" />
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-gold rounded-pill">
+                                                Chọn <i class="fas fa-plus ms-1"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="assignStaffModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content border-0 rounded-4 shadow">
@@ -305,6 +330,7 @@
 </div>
 
 <div class="modal fade" id="rescheduleModal" tabindex="-1">
+    <!-- rescheduleModal body... -->
     <div class="modal-dialog">
         <div class="modal-content border-0 rounded-4 shadow">
             <div class="modal-header border-0 pb-0">
@@ -353,6 +379,14 @@
         z-index: 1;
     }
     .timeline-marker.bg-success { box-shadow: 0 0 0 2px #dcfce7; }
+    .timeline-marker.bg-warning { box-shadow: 0 0 0 2px #fef9c3; }
+    .timeline-marker.bg-danger { box-shadow: 0 0 0 2px #fee2e2; }
+    .timeline-marker.bg-primary { box-shadow: 0 0 0 2px #dbeafe; }
+
+    .hover-elevate { transition: all 0.3s ease; }
+    .hover-elevate:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+</style>
+eline-marker.bg-success { box-shadow: 0 0 0 2px #dcfce7; }
     .timeline-marker.bg-warning { box-shadow: 0 0 0 2px #fef9c3; }
     .timeline-marker.bg-danger { box-shadow: 0 0 0 2px #fee2e2; }
     .timeline-marker.bg-primary { box-shadow: 0 0 0 2px #dbeafe; }

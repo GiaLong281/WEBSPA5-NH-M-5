@@ -195,10 +195,6 @@
                     inputsContainer.append(`<input type="hidden" name="SelectedServiceIds[${idx}]" value="${sv.id}" />`);
                 });
 
-                selectedServices.forEach(function (sv, idx) {
-                    inputsContainer.append(`<input type="hidden" name="SelectedServiceIds[${idx}]" value="${sv.id}" />`);
-                });
-
                 $('#SelectedServiceIdsCombined').val(selectedServices.map(function (s) { return s.id; }).join(','));
                 loadTimeSlots();
             }

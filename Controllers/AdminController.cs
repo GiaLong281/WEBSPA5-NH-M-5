@@ -19,7 +19,7 @@ using System.Linq;
 namespace SpaN5.Controllers
 {
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Receptionist,Staff")]
     public class AdminController : Controller
     {
         private readonly SpaDbContext _context;
@@ -696,7 +696,39 @@ public async Task<IActionResult> GetQuansByThanhPho(int maThanhPho)
                     .ToListAsync();
             }
 
+            ViewBag.AllServices = await _context.Services.Where(s => s.IsActive).ToListAsync();
+
             return View(booking);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddServiceToBooking(int bookingId, int serviceId)
+        {
+            var booking = await _context.Bookings.Include(b => b.BookingDetails).FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            var service = await _context.Services.FindAsync(serviceId);
+
+            if (booking == null || service == null) return NotFound();
+
+            var newDetail = new BookingDetail
+            {
+                BookingId = bookingId,
+                ServiceId = serviceId,
+                PriceAtTime = service.Price,
+                Status = DetailStatus.Pending,
+                // Automatically assign room/staff in a real scenario, but for now just add the detail
+            };
+
+            booking.BookingDetails.Add(newDetail);
+            booking.TotalAmount += service.Price;
+
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
+
+            await _audit.LogAsync("Update", "Booking", bookingId.ToString(), "Added service " + service.ServiceName, JsonSerializer.Serialize(booking));
+
+            TempData["SuccessMessage"] = $"Đã thêm dịch vụ {service.ServiceName} vào đơn lịch.";
+            return RedirectToAction(nameof(BookingDetails), new { id = bookingId });
         }
 
         [HttpPost]

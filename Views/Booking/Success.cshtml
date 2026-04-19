@@ -223,9 +223,12 @@
                 <a href="@Url.Action("Details", "Booking", new { bookingCode = Model.BookingCode })" class="btn btn-ticket btn-dark-main">
                     Chi tiết & Hủy
                 </a>
-                <a href="/Booking" class="btn btn-ticket btn-gold-sub">
-                    Đặt thêm lịch
-                </a>
+                @if (User.IsInRole("Admin") || User.IsInRole("Receptionist"))
+                {
+                    <a href="/Admin/Home/Index" class="btn btn-ticket btn-gold-sub" style="background: var(--p-navy); border: 2px solid var(--p-gold);">
+                        <i class="fas fa-desktop me-2"></i> Về Trang Lễ Tân
+                    </a>
+                }
             </div>
         </div>
         

@@ -318,7 +318,7 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="/Booking/CustomerList" class="nav-link">
                             <i class="fa-solid fa-users"></i> Khách hàng (Admin)
                         </a>
                     </div>
@@ -327,7 +327,7 @@
                 {
                     <div class="menu-label">Khách hàng</div>
                     <div class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="/Booking/CustomerList" class="nav-link">
                             <i class="fa-solid fa-users"></i> Danh sách khách
                         </a>
                     </div>
@@ -335,7 +335,7 @@
 
                 <div class="menu-label">Vận hành</div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="/Admin/ManageServices" class="nav-link">
                         <i class="fa-solid fa-spa"></i> Dịch vụ
                     </a>
                 </div>
@@ -352,13 +352,13 @@
 
                 <div class="menu-label">Hậu cần & Tài chính</div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="/Admin/ManageMaterials" class="nav-link">
                         <i class="fa-solid fa-boxes-stacked"></i> Kho nguyên liệu
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-file-invoice-dollar"></i> Hóa đơn & Thu chi
+                    <a href="/Admin/Home/Payments" class="nav-link @(Context.Request.Path == "/Admin/Home/Payments" ? "active" : "")">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Lịch sử Thanh toán
                     </a>
                 </div>
 
@@ -426,6 +426,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
         $(document).ready(function() {

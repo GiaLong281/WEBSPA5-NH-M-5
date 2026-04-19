@@ -107,19 +107,24 @@
             <div class="col-md-4">
                 <div class="form-group mb-3">
                     <label class="form-label">Hình ảnh hiện tại</label>
-                    @if (!string.IsNullOrEmpty(Model.Image))
-                    {
-                        <div class="card mb-3">
-                            <div class="card-body text-center">
-                                <img src="/images/@Model.Image" alt="Current image" style="max-width: 100%; max-height: 200px; object-fit: cover;" class="rounded border" />
+                    <div class="card mb-3">
+                        <div class="card-body text-center">
+                            @{
+                                var imageUrl = (Model.Image != null && Model.Image.StartsWith("http")) 
+                                    ? Model.Image 
+                                    : (!string.IsNullOrEmpty(Model.Image) ? "/images/" + Model.Image : null);
+                            }
+                            @if (imageUrl != null)
+                            {
+                                <img src="@imageUrl" alt="Current image" style="max-width: 100%; max-height: 200px; object-fit: cover;" class="rounded border" />
                                 <p class="text-muted mt-2 small">Tên file: @Model.Image</p>
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">Chưa có hình ảnh</div>
+                            }
                         </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">Chưa có hình ảnh</div>
-                    }
+                    </div>
                     
                     <label class="form-label mt-2">Cập nhật hình ảnh mới</label>
                     <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" onchange="previewImage(this)" />

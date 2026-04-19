@@ -4,6 +4,7 @@ namespace SpaN5.Models
     {
         Pending,
         Confirmed,
+        Accepted,
         InProgress,
         Completed,
         Cancelled
@@ -28,6 +29,7 @@ namespace SpaN5.Models
     {
         Pending,
         InProgress,
-        Completed
+        Completed,
+        Cancelled
     }
 }

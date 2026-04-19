@@ -15,6 +15,33 @@
             <div class="card">
                 <div class="card-header bg-gold text-white">Thông tin tài khoản</div>
                 <div class="card-body">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Receptionist"))
+                    {
+                        <div class="alert alert-info border-0 rounded-4 d-flex align-items-center justify-content-between mb-4" style="background: var(--admin-bg);">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-user-shield fs-4 me-3 text-primary"></i>
+                                <div>
+                                    <div class="fw-bold text-dark">Quyền truy cập Quản lý</div>
+                                    <div class="small text-muted">Bạn có quyền truy cập vào hệ thống điều phối Spa.</div>
+                                </div>
+                            </div>
+                            <a href="/Admin/Home/Index" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Bảng điều khiển <i class="fa-solid fa-arrow-right ms-2"></i></a>
+                        </div>
+                    }
+                    else if (User.IsInRole("Staff"))
+                    {
+                        <div class="alert alert-info border-0 rounded-4 d-flex align-items-center justify-content-between mb-4" style="background: #f0fdf4;">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-briefcase fs-4 me-3 text-success"></i>
+                                <div>
+                                    <div class="fw-bold text-dark">Cổng nhân viên</div>
+                                    <div class="small text-muted">Vào xem lịch làm việc và dịch vụ được phân công.</div>
+                                </div>
+                            </div>
+                            <a href="/Staff/Home/Index" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">Vào làm việc <i class="fa-solid fa-arrow-right ms-2"></i></a>
+                        </div>
+                    }
+
                     <form asp-action="Profile" method="post">
                         <input asp-for="Id" type="hidden" />
                         <div class="mb-3">

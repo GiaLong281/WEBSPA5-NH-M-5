@@ -10,6 +10,11 @@
 }
 
 <style>
+    :root {
+        --team-primary: @(ViewBag.TeamInfo?.Color ?? "#0ea5e9");
+        --team-primary-light: @(ViewBag.TeamInfo?.Color + "15" ?? "#e0f2fe");
+    }
+
     /* Headers */
     .date-header { font-size: 0.75rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
     .page-main-title { font-size: 1.8rem; font-weight: 700; color: var(--serene-navy); letter-spacing: -0.5px; margin: 0;}
@@ -28,26 +33,27 @@
 
     .timeline-card { 
         background: white; border: 1px solid var(--serene-border); border-radius: 12px; padding: 16px; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02); flex: 1; transition: all 0.2s; cursor: pointer; text-decoration: none; display: block; color: inherit;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02); flex: 1; transition: all 0.2s; color: inherit;
     }
     .timeline-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
 
     /* Active State Timeline */
-    .timeline-item.active .timeline-node { border-color: var(--serene-blue); background: white; box-shadow: 0 0 0 4px #e0f2fe; }
-    .timeline-item.active .timeline-card { border: 2px solid var(--serene-blue); background: #f8fafc; box-shadow: 0 8px 16px rgba(14, 165, 233, 0.1); }
+    .timeline-item.active .timeline-node { border-color: var(--team-primary); background: white; box-shadow: 0 0 0 4px var(--team-primary-light); }
+    .timeline-item.active .timeline-card { border: 2px solid var(--team-primary); background: #f8fafc; box-shadow: 0 8px 16px rgba(14, 165, 233, 0.1); }
     
     .t-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .t-time { font-size: 0.8rem; font-weight: 600; color: #94a3b8; }
     .t-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
     .t-badge.done { background: #f1f5f9; color: #64748b; }
     .t-badge.doing { background: #dbeafe; color: var(--serene-blue-strong); }
+    .t-badge.accepted { background: #e0e7ff; color: #4338ca; }
     .t-badge.upcoming { background: #fef3c7; color: #d97706; }
 
     .t-customer { font-size: 1.1rem; font-weight: 700; color: var(--serene-navy); margin-bottom: 6px; }
     .t-detail { font-size: 0.8rem; color: #64748b; display: flex; align-items: center; gap: 12px; }
     
     /* Right Pane Stats */
-    .eff-card { background: var(--serene-blue-strong); color: white; border-radius: 16px; padding: 20px; box-shadow: 0 10px 20px rgba(2, 132, 199, 0.2); margin-bottom: 20px;}
+    .eff-card { background: var(--team-primary); color: white; border-radius: 16px; padding: 20px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); margin-bottom: 20px;}
     .eff-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; opacity: 0.9;}
     .eff-val { font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 15px;}
     .eff-progress { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin-bottom: 15px; position: relative; overflow: hidden;}
@@ -75,8 +81,33 @@
     .small-info-card .val { font-size: 1.1rem; font-weight: 700; color: var(--serene-navy); }
 
     .fab-btn {
-        width: 50px; height: 50px; border-radius: 50%; background: var(--serene-blue-strong); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-        border: none; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); margin-top: 20px; margin-left: auto; cursor: pointer;
+        width: 50px; height: 50px; border-radius: 50%; background: var(--team-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); cursor: pointer;
+    }
+
+    /* Calendar Grid for Month View */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .cal-header { background: #f8fafc; padding: 10px; text-align: center; font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .cal-day { background: white; min-height: 100px; padding: 10px; transition: 0.2s; }
+    .cal-day:hover { background: #f1f5f9; }
+    .cal-day.today { background: #f0f9ff; }
+    .cal-day.today .cal-num { background: var(--team-primary); color: white; }
+    .cal-num { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 5px; }
+    .cal-event { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: var(--team-primary-light); color: var(--team-primary); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+    
+    /* Leave Bar Styling (Rule 2) */
+    .cal-leave { 
+        font-size: 0.65rem; padding: 4px 8px; background: #fff1f2; color: #e11d48; 
+        border-left: 3px solid #e11d48; margin-bottom: 2px; font-weight: 700; 
+        border-radius: 4px; text-transform: uppercase;
+        display: flex; align-items: center; gap: 4px;
+    }
+    .cal-leave i { font-size: 0.75rem; }
+    
+    .timeline-leave-alert {
+        background: #fff1f2; border: 1px dashed #fda4af; border-radius: 12px;
+        padding: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;
+        color: #e11d48;
     }
 </style>
 
@@ -85,32 +116,90 @@
     <div class="col-lg-7 col-xl-8">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
-                <div class="date-header">Hôm nay, @DateTime.Now.ToString("dd 'tháng' MM")</div>
-                <h1 class="page-main-title">Lịch trình cá nhân</h1>
+                <div class="date-header">Hôm nay, @DateTime.Now.ToString("dd 'tháng' MM") • <span style="color: var(--team-primary)">@ViewBag.TeamInfo?.Name</span></div>
+                <h1 class="page-main-title"><i class="bi @ViewBag.TeamInfo?.Icon me-2" style="color: var(--team-primary)"></i>Lịch trình cá nhân</h1>
             </div>
             <div class="toggle-group">
-                <button class="toggle-btn active">Ngày</button>
-                <button class="toggle-btn">Tuần</button>
+                <a href="@Url.Action("Index", new { view = "day" })" class="toggle-btn @(ViewBag.CurrentView == "day" ? "active" : "")">Ngày</a>
+                <a href="@Url.Action("Index", new { view = "week" })" class="toggle-btn @(ViewBag.CurrentView == "week" ? "active" : "")">Tuần</a>
+                <a href="@Url.Action("Index", new { view = "month" })" class="toggle-btn @(ViewBag.CurrentView == "month" ? "active" : "")">Tháng</a>
             </div>
         </div>
 
-        <div class="timeline">
-            @if(!Model.Any()) {
-                <div class="text-muted p-4 text-center">Hôm nay chưa có lịch hẹn nào.</div>
+        @if (ViewBag.CurrentView == "month") {
+            <!-- Giao diện Tháng (Lược dịch Calendar) -->
+            <div class="calendar-grid">
+                @foreach (var day in new[] { "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "CN" }) {
+                    <div class="cal-header">@day</div>
+                }
+                
+                @{
+                    var firstDayOfMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                    int offset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
+                    int daysInMonth = DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
+                }
+
+                @for (int i = 0; i < offset; i++) {
+                    <div class="cal-day bg-light opacity-50"></div>
+                }
+
+                @for (int d = 1; d <= daysInMonth; d++) {
+                    var currentDt = new DateTime(DateTime.Today.Year, DateTime.Today.Month, d);
+                    var dayBookings = Model.Where(b => b.BookingDate.Date == currentDt.Date).ToList();
+                    
+                    // Kiểm tra xem ngày này nhân viên có đang nghỉ phép (đã duyệt) không
+                    var approvedLeaves = ViewBag.ApprovedLeaves as List<LeaveRequest> ?? new List<LeaveRequest>();
+                    var currentLeave = approvedLeaves.FirstOrDefault(l => currentDt.Date >= l.FromDate.Date && currentDt.Date <= l.ToDate.Date);
+                    
+                    <div class="cal-day @(currentDt == DateTime.Today ? "today" : "")">
+                        <div class="cal-num">@d</div>
+                        
+                        @if (currentLeave != null)
+                        {
+                            <div class="cal-leave" title="Lý do: @currentLeave.Reason">
+                                <i class="bi bi-calendar-x-fill"></i> NGHỈ PHÉP
+                            </div>
+                        }
+
+                        @foreach(var b in dayBookings) {
+                            <div class="cal-event" onclick="window.scrollTo(0, 0); alert('Nhấn sang chế độ Ngày để thao tác ca này')">@b.StartTime.ToString("HH:mm") @b.Customer?.FullName</div>
+                        }
+                    </div>
+                }
+            </div>
+        } else {
+            var approvedLeavesDay = ViewBag.ApprovedLeaves as List<LeaveRequest> ?? new List<LeaveRequest>();
+            var todayLeave = approvedLeavesDay.FirstOrDefault(l => DateTime.Today >= l.FromDate.Date && DateTime.Today <= l.ToDate.Date);
+
+            if (todayLeave != null && ViewBag.CurrentView == "day")
+            {
+                <div class="timeline-leave-alert">
+                    <div class="fs-2"><i class="bi bi-info-circle-fill"></i></div>
+                    <div>
+                        <div class="fw-bold fs-5">HÔM NAY BẠN ĐANG NGHỈ PHÉP</div>
+                        <div class="small opacity-75">Từ @todayLeave.FromDate.ToString("dd/MM") đến @todayLeave.ToDate.ToString("dd/MM") - Lý do: @todayLeave.Reason</div>
+                    </div>
+                </div>
             }
+            
+            <!-- Giao diện Ngày/Tuần (Timeline) -->
+            <div class="timeline">
+                @if(!Model.Any()) {
+                    <div class="text-muted p-4 text-center">Không có lịch hẹn nào trong khoảng thời gian này.</div>
+                }
             @foreach(var b in Model) {
+                bool isAccepted = b.Status == SpaN5.Models.BookingStatus.Accepted;
                 bool isDoing = b.Status == SpaN5.Models.BookingStatus.InProgress;
                 bool isDone = b.Status == SpaN5.Models.BookingStatus.Completed;
                 var bd = b.BookingDetails.FirstOrDefault();
                 
-                string badgeClass = isDone ? "done" : (isDoing ? "doing" : "upcoming");
-                string badgeText = isDone ? "ĐÃ HOÀN THÀNH" : (isDoing ? "ĐANG DIỄN RA" : "SẮP TỚI");
-                string url = isDoing ? $"/Staff/Home/ProcessBooking/{b.BookingId}" : "javascript:void(0)";
+                string badgeClass = isDone ? "done" : (isDoing ? "doing" : (isAccepted ? "accepted" : "upcoming"));
+                string badgeText = isDone ? "ĐÃ HOÀN THÀNH" : (isDoing ? "ĐANG DIỄN RA" : (isAccepted ? "ĐÃ NHẬN LỊCH" : "SẮP TỚI"));
 
                 <div class="timeline-item @(isDoing ? "active" : "")">
                     <div class="timeline-node"></div>
-                    <a href="@url" class="timeline-card">
-                        <div class="d-flex justify-content-between">
+                    <div class="timeline-card shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <div class="t-header">
                                     <div class="t-time">@b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")</div>
@@ -123,23 +212,40 @@
                                 </div>
                             </div>
                             
-                            @if(isDoing) {
-                                var remain = (int)Math.Max(0, b.EndTime.Subtract(DateTime.Now).TotalMinutes);
-                                <div class="text-end d-flex flex-column justify-content-center border-start ps-4 ms-2 border-opacity-25">
-                                    <div style="font-size: 0.65rem; font-weight: 600; color: var(--serene-blue-strong); text-transform: uppercase;">Thời gian còn lại</div>
-                                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--serene-blue-strong);">@remain Phút</div>
-                                </div>
-                            } else {
-                                <div class="text-end d-flex flex-column justify-content-center">
-                                    <i class="bi bi-chevron-right text-muted" style="font-size: 1.2rem; opacity: 0.3;"></i>
-                                </div>
-                            }
+                            <div class="text-end d-flex align-items-center gap-3">
+                                @if (isDoing)
+                                {
+                                    var remain = (int)Math.Max(0, b.EndTime.Subtract(DateTime.Now).TotalMinutes);
+                                    <div class="border-start ps-3 me-2 border-opacity-25 d-none d-sm-block text-start timer-container" 
+                                         data-end-time="@b.EndTime.ToString("O")" 
+                                         style="min-width: 80px;">
+                                        <div style="font-size: 0.6rem; font-weight: 600; color: var(--serene-blue-strong); text-transform: uppercase;">Còn lại</div>
+                                        <div class="timer-text" style="font-size: 1.1rem; font-weight: 700; color: var(--serene-blue-strong);">@remain'</div>
+                                    </div>
+                                    <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" onclick="showCompleteForm(@b.BookingId)">Hoàn tất</button>
+                                }
+                                else if (isAccepted)
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold me-1" onclick="requestTransfer(@b.BookingId)">Chuyển ca</button>
+                                    <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="startService(@b.BookingId)">Bắt đầu</button>
+                                }
+                                else if (!isDone)
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold me-1" onclick="requestTransfer(@b.BookingId)">Chuyển ca</button>
+                                    <button class="btn btn-sm btn-info text-white rounded-pill px-3 fw-bold" onclick="acceptBooking(@b.BookingId)">Nhận nhiệm vụ</button>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                                }
+                            </div>
                         </div>
-                    </a>
+                    </div>
                 </div>
             }
         </div>
-    </div>
+    }
+</div>
 
     <!-- Cột Phải: Hiệu suất & Chuẩn bị -->
     <div class="col-lg-5 col-xl-4">
@@ -184,6 +290,51 @@
             </div>
         }
 
+        <!-- Lịch sử xin nghỉ gần đây (Rule 2) -->
+        @{
+            var leaveRequests = ViewBag.LeaveRequests as List<LeaveRequest> ?? new List<LeaveRequest>();
+        }
+        @if (leaveRequests.Any())
+        {
+            <div class="prep-card shadow-sm mt-3" style="border-left: 4px solid #ef4444;">
+                <div class="prep-title" style="color: #ef4444;"><i class="bi bi-calendar-check-fill"></i> Đơn xin nghỉ gần đây</div>
+                <div class="p-3">
+                    @foreach (var lr in leaveRequests)
+                    {
+                        <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom border-light">
+                            <div>
+                                <div class="fw-bold small" style="font-size: 0.8rem;">
+                                    @if (lr.FromDate.Date == lr.ToDate.Date) { <span>Ngày @lr.FromDate.ToString("dd/MM")</span> }
+                                    else { <span>@lr.FromDate.ToString("dd/MM") - @lr.ToDate.ToString("dd/MM")</span> }
+                                </div>
+                                <div class="text-muted italic" style="font-size: 0.7rem;">"@lr.Reason"</div>
+                            </div>
+                            <div class="text-end">
+                                @if (lr.Status == LeaveRequestStatus.Approved)
+                                {
+                                    <span class="badge bg-success rounded-pill px-2" style="font-size: 0.65rem;">
+                                        <i class="bi bi-patch-check-fill me-1"></i>ĐÃ DUYỆT
+                                    </span>
+                                }
+                                else if (lr.Status == LeaveRequestStatus.Pending)
+                                {
+                                    <span class="badge bg-warning rounded-pill px-2 text-dark" style="font-size: 0.65rem;">
+                                        ĐANG CHỜ
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary rounded-pill px-2" style="font-size: 0.65rem;">
+                                        @lr.Status.ToString().ToUpper()
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
         <!-- Mini Stats -->
         <div class="small-info-card shadow-sm">
             <div class="label"><i class="bi bi-emoji-smile text-primary"></i> Đánh giá TB</div>
@@ -195,8 +346,236 @@
             <div class="val">450k</div>
         </div>
 
-        <button class="fab-btn">
-            <i class="bi bi-plus"></i>
-        </button>
+        <div class="dropup d-flex justify-content-end mt-4">
+            <button class="fab-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-plus"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mb-2" style="min-width: 220px;">
+                <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="toggleAttendance()"><i class="bi bi-fingerprint text-success fs-5"></i> Cập nhật Chấm Công</a></li>
+                <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="showLeaveRequest()"><i class="bi bi-calendar-minus text-danger fs-5"></i> Đăng ký nghỉ/vắng face</a></li>
+                <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="showMaterialReport()"><i class="bi bi-box-seam text-warning fs-5"></i> Báo thiếu vật tư</a></li>
+            </ul>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Real-time Countdown Timer
+        function updateTimers() {
+            document.querySelectorAll('.timer-container').forEach(container => {
+                const endTimeStr = container.getAttribute('data-end-time');
+                if (!endTimeStr) return;
+                
+                const endTime = new Date(endTimeStr);
+                const now = new Date();
+                const diff = endTime - now;
+                
+                const timerText = container.querySelector('.timer-text');
+                
+                if (diff <= 0) {
+                    timerText.innerHTML = "00:00";
+                    timerText.classList.add('text-danger');
+                    return;
+                }
+                
+                const minutesTotal = Math.floor(diff / 1000 / 60);
+                const hours = Math.floor(minutesTotal / 60);
+                const minutes = minutesTotal % 60;
+                const seconds = Math.floor((diff / 1000) % 60);
+                
+                if (hours > 0) {
+                    timerText.innerHTML = `${hours}h ${minutes}m`;
+                } else {
+                    timerText.innerHTML = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+                
+                // Alert in final 5 minutes
+                if (minutes < 5) {
+                    timerText.classList.add('text-danger');
+                }
+            });
+        }
+        
+        setInterval(updateTimers, 1000);
+        
+        function acceptBooking(bookingId) {
+            Swal.fire({
+                title: 'Nhận nhiệm vụ',
+                text: "Bạn xác nhận đã xem và sẵn sàng thực hiện ca làm này?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý nhận',
+                confirmButtonColor: '#0ea5e9'
+            });
+        }
+
+        function showLeaveRequest() {
+            Swal.fire({
+                title: 'Đăng ký nghỉ phép',
+                html: `
+                    <div class="text-start">
+                        <label class="form-label fw-bold">Từ ngày:</label>
+                        <input type="date" id="leaveFrom" class="form-control mb-3" value="${new Date().toISOString().split('T')[0]}">
+                        <label class="form-label fw-bold">Đến ngày:</label>
+                        <input type="date" id="leaveTo" class="form-control mb-3" value="${new Date().toISOString().split('T')[0]}">
+                        <label class="form-label fw-bold">Lý do nghỉ:</label>
+                        <textarea id="leaveReason" class="form-control" rows="3" placeholder="Ghi rõ lý do (vd: ốm, việc gia đình...)"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Gửi đơn',
+                confirmButtonColor: '#ef4444',
+                preConfirm: () => {
+                    const from = document.getElementById('leaveFrom').value;
+                    const to = document.getElementById('leaveTo').value;
+                    const reason = document.getElementById('leaveReason').value;
+                    if (!from || !to || !reason) {
+                        Swal.showValidationMessage('Vui lòng nhập đầy đủ thông tin');
+                        return false;
+                    }
+                    return { from, to, reason };
+                }
+            }).then(r => {
+                if (r.isConfirmed) {
+                    $.post('/Staff/Home/SubmitLeaveRequest', { 
+                        fromDate: r.value.from, 
+                        toDate: r.value.to, 
+                        reason: r.value.reason 
+                    }, function(res) {
+                        if (res.success) {
+                            Swal.fire('Đã gửi', res.message, 'success');
+                        } else {
+                            Swal.fire('Lỗi', res.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+        function toggleAttendance() {
+            Swal.fire({
+                title: 'Xác nhận Điểm danh',
+                text: "Xác nhận ghi nhận thời gian vào/ra ca làm?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    $.post('/Staff/Home/ToggleAttendance', function(r) {
+                        if(r.success) {
+                            Swal.fire({ title: 'Thành công!', text: `Hệ thống ghi nhận lúc: ${r.time}`, icon: 'success', timer: 2000 }).then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', r.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function showMaterialReport() {
+            $.get('/Staff/Home/GetMaterials', function(res) {
+                if(res.success && res.data) {
+                    let options = res.data.map(m => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join('');
+                    Swal.fire({
+                        title: 'Khai báo Vật tư hao hụt',
+                        html: `
+                            <div class="text-start px-2">
+                                <label class="fw-bold mb-1 small text-muted text-uppercase" style="font-size:0.65rem">Sản phẩm / Vật tư</label>
+                                <select id="matSelect" class="form-select mb-3">${options}</select>
+                                
+                                <label class="fw-bold mb-1 small text-muted text-uppercase" style="font-size:0.65rem">Mức độ hao hụt (Số nguyên)</label>
+                                <input type="number" id="matQty" class="form-control mb-3" placeholder="Ví dụ: 1 hoặc 2" value="1" step="1">
+                                
+                                <label class="fw-bold mb-1 small text-muted text-uppercase" style="font-size:0.65rem">Ghi chú (Tùy chọn)</label>
+                                <textarea id="matNote" class="form-control" rows="2" placeholder="Ví dụ: Lọ tinh dầu bị vỡ..."></textarea>
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Gửi Báo Cáo',
+                        cancelButtonText: 'Hủy',
+                        confirmButtonColor: '#0ea5e9',
+                        preConfirm: () => { return { id: $('#matSelect').val(), qty: $('#matQty').val(), note: $('#matNote').val() } }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if(!result.value.qty || result.value.qty <= 0) { Swal.fire('Lỗi', 'Vui lòng nhập số lượng hợp lệ', 'error'); return; }
+                            $.post('/Staff/Home/ReportMaterial', { materialId: result.value.id, quantity: result.value.qty, note: result.value.note }, function(r) {
+                                if(r.success) Swal.fire('Thành công!', 'Đã gửi báo cáo vật tư.', 'success');
+                                else Swal.fire('Lỗi', r.message, 'error');
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function showCompleteForm(bookingId) {
+            Swal.fire({
+                title: 'Bàn giao Ca làm & Ghi chú',
+                html: `
+                    <div class="text-start px-2 mt-2">
+                        <div class="alert alert-info py-2 small fw-bold mb-3" style="background: var(--team-primary-light); color: var(--team-primary); border:none; font-size:0.75rem;"><i class="bi @ViewBag.TeamInfo?.Icon me-1"></i> Chuyên môn @ViewBag.TeamInfo?.Name: Ghi nhận kỹ thông tin khách hàng.</div>
+                        <label class="fw-bold mb-1 small text-muted text-uppercase" style="font-size:0.65rem">Ghi chú chuyên môn (Bắt buộc):</label>
+                        <textarea id="noteText" class="form-control mb-3" rows="4" placeholder="@ViewBag.TeamInfo?.NoteHint"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Hoàn thành Dịch vụ',
+                confirmButtonColor: '#0ea5e9',
+                preConfirm: () => { return $('#noteText').val(); }
+            }).then(r => {
+                if(r.isConfirmed) {
+                    let note = r.value;
+                    if(!note) { Swal.fire('Vui lòng ghi chú', 'Bạn phải điền ghi chú tiến trình khách hàng!', 'warning'); return; }
+                    
+                    $.post('/Staff/Home/CompleteWithNote', { bookingId: bookingId, note: note }, function(res) {
+                        if(res.success) {
+                            Swal.fire({ title: 'Thành công', text: 'Đã lưu ghi chú và kết thúc ca.', icon: 'success' }).then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', res.message, 'error');
+                        }
+                    });
+                }
+            })
+        }
+
+        function startService(bookingId) {
+            Swal.fire({
+                title: 'Bắt đầu dịch vụ',
+                text: "Xác nhận khách đã có mặt và bắt đầu thực hiện liệu trình?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Bắt đầu ngay',
+                confirmButtonColor: 'var(--team-primary)'
+            }).then(r => {
+                if(r.isConfirmed) {
+                    $.post('/Staff/Home/CheckIn', { bookingId: bookingId }, function(res) {
+                        if(res.success) location.reload();
+                        else Swal.fire('Lỗi', res.message, 'error');
+                    });
+                }
+            });
+        }
+
+        function requestTransfer(bookingId) {
+            Swal.fire({
+                title: 'Yêu cầu chuyển ca',
+                text: "Bạn không thể thực hiện ca này và muốn nhờ Lễ tân sắp xếp người khác?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Đúng, chuyển ca',
+                confirmButtonColor: '#f59e0b',
+                cancelButtonText: 'Hủy'
+            }).then(r => {
+                if(r.isConfirmed) {
+                    $.post('/Staff/Home/RequestTransfer', { bookingId: bookingId }, function(res) {
+                        if(res.success) {
+                            Swal.fire('Đã gửi yêu cầu', res.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', res.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

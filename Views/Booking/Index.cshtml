@@ -586,6 +586,7 @@
                 @Html.AntiForgeryToken()
                 
                 <input type="hidden" asp-for="ServiceId" id="ServiceId" />
+                <div id="hidden-service-inputs"></div>
                 <input type="hidden" asp-for="BookingDate" id="BookingDate" />
                 <input type="hidden" asp-for="StartTime" id="StartTime" />
 
@@ -601,7 +602,12 @@
                                  onclick="selectService(@service.ServiceId, '@service.ServiceName', @service.Price.ToString(System.Globalization.CultureInfo.InvariantCulture), this)"
                                  data-aos="fade-up">
                                 <div class="service-img-wrapper">
-                                    <img src="@service.Image" alt="@service.ServiceName">
+                                    @{
+                                        var serviceImg = (service.Image != null && service.Image.StartsWith("http")) 
+                                            ? service.Image 
+                                            : (!string.IsNullOrEmpty(service.Image) ? "/images/" + service.Image : "https://via.placeholder.com/600x800");
+                                    }
+                                    <img src="@serviceImg" alt="@service.ServiceName">
                                     <div class="service-overlay-btn" onclick="event.stopPropagation(); showServiceDetails(@service.ServiceId)">
                                         <i class="fas fa-search-plus"></i>
                                     </div>
@@ -861,12 +867,14 @@
                     `;
                 });
                 
-                // Cập nhật input ẩn cho form submit (lấy ID đầu tiên hoặc xử lý list tùy backend)
+                // Cập nhật input ẩn cho form submit (lấy ID đầu tiên phòng hờ fallback)
                 document.getElementById('ServiceId').value = selectedServices[0].id;
-                // Nếu backend cần nhiều ID: document.getElementById('SelectedServiceIds').value = selectedServices.map(x => x.id).join(',');
+                // Tạo hidden inputs cho danh sách SelectedServiceIds để ASP.NET Core list binding hoạt động tốt với index
+                document.getElementById('hidden-service-inputs').innerHTML = selectedServices.map((x, idx) => `<input type="hidden" name="SelectedServiceIds[${idx}]" value="${x.id}" />`).join('');
             } else {
                 summaryPane.style.display = 'none';
                 document.getElementById('ServiceId').value = '';
+                document.getElementById('hidden-service-inputs').innerHTML = '';
             }
             
             totalDisplay.innerText = total.toLocaleString('vi-VN') + ' đ';
@@ -1033,14 +1041,20 @@
                         didOpen: () => { Swal.showLoading(); }
                     });
 
-                    fetch(form.action, {
+                    fetch('/Booking/SubmitBooking', {
                         method: 'POST',
                         body: formData,
                         headers: {
                             'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
                         }
                     })
-                    .then(res => res.json())
+                    .then(async res => {
+                        if (!res.ok) {
+                            console.error('HTTP Error:', res.status);
+                            throw new Error('Không thể xử lý yêu cầu. Vui lòng kiểm tra lại.');
+                        }
+                        return res.json();
+                    })
                     .then(data => {
                         if(data.success) {
                             window.location.href = data.redirectUrl;
@@ -1053,8 +1067,8 @@
                         }
                     })
                     .catch(err => {
-                        console.error(err);
-                        Swal.fire({ icon: 'error', title: 'Lỗi hệ thống', text: 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.' });
+                        console.error('Lỗi SubmitBooking:', err);
+                        Swal.fire({ icon: 'error', title: 'Lỗi hệ thống', text: err.message || 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.' });
                     });
                 }
             });
@@ -1083,7 +1097,10 @@
                         const sId = data.serviceId || data.ServiceId || id;
                         const sName = data.serviceName || data.ServiceName || 'Dịch vụ';
                         const sPrice = data.price || data.Price || 0;
-                        const sImg = data.image || data.Image || 'https://via.placeholder.com/600x800';
+                        let sImg = data.image || data.Image || 'https://via.placeholder.com/600x800';
+                        if (sImg && !sImg.startsWith('http')) {
+                            sImg = '/images/' + sImg;
+                        }
                         const sDur = data.duration || data.Duration || 0;
                         const sDesc = data.description || data.Description || 'Mô tả đang cập nhật...';
                         const sVid = data.videoUrl || data.VideoUrl || null;

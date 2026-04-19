@@ -163,10 +163,20 @@
 
             <nav class="navbar navbar-expand-lg spa-navbar py-3">
                 <div class="container">
-                    <a class="spa-brand" asp-controller="Home" asp-action="Index">
-                        <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
-                        <span class="fs-4">Spa<span class="text-gold">N5</span></span>
-                    </a>
+                    @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Receptionist") || User.IsInRole("Staff")))
+                    {
+                        <a class="spa-brand" href="/Admin/Home/Index">
+                            <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
+                            <span class="fs-4">Spa<span class="text-gold">N5</span></span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="spa-brand" asp-controller="Home" asp-action="Index">
+                            <span class="brand-mark"><i class="fa-solid fa-spa"></i></span>
+                            <span class="fs-4">Spa<span class="text-gold">N5</span></span>
+                        </a>
+                    }
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#spaNav">
                         <span class="navbar-toggler-icon"></span>
@@ -190,40 +200,25 @@
                             <li class="nav-item"><a class="nav-link" asp-controller="Branches" asp-action="Index">Chi nhánh</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="About">Về chúng tôi</a></li>
 
-                            @if (User.Identity?.IsAuthenticated == true)
+                            <li class="nav-item ms-lg-3">
+                                <a class="btn btn-gold" asp-controller="Booking" asp-action="Index">Đặt lịch ngay</a>
+                            </li>
+
+                            @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Receptionist") || User.IsInRole("Staff")))
                             {
-                                <li class="nav-item dropdown ms-lg-3">
-                                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
-                                        <i class="fa-solid fa-circle-user fa-lg"></i>
-                                        <span>@User.FindFirst("FullName")?.Value</span>
+                                <li class="nav-item dropdown ms-lg-2">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-circle-user fs-5 text-gold"></i>
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                                        @if (User.IsInRole("Admin"))
-                                        {
-                                            <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard"><i class="fa-solid fa-gauge me-2"></i>Quản trị</a></li>
-                                        }
-                                        @if (User.IsInRole("Staff"))
-                                        {
-                                            <li><a class="dropdown-item" asp-area="Staff" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-calendar-check me-2"></i>Bảng làm việc</a></li>
-                                        }
-                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user me-2"></i>Hồ sơ</a></li>
-                                        @if (User.IsInRole("Customer"))
-                                        {
-                                            <li><a class="dropdown-item" asp-controller="Booking" asp-action="Upcoming"><i class="fa-solid fa-calendar-day me-2"></i>Lịch sắp tới</a></li>
-                                        }
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form asp-controller="Account" asp-action="Logout" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</button>
-                                            </form>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 rounded-3 mt-2">
+                                        <li class="px-3 py-2 border-bottom mb-2 text-center">
+                                            <div class="small fw-bold text-main">@User.Identity.Name</div>
                                         </li>
+                                        <li><a class="dropdown-item rounded-2 py-2 fw-600" asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user-gear me-2 text-primary opacity-75"></i> Hồ sơ cá nhân</a></li>
+                                        <li><hr class="dropdown-divider opacity-50"></li>
+                                        <li><a class="dropdown-item rounded-2 py-2 fw-600 text-danger" href="/Auth/Logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất</a></li>
                                     </ul>
                                 </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item ms-lg-3"><a class="btn btn-gold" asp-controller="Booking" asp-action="Index">Đặt lịch ngay</a></li>
                             }
 
                             <li class="nav-item dropdown ms-lg-2">
@@ -294,6 +289,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>

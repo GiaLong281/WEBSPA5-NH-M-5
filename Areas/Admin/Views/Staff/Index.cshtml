@@ -66,16 +66,32 @@
                 <div class="mb-3">
                     <h5 class="fw-bold mb-1">@staff.FullName</h5>
                     <div class="text-muted smaller mb-2">@staff.Email</div>
-                    @if (user != null)
-                    {
-                        <span class="role-badge @(user.Role == "Admin" ? "badge-admin" : (user.Role == "Receptionist" ? "badge-receptionist" : "badge-therapist"))">
-                            @user.Role
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="role-badge bg-light text-muted">CHƯA CẤP TK</span>
-                    }
+                    
+                    <div class="d-flex flex-wrap gap-1">
+                        @if (user != null)
+                        {
+                            <span class="role-badge @(user.Role == "Admin" ? "badge-admin" : (user.Role == "Receptionist" ? "badge-receptionist" : "badge-therapist"))">
+                                @user.Role
+                            </span>
+                        }
+
+                        @if (staff.Specialization != null)
+                        {
+                            var svcName = staff.Specialization.ServiceName;
+                            string teamName = "General";
+                            string teamColor = "#0ea5e9";
+                            string teamIcon = "fa-user-gear";
+
+                            if (svcName.Contains("Massage")) { teamName = "Zen Therapy"; teamColor = "#78350f"; teamIcon = "fa-leaf"; }
+                            else if (svcName.Contains("Da Mặt")) { teamName = "Skin Clinical"; teamColor = "#0d9488"; teamIcon = "fa-hand-holding-medical"; }
+                            else if (svcName.Contains("Thảo Dược")) { teamName = "Nature Herbal"; teamColor = "#15803d"; teamIcon = "fa-seedling"; }
+                            else if (svcName.Contains("VIP")) { teamName = "Royal VIP"; teamColor = "#7e22ce"; teamIcon = "fa-crown"; }
+
+                            <span class="role-badge shadow-sm" style="background: @(teamColor + "15"); color: @teamColor; border: 1px solid @(teamColor + "30")">
+                                <i class="fa-solid @teamIcon me-1"></i> @teamName
+                            </span>
+                        }
+                    </div>
                 </div>
 
                 <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">

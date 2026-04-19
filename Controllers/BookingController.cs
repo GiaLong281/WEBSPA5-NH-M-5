@@ -77,13 +77,29 @@ namespace SpaN5.Controllers
                 return View(model);
             }
 
-            var customerId = GetCustomerId();
-            if (customerId == null)
+            int? customerId;
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == model.Phone);
+            if (customer == null)
             {
-                ModelState.AddModelError("", "Vui lòng đăng nhập để đặt lịch.");
-                await LoadDropdowns(model);
-                return View(model);
+                customer = new Customer 
+                { 
+                    FullName = model.FullName, 
+                    Phone = model.Phone, 
+                    Email = model.Email,
+                    CreatedAt = DateTime.Now 
+                };
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
             }
+            else
+            {
+                // Cập nhật thông tin mới nhất
+                if (!string.IsNullOrEmpty(model.FullName)) customer.FullName = model.FullName;
+                if (!string.IsNullOrEmpty(model.Email)) customer.Email = model.Email;
+                await _context.SaveChangesAsync();
+            }
+
+            customerId = customer.CustomerId;
 
             var selectedServices = await _context.Services
                 .Where(s => model.SelectedServiceIds.Contains(s.ServiceId) && s.IsActive)
@@ -201,7 +217,18 @@ namespace SpaN5.Controllers
         public async Task<IActionResult> GetAvailableTimes(string date, int serviceId)
         {
             var service = await _context.Services.FindAsync(serviceId);
-            int maxCapacity = (service?.MaxCapacity ?? 10) <= 0 ? 10 : service.MaxCapacity;
+            int baseCapacity = (service?.MaxCapacity ?? 10) <= 0 ? 10 : service.MaxCapacity;
+
+            // Lấy danh sách bảo trì để tính công suất THỰC TẾ
+            var maintSetting = await _context.Settings.FirstOrDefaultAsync(s => s.Key == "MaintenanceRooms");
+            var maintRooms = new List<string>();
+            if (maintSetting != null && !string.IsNullOrEmpty(maintSetting.Value))
+            {
+                try { maintRooms = System.Text.Json.JsonSerializer.Deserialize<List<string>>(maintSetting.Value) ?? new List<string>(); } catch { }
+            }
+            int maintCount = maintRooms.Count(r => r.StartsWith($"{serviceId}_"));
+            int effectiveCapacity = Math.Max(0, baseCapacity - maintCount);
+
             var standardSlots = new[] { "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00" };
             
             var response = new List<object>();
@@ -218,14 +245,20 @@ namespace SpaN5.Controllers
                     DateTime slotTime = DateTime.ParseExact($"{date} {slot}", "yyyy-MM-dd HH:mm", null);
                     int current = booked.Count(b => slotTime >= b.StartTime && slotTime < b.EndTime);
                     bool isPast = selectedDate.Date == now.Date && slotTime < now;
-                    response.Add(new { time = slot, isFull = current >= maxCapacity, isPast = isPast, remaining = Math.Max(0, maxCapacity - current), total = maxCapacity });
+                    response.Add(new { 
+                        time = slot, 
+                        isFull = current >= effectiveCapacity, 
+                        isPast = isPast, 
+                        remaining = Math.Max(0, effectiveCapacity - current), 
+                        total = effectiveCapacity,
+                        hasMaintenance = maintCount > 0
+                    });
                 }
             }
             return Json(new { success = true, times = response });
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitBooking(BookingViewModel model)
         {
             if (!ModelState.IsValid) {
@@ -233,16 +266,60 @@ namespace SpaN5.Controllers
                 return Json(new { success = false, message = errors });
             }
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == model.Phone) 
-                           ?? new Customer { FullName = model.FullName, Phone = model.Phone, Email = model.Email };
-            
-            if (customer.CustomerId == 0) { _context.Customers.Add(customer); await _context.SaveChangesAsync(); }
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Phone == model.Phone);
+            if (customer == null)
+            {
+                customer = new Customer { FullName = model.FullName, Phone = model.Phone, Email = model.Email, CreatedAt = DateTime.Now };
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Cập nhật thông tin mới nhất nếu có thay đổi
+                if (!string.IsNullOrEmpty(model.FullName)) customer.FullName = model.FullName;
+                if (!string.IsNullOrEmpty(model.Email)) customer.Email = model.Email;
+                await _context.SaveChangesAsync();
+            }
 
-            var service = await _context.Services.FindAsync(model.ServiceId);
-            if (service == null) return Json(new { success = false, message = "Lỗi dịch vụ" });
+            var selectedServicesList = new List<Service>();
+            if (model.SelectedServiceIds != null && model.SelectedServiceIds.Any()) {
+                selectedServicesList = await _context.Services.Where(s => model.SelectedServiceIds.Contains(s.ServiceId)).ToListAsync();
+            } else if (model.ServiceId.HasValue) {
+                var s = await _context.Services.FindAsync(model.ServiceId.Value);
+                if (s != null) selectedServicesList.Add(s);
+            }
+
+            if (!selectedServicesList.Any()) return Json(new { success = false, message = "Lỗi dịch vụ" });
 
             DateTime start = model.BookingDate.Date.Add(model.StartTime);
-            DateTime end = start.AddMinutes(service.Duration);
+            int totalDuration = selectedServicesList.Sum(x => x.Duration);
+            DateTime end = start.AddMinutes(totalDuration);
+            decimal totalAmount = selectedServicesList.Sum(s => s.Price);
+
+            // KIỂM TRA LẠI CÔNG SUẤT PHÒNG TRƯỚC KHI LƯU (Rule 10 phòng)
+            var maintSetting = await _context.Settings.FirstOrDefaultAsync(s => s.Key == "MaintenanceRooms");
+            var maintRooms = new List<string>();
+            if (maintSetting != null && !string.IsNullOrEmpty(maintSetting.Value))
+            {
+                try { maintRooms = System.Text.Json.JsonSerializer.Deserialize<List<string>>(maintSetting.Value) ?? new List<string>(); } catch { }
+            }
+
+            foreach (var svc in selectedServicesList)
+            {
+                int baseCap = (svc.MaxCapacity <= 0) ? 10 : svc.MaxCapacity;
+                int maintCount = maintRooms.Count(r => r.StartsWith($"{svc.ServiceId}_"));
+                int effCap = Math.Max(0, baseCap - maintCount);
+
+                int currentBooked = await _context.Bookings
+                    .Where(b => b.BookingDate.Date == start.Date && b.Status != BookingStatus.Cancelled)
+                    .Where(b => b.BookingDetails.Any(bd => bd.ServiceId == svc.ServiceId))
+                    .CountAsync(b => start >= b.StartTime && start < b.EndTime);
+
+                if (currentBooked >= effCap)
+                {
+                    return Json(new { success = false, message = $"Rất tiếc, dịch vụ {svc.ServiceName} vào khung giờ này đã vừa đủ chỗ (do giới hạn phòng hoạt động). Vui lòng chọn giờ khác." });
+                }
+            }
 
             int? finalStaffId = null;
             if (model.AutoAssignStaff)
@@ -256,20 +333,24 @@ namespace SpaN5.Controllers
                 finalStaffId = model.StaffId;
             }
 
+            var bookingDetails = new List<BookingDetail>();
+            foreach (var svc in selectedServicesList)
+            {
+                bookingDetails.Add(new BookingDetail {
+                    ServiceId = svc.ServiceId,
+                    PriceAtTime = svc.Price,
+                    StaffId = finalStaffId,
+                    RoomNumber = model.RoomNumber,
+                    Status = DetailStatus.Pending
+                });
+            }
+
             var booking = new Booking {
                 BookingCode = "BK" + DateTime.Now.ToString("yyyyMMddHHmmss"),
                 CustomerId = customer.CustomerId, BranchId = 1, BookingDate = start.Date,
                 StartTime = start, EndTime = end, Status = BookingStatus.Pending,
-                TotalAmount = service.Price, Notes = model.Notes, CreatedAt = DateTime.Now,
-                BookingDetails = new List<BookingDetail> { 
-                    new BookingDetail { 
-                        ServiceId = service.ServiceId, 
-                        PriceAtTime = service.Price,
-                        StaffId = finalStaffId,
-                        RoomNumber = model.RoomNumber,
-                        Status = DetailStatus.Pending
-                    } 
-                }
+                TotalAmount = totalAmount, Notes = model.Notes, CreatedAt = DateTime.Now,
+                BookingDetails = bookingDetails
             };
 
             _context.Bookings.Add(booking);
@@ -385,11 +466,62 @@ namespace SpaN5.Controllers
 
         private async Task<int?> FindAvailableStaff(int branchId, DateTime date, DateTime start, DateTime end)
         {
-            var staffs = await _context.Staffs.Where(s => s.BranchId == branchId && s.Status == "active").ToListAsync();
+            var dayOfWeek = date.DayOfWeek;
+            var timeStart = start.TimeOfDay;
+            var timeEnd = end.TimeOfDay;
+            var buffer = TimeSpan.FromMinutes(10);
+
+            var staffs = await _context.Staffs
+                .Where(s => s.BranchId == branchId && s.Status == "active")
+                .ToListAsync();
+
+            // Lọc nhân viên đang nghỉ phép
+            var staffOnLeaveIds = await _context.LeaveRequests
+                .Where(lr => date.Date >= lr.FromDate.Date && date.Date <= lr.ToDate.Date && lr.Status == LeaveRequestStatus.Approved)
+                .Select(lr => lr.StaffId)
+                .ToListAsync();
+
             foreach (var s in staffs)
             {
-                bool busy = await _context.BookingDetails.Include(bd => bd.Booking).Where(bd => bd.StaffId == s.StaffId && bd.Booking.BookingDate.Date == date.Date && bd.Booking.Status != BookingStatus.Cancelled)
-                    .AnyAsync(bd => bd.Booking.StartTime < end && bd.Booking.EndTime > start);
+                if (staffOnLeaveIds.Contains(s.StaffId)) continue;
+
+                // 1. Kiểm tra Lịch làm việc (Rule 1)
+                // Ưu tiên Lịch thực tế (Override) -> Nếu không có thì dùng Lịch cố định
+                var actualSchedule = await _context.WorkSchedules
+                    .Include(ws => ws.Shift)
+                    .FirstOrDefaultAsync(ws => ws.StaffId == s.StaffId && ws.Date.Date == date.Date);
+
+                Shift? activeShift = null;
+                if (actualSchedule != null)
+                {
+                    if (actualSchedule.Status != WorkStatus.Working) continue; // Đang nghỉ, ốm...
+                    activeShift = actualSchedule.Shift;
+                }
+                else
+                {
+                    var fixedSchedule = await _context.StaffSchedules
+                        .Include(fs => fs.Shift)
+                        .FirstOrDefaultAsync(fs => fs.StaffId == s.StaffId && fs.DayOfWeek == dayOfWeek);
+                    
+                    if (fixedSchedule == null || fixedSchedule.IsOff) continue;
+                    activeShift = fixedSchedule.Shift;
+                }
+
+                if (activeShift == null) continue;
+
+                // Kiểm tra xem giờ khách đặt có nằm trong ca làm việc không
+                if (timeStart < activeShift.StartTime || timeEnd > activeShift.EndTime) continue;
+
+                // 2. Kiểm tra trùng lịch + Buffer 10p (Rule 2 & 4)
+                bool busy = await _context.BookingDetails
+                    .Include(bd => bd.Booking)
+                    .Where(bd => bd.StaffId == s.StaffId && 
+                                 bd.Booking.BookingDate.Date == date.Date && 
+                                 bd.Booking.Status != BookingStatus.Cancelled)
+                    .AnyAsync(bd => 
+                        (bd.Booking.StartTime < end.Add(buffer) && bd.Booking.EndTime.Add(buffer) > start)
+                    );
+
                 if (!busy) return s.StaffId;
             }
             return null;
@@ -400,6 +532,30 @@ namespace SpaN5.Controllers
             if (User.Identity?.IsAuthenticated != true) return null;
             var user = _context.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
             return user?.CustomerId;
+        }
+
+        [Authorize(Roles = "Admin,Receptionist,Staff")]
+        public async Task<IActionResult> CustomerList()
+        {
+            var customers = await _context.Customers
+                .Include(c => c.Bookings)
+                    .ThenInclude(b => b.BookingDetails)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+            return View(customers);
+        }
+
+        [Authorize(Roles = "Admin,Receptionist,Staff")]
+        public async Task<IActionResult> CustomerDetail(int id)
+        {
+            var customer = await _context.Customers
+                .Include(c => c.Bookings)
+                    .ThenInclude(b => b.BookingDetails)
+                        .ThenInclude(d => d.Service)
+                .FirstOrDefaultAsync(c => c.CustomerId == id);
+
+            if (customer == null) return NotFound();
+            return View(customer);
         }
     }
 }

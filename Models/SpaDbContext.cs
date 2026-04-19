@@ -26,6 +26,10 @@ namespace SpaN5.Models
         public DbSet<Material> Materials { get; set; }
         public DbSet<ServiceMaterial> ServiceMaterials { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
+        public DbSet<Shift> Shifts { get; set; }
+        public DbSet<StaffSchedule> StaffSchedules { get; set; }
+        public DbSet<WorkSchedule> WorkSchedules { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; } 
 
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Setting> Settings { get; set; }

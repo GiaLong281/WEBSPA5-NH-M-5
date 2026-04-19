@@ -1,123 +1,186 @@
 @model IEnumerable<SpaN5.Models.Customer>
 
 @{
-    ViewData["Title"] = "Quản lý khách đăng ký";
-    Layout = "_Layout";
+    ViewData["Title"] = "Hệ thống Quản lý Khách hàng | Azure Spa CRM";
+    if (User.IsInRole("Admin") || User.IsInRole("Receptionist") || User.IsInRole("Staff"))
+    {
+        Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
 }
 
 <style>
     .customer-list-container {
         padding-top: 120px;
         padding-bottom: 80px;
-        background-color: #fcfaf7;
+        background-color: #f8f9fa;
         min-height: 100vh;
     }
     
     .glass-card {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.05);
     }
     
-    .font-playfair {
-        font-family: 'Playfair Display', serif;
-    }
-    
-    .text-gold {
-        color: #C5A059;
-    }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .text-gold { color: #C5A059; }
     
     .btn-gold-outline {
-        border: 1px solid #C5A059;
+        border: 1.5px solid #C5A059;
         color: #C5A059;
-        transition: all 0.3s ease;
-        border-radius: 50px;
-        padding: 5px 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        padding: 8px 18px;
+        font-weight: 600;
+        background: transparent;
     }
     
     .btn-gold-outline:hover {
         background-color: #C5A059;
         color: white;
         transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(197, 160, 89, 0.3);
     }
-    
-    .badge-gold {
-        background-color: #C5A059;
-        color: white;
-    }
-    
-    .table thead th {
-        border-top: none;
-        color: #888;
-        font-weight: 500;
+
+    /* Membership Badges */
+    .tier-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
         text-transform: uppercase;
-        font-size: 0.8rem;
         letter-spacing: 1px;
+        padding: 5px 12px;
+        border-radius: 100px;
+        display: inline-block;
     }
-    
-    .customer-row {
-        transition: all 0.2s ease;
+    .tier-bronze { background: #EED7C1; color: #8A5A44; }
+    .tier-silver { background: #E2E2E2; color: #555555; }
+    .tier-gold { background: #FFF4D1; color: #B08D00; }
+    .tier-diamond { background: #E2F0FF; color: #0066CC; border: 1px solid #7FBFFF; }
+
+    .search-input {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        padding: 12px 20px 12px 45px;
+        width: 100%;
+        max-width: 400px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
     }
-    
-    .customer-row:hover {
-        background-color: rgba(197, 160, 89, 0.03) !important;
+    .search-input:focus {
+        border-color: #C5A059;
+        box-shadow: 0 4px 20px rgba(197, 160, 89, 0.15);
+        outline: none;
+    }
+    .search-icon {
+        position: absolute;
+        left: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+
+    .stat-mini {
+        font-size: 0.75rem;
+        color: #888;
+        font-weight: 600;
     }
 </style>
 
 <div class="customer-list-container">
     <div class="container">
-        <div class="text-center mb-5">
-            <h6 class="text-gold text-uppercase fw-bold ls-2 mb-2">Hệ thống quản lý</h6>
-            <h1 class="font-playfair display-5 mb-3">Danh sách khách hàng đăng ký</h1>
-            <div class="divider-gold mx-auto"></div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
+            <div>
+                <h6 class="text-gold text-uppercase fw-bold ls-2 mb-2"><i class="fas fa-crown me-2"></i> Hệ thống Quản lý Khách hàng</h6>
+                <h1 class="font-playfair display-5 mb-0">Hồ sơ Khách hàng</h1>
+            </div>
+            <div class="mt-4 mt-md-0 position-relative">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="customerSearch" class="search-input" placeholder="Tìm tên, số điện thoại...">
+            </div>
         </div>
 
         <div class="glass-card p-4 p-md-5">
             <div class="table-responsive">
-                <table class="table align-middle custom-table">
+                <table class="table align-middle" id="customerTable">
                     <thead>
-                        <tr>
+                        <tr class="text-muted small text-uppercase fw-bold">
                             <th>Khách hàng</th>
-                            <th>Liên hệ</th>
+                            <th>Hạng mục</th>
+                            <th>Chi tiêu</th>
                             <th class="text-center">Số dịch vụ</th>
                             <th class="text-center">Ngày tạo</th>
-                            <th class="text-end">Chi tiết</th>
+                            <th class="text-end">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="py-4">
+                                        <i class="fas fa-users-slash fa-4x text-muted opacity-25 mb-3"></i>
+                                        <h5 class="text-muted">Chưa có khách hàng nào trong hệ thống</h5>
+                                        <p class="small text-muted mb-4">Các khách hàng mới sẽ tự động xuất hiện ở đây sau khi đặt lịch hoặc đăng ký.</p>
+                                        <a href="/Admin/CreateCustomer" class="btn btn-gold btn-sm rounded-pill px-4">
+                                            <i class="fas fa-plus me-2"></i> Thêm khách hàng thủ công
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                         @foreach (var customer in Model)
                         {
-                            var totalServices = customer.Bookings.SelectMany(b => b.BookingDetails).Count();
+                            var completedBookings = customer.Bookings?.Where(b => b.Status == SpaN5.Models.BookingStatus.Completed).ToList() ?? new List<SpaN5.Models.Booking>();
+                            var totalVisits = completedBookings.Count;
+                            var totalServices = completedBookings.SelectMany(b => b.BookingDetails).Count();
+                            var lastBooking = customer.Bookings?.OrderByDescending(b => b.BookingDate).FirstOrDefault();
+                            
+                            // Membership Tier Logic
+                            string tierClass = "tier-bronze";
+                            string tierName = "Hạng Đồng";
+                            if (customer.TotalSpent >= 10000000) { tierClass = "tier-diamond"; tierName = "Kim Cương"; }
+                            else if (customer.TotalSpent >= 5000000) { tierClass = "tier-gold"; tierName = "Hạng Vàng"; }
+                            else if (customer.TotalSpent >= 1000000) { tierClass = "tier-silver"; tierName = "Hạng Bạc"; }
+
                             <tr class="customer-row">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="avatar-circle me-3">
-                                            @customer.FullName.Substring(0, 1).ToUpper()
+                                        <div class="avatar-circle-lg me-3">
+                                            @(string.IsNullOrEmpty(customer.FullName) ? "?" : customer.FullName.Substring(0, 1).ToUpper())
                                         </div>
                                         <div>
-                                            <div class="fw-bold text-dark">@customer.FullName</div>
-                                            <small class="text-muted">ID: #CST-@customer.CustomerId.ToString("D4")</small>
+                                            <div class="fw-bold text-dark fs-6">@customer.FullName</div>
+                                            <div class="small text-muted"><i class="fas fa-phone-alt me-1 text-gold" style="font-size: 0.7rem;"></i> @customer.Phone</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div><i class="fas fa-phone-alt text-gold me-2 small"></i> @customer.Phone</div>
-                                    @if (!string.IsNullOrEmpty(customer.Email))
-                                    {
-                                        <div class="small text-muted"><i class="fas fa-envelope text-gold me-2 small"></i> @customer.Email</div>
+                                    <span class="tier-badge @tierClass">@tierName</span>
+                                    <div class="stat-mini mt-1"><i class="fas fa-star text-gold me-1"></i> @customer.LoyaltyPoints pts</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@customer.TotalSpent.ToString("N0") <span class="small">₫</span></div>
+                                    @if(lastBooking != null) {
+                                        <div class="small text-muted" style="font-size: 0.7rem;">Lần cuối: @lastBooking.BookingDate.ToString("dd/MM/yy")</div>
                                     }
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge badge-gold rounded-pill px-3">@totalServices dịch vụ</span>
+                                    <div class="fw-bold text-primary">@totalVisits lần tới</div>
+                                    <div class="small text-muted">@totalServices dịch vụ</div>
                                 </td>
                                 <td class="text-center text-muted small">
                                     @customer.CreatedAt.ToString("dd/MM/yyyy")
                                 </td>
                                 <td class="text-end">
-                                    <a asp-action="CustomerDetail" asp-route-id="@customer.CustomerId" class="btn btn-gold-outline btn-sm">
-                                        <i class="fas fa-chevron-right me-1"></i> Xem lịch sử
+                                    <a href="/Booking/CustomerDetail/@customer.CustomerId" class="btn btn-gold-outline btn-sm">
+                                        <i class="fas fa-history me-1"></i> Thống kê
                                     </a>
                                 </td>
                             </tr>
@@ -130,26 +193,35 @@
 </div>
 
 <style>
-    .avatar-circle {
-        width: 45px;
-        height: 45px;
-        background-color: #f0e6d2;
-        color: #C5A059;
-        border-radius: 50%;
+    .avatar-circle-lg {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #f0e6d2 0%, #e2d1b0 100%);
+        color: #8D6E63;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
+        font-weight: 800;
+        font-size: 1.3rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     
-    .divider-gold {
-        width: 80px;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #C5A059, transparent);
-    }
+    .ls-2 { letter-spacing: 2px; }
     
-    .ls-2 {
-        letter-spacing: 2px;
-    }
+    .customer-row { transition: background 0.2s; cursor: pointer; }
+    .customer-row:hover { background: rgba(197, 160, 89, 0.04); }
 </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#customerSearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#customerTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+}

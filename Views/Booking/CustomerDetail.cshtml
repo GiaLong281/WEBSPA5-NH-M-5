@@ -2,7 +2,14 @@
 
 @{
     ViewData["Title"] = "Lịch sử dịch vụ - " + Model.FullName;
-    Layout = "_Layout";
+    if (User.IsInRole("Admin") || User.IsInRole("Receptionist") || User.IsInRole("Staff"))
+    {
+        Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
 }
 
 <style>
@@ -112,9 +119,13 @@
                 </div>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="glass-card d-inline-block px-4 py-3 text-center me-2">
+                    <div class="h3 mb-0 text-gold fw-bold">@Model.Bookings.Where(b => b.Status == SpaN5.Models.BookingStatus.Completed).Count()</div>
+                    <small class="text-muted text-uppercase ls-1">Lần tới Spa</small>
+                </div>
                 <div class="glass-card d-inline-block px-4 py-3 text-center">
-                    <div class="h3 mb-0 text-gold fw-bold">@Model.Bookings.SelectMany(b => b.BookingDetails).Count()</div>
-                    <small class="text-muted text-uppercase ls-1">Dịch vụ đã đặt</small>
+                    <div class="h3 mb-0 text-gold fw-bold">@Model.Bookings.Where(b => b.Status == SpaN5.Models.BookingStatus.Completed).SelectMany(b => b.BookingDetails).Count()</div>
+                    <small class="text-muted text-uppercase ls-1">Dịch vụ sử dụng</small>
                 </div>
             </div>
         </div>

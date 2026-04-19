@@ -23,43 +23,55 @@
         }
         .hero-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(90deg, rgba(18,32,45,0.85) 0%, rgba(18,32,45,0.4) 100%);
+            background: linear-gradient(280deg, rgba(14,24,34,0.85) 0%, rgba(14,24,34,0.3) 100%);
             z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; color: #fff; }
         .text-gold { color: #b68a63 !important; }
+        .text-gradient {
+            background: linear-gradient(135deg, #f0d5b6 0%, #d9b48f 30%, #b68a63 70%, #8a6442 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
         .btn-gold { 
-            background: linear-gradient(135deg, #b68a63 0%, #d9b48f 100%);
-            border: none; color: #fff; padding: 0.8rem 2.2rem; border-radius: 999px;
-            transition: all 0.3s ease; font-weight: 600;
+            background: linear-gradient(135deg, #c49a6c 0%, #a67c52 100%);
+            border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 1rem 2.8rem; border-radius: 999px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); font-weight: 700; font-size: 1.05rem;
+            letter-spacing: 0.5px;
         }
-        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(182,138,99,0.3); color: #fff; }
+        .btn-gold:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 35px rgba(182,138,99,0.45); color: #fff; }
         .btn-glass {
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2); color: #fff;
-            padding: 0.8rem 2.2rem; border-radius: 999px;
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.25); color: #fff;
+            padding: 1rem 2.8rem; border-radius: 999px; font-weight: 600; font-size: 1.05rem;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
-        .section-pad { padding: 7rem 0; }
+        .btn-glass:hover { background: rgba(255,255,255,0.15); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .section-pad { padding: 8rem 0; }
         .section-label {
-            display: inline-block; font-size: 0.8rem; text-transform: uppercase;
-            letter-spacing: 2px; color: #b68a63; font-weight: 700; margin-bottom: 1rem;
+            display: inline-block; font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 3px; color: #d9b48f; font-weight: 800; margin-bottom: 1.2rem;
+            background: rgba(182,138,99,0.1); padding: 6px 16px; border-radius: 50px;
         }
         .image-stack { position: relative; }
-        .image-main { width: 90%; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .image-main { width: 90%; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.15); transition: 0.5s; }
         .image-floating { 
-            position: absolute; right: 0; bottom: -20px; 
-            width: 45%; border: 6px solid #fff; border-radius: 15px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: absolute; right: 0; bottom: -30px; 
+            width: 48%; border: 8px solid #fff; border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); transition: 0.5s;
         }
+        .image-stack:hover .image-main { transform: scale(1.02); }
+        .image-stack:hover .image-floating { transform: translateY(-10px) scale(1.05); }
         .service-card {
-            background: #fff; border-radius: 20px; overflow: hidden;
-            transition: all 0.4s ease; border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.02); height: 100%;
+            background: #fff; border-radius: 24px; overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); border: 1px solid rgba(182,138,99,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); height: 100%; position: relative;
         }
-        .service-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-        .card-video-wrapper { position: relative; height: 220px; overflow: hidden; }
-        .card-video-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .service-card:hover .card-video-wrapper img { transform: scale(1.1); }
+        .service-card:hover { transform: translateY(-15px); box-shadow: 0 30px 60px rgba(182,138,99,0.15); border-color: rgba(182,138,99,0.4); }
+        .card-video-wrapper { position: relative; height: 260px; overflow: hidden; }
+        .card-video-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        .service-card:hover .card-video-wrapper img { transform: scale(1.15); }
         .step-card {
             background: #fdfaf7; padding: 2rem; border-radius: 25px;
             height: 100%; border: 1px solid rgba(182,138,99,0.08);
@@ -88,13 +100,13 @@
         <div class="row" data-aos="fade-up">
             <div class="col-lg-8">
                 <span class="section-label">Premium Spa & Wellness</span>
-                <h1 class="display-2 font-playfair fw-bold mb-4">Nuông chiều bản thân,<br><span class="text-gold">Đánh thức vẻ đẹp.</span></h1>
+                <h1 class="display-2 font-playfair fw-bold mb-4" style="line-height: 1.1;">Nuông chiều bản thân,<br><span class="text-gradient" style="background: linear-gradient(135deg, #fcebc6 0%, #d9b48f 30%, #b68a63 70%, #8a6442 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Đánh thức vẻ đẹp.</span></h1>
                 <p class="fs-5 fw-light mb-5" style="max-width: 600px; opacity: 0.9; line-height: 1.8;">
                     Trải nghiệm không gian thư giãn tuyệt đối và những liệu pháp tái tạo năng lượng hàng đầu. Nơi vẻ đẹp tự nhiên của bạn được tôn vinh một cách tinh tế nhất.
                 </p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a asp-controller="Booking" asp-action="Index" class="btn btn-gold btn-lg shadow">Đặt lịch ngay</a>
-                    <a href="#services" class="btn btn-glass btn-lg">Khám phá dịch vụ</a>
+                <div class="d-flex flex-wrap gap-3 align-items-center mt-3">
+                    <a asp-controller="Booking" asp-action="Index" class="btn btn-gold btn-lg shadow d-inline-flex justify-content-center align-items-center" style="min-width: 200px; height: 55px;">Đặt lịch ngay</a>
+                    <a href="#services" class="btn btn-glass btn-lg d-inline-flex justify-content-center align-items-center" style="min-width: 200px; height: 55px;">Khám phá dịch vụ</a>
                 </div>
             </div>
         </div>

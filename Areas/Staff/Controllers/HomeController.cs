@@ -17,7 +17,7 @@ namespace SpaN5.Areas.Staff.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string view = "day")
         {
             var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
             
@@ -28,38 +28,123 @@ namespace SpaN5.Areas.Staff.Controllers
             }
 
             var today = DateTime.Today;
+            DateTime startDate = today;
+            DateTime endDate = today;
 
-            // Chỉ lấy các Booking CỦA HÔM NAY mà TÀI KHOẢN NÀY ĐƯỢC GÁN
-            var allTodayBookings = await _context.Bookings
+            if (view == "week")
+            {
+                startDate = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday); // Thứ 2
+                endDate = startDate.AddDays(6); // Chủ nhật
+            }
+            else if (view == "month")
+            {
+                startDate = new DateTime(today.Year, today.Month, 1);
+                endDate = startDate.AddMonths(1).AddDays(-1);
+            }
+
+            ViewBag.CurrentView = view;
+
+            // Chỉ lấy các Booking trong khoảng thời gian mà TÀI KHOẢN NÀY ĐƯỢC GÁN
+            var allBookings = await _context.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.BookingDetails)
                     .ThenInclude(bd => bd.Service)
-                .Where(b => b.BookingDate.Date == today)
+                .Where(b => b.BookingDate.Date >= startDate && b.BookingDate.Date <= endDate)
                 .Where(b => b.BookingDetails.Any(bd => bd.StaffId == staffId)) 
-                .OrderBy(b => b.StartTime)
+                .OrderBy(b => b.BookingDate).ThenBy(b => b.StartTime)
                 .ToListAsync();
 
             // Loại bỏ các detail của KTV khác trong nội bộ 1 booking kết quả
-            foreach (var b in allTodayBookings)
+            foreach (var b in allBookings)
             {
                 b.BookingDetails = b.BookingDetails.Where(bd => bd.StaffId == staffId).ToList();
             }
 
-            // Tính hiệu suất
-            int totalCa = allTodayBookings.Count;
-            int hoanThanh = allTodayBookings.Count(b => b.Status == BookingStatus.Completed);
+            // Lấy lịch sử xin nghỉ
+            ViewBag.LeaveRequests = await _context.LeaveRequests
+                .Where(lr => lr.StaffId == staffId)
+                .OrderByDescending(lr => lr.CreatedAt)
+                .Take(5)
+                .ToListAsync();
+
+            // Lấy TẤT CẢ đơn nghỉ ĐÃ DUYỆT trong khoảng thời gian đang xem để hiện lên lịch
+            ViewBag.ApprovedLeaves = await _context.LeaveRequests
+                .Where(lr => lr.StaffId == staffId && lr.Status == LeaveRequestStatus.Approved)
+                .Where(lr => lr.FromDate <= endDate && lr.ToDate >= startDate)
+                .ToListAsync();
+
+            // Tính hiệu suất (Tính trên toàn bộ lịch được lấy ra để bao quát cả Tuần/Tháng)
+            int totalCa = allBookings.Count;
+            int hoanThanh = allBookings.Count(b => b.Status == BookingStatus.Completed);
             int percent = totalCa > 0 ? (hoanThanh * 100) / totalCa : 0;
             
             ViewBag.TotalCa = totalCa;
             ViewBag.CaHoanThanh = hoanThanh;
             ViewBag.Efficiency = percent;
 
+            // Lấy thông tin Staff và Specialization để phân Team
+            var staff = await _context.Staffs
+                .Include(s => s.Specialization)
+                .FirstOrDefaultAsync(s => s.StaffId == staffId);
+
+            // Logic Mapping Team chuyên nghiệp (Theo yêu cầu: 1 dịch vụ = 1 team)
+            string teamName = "General Team";
+            string teamType = "general";
+            string teamColor = "#0ea5e9"; // Mặc định xanh dương
+            string teamIcon = "bi-person-badge";
+            string noteHint = "Ghi chú tiến trình khách hàng...";
+
+            if (staff?.Specialization != null)
+            {
+                var svcName = staff.Specialization.ServiceName;
+                if (svcName.Contains("Massage"))
+                {
+                    teamName = "Team Zen Therapy";
+                    teamType = "zen";
+                    teamColor = "#78350f"; // Nâu gỗ Zen
+                    teamIcon = "bi-peace";
+                    noteHint = "Ghi chú vùng cơ đau mỏi, lực nhấn yêu thích của khách...";
+                }
+                else if (svcName.Contains("Da Mặt"))
+                {
+                    teamName = "Team Skin Clinical";
+                    teamType = "skin";
+                    teamColor = "#0d9488"; // Xanh Teal Y tế
+                    teamIcon = "bi-shield-plus";
+                    noteHint = "Ghi chú tình trạng nền da, phản ứng với serum và tinh chất...";
+                }
+                else if (svcName.Contains("Thảo Dược"))
+                {
+                    teamName = "Team Nature Herbal";
+                    teamType = "herbal";
+                    teamColor = "#15803d"; // Xanh lá thảo mộc
+                    teamIcon = "bi-leaf";
+                    noteHint = "Ghi chú mức độ đào thải độc tố và cảm nhận sau khi ngâm thảo mộc...";
+                }
+                else if (svcName.Contains("VIP"))
+                {
+                    teamName = "Team Royal VIP";
+                    teamType = "royal";
+                    teamColor = "#7e22ce"; // Tím quý phái/Vàng kim
+                    teamIcon = "bi-crown";
+                    noteHint = "Ghi chú trải nghiệm không gian và yêu cầu đặc biệt của khách thượng lưu...";
+                }
+            }
+
+            ViewBag.TeamInfo = new {
+                Name = teamName,
+                Type = teamType,
+                Color = teamColor,
+                Icon = teamIcon,
+                NoteHint = noteHint
+            };
+
             // Ca chuẩn bị tiếp theo (Ca chưa hoàn thành và gần nhất)
-            var nextBooking = allTodayBookings.FirstOrDefault(b => b.Status == BookingStatus.Pending || b.Status == BookingStatus.Confirmed);
+            var nextBooking = allBookings.FirstOrDefault(b => b.Status == BookingStatus.Pending || b.Status == BookingStatus.Confirmed);
             ViewBag.NextBooking = nextBooking;
 
             // View chỉ hiển thị ca chưa hoàn thành hoặc đang làm
-            var activeBookings = allTodayBookings;
+            var activeBookings = allBookings;
 
             // Lấy tất cả dịch vụ để hiển thị trong phần Task Dịch Vụ
             var allServices = await _context.Services.Where(s => s.IsActive).ToListAsync();
@@ -140,7 +225,53 @@ namespace SpaN5.Areas.Staff.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int bookingId, BookingStatus newStatus)
+        public async Task<IActionResult> AcceptBooking(int bookingId)
+        {
+            var booking = await _context.Bookings.FindAsync(bookingId);
+            if (booking == null) return Json(new { success = false, message = "Không tìm thấy mã lịch." });
+            
+            if (booking.Status != BookingStatus.Confirmed)
+                return Json(new { success = false, message = "Lịch hẹn hiện không trong trạng thái chờ nhận." });
+
+            booking.Status = BookingStatus.Accepted;
+            await _context.SaveChangesAsync();
+            
+            return Json(new { success = true, message = "Đã nhận nhiệm vụ thành công." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitLeaveRequest(DateTime fromDate, DateTime toDate, string reason)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
+            {
+                return Json(new { success = false, message = "Phiên đăng nhập hết hạn." });
+            }
+
+            if (fromDate.Date < DateTime.Today)
+                return Json(new { success = false, message = "Không thể xin nghỉ cho ngày trong quá khứ." });
+
+            if (toDate < fromDate)
+                return Json(new { success = false, message = "Ngày kết thúc không hợp lệ." });
+
+            var request = new LeaveRequest
+            {
+                StaffId = staffId,
+                FromDate = fromDate,
+                ToDate = toDate,
+                Reason = reason,
+                Status = LeaveRequestStatus.Pending,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.LeaveRequests.Add(request);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Đã gửi đơn xin nghỉ. Vui lòng chờ Admin phê duyệt." });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CheckIn(int bookingId)
         {
             var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
             if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
@@ -154,63 +285,48 @@ namespace SpaN5.Areas.Staff.Controllers
 
             if (booking == null) return Json(new { success = false, message = "Không tìm thấy mã lịch." });
 
-            // Logic tự động gán staff và phòng nếu đang chuyển sang InProgress
-            if (newStatus == BookingStatus.InProgress)
-            {
-                foreach(var detail in booking.BookingDetails)
-                {
-                    if (detail.StaffId == null) detail.StaffId = staffId;
-                    
-                    if (detail.RoomNumber == null)
-                    {
-                        // Tìm các phòng đang bận cho dịch vụ này
-                        var occupiedRooms = await _context.BookingDetails
-                            .Where(bd => bd.ServiceId == detail.ServiceId && bd.Booking.Status == BookingStatus.InProgress)
-                            .Select(bd => bd.RoomNumber)
-                            .ToListAsync();
+            // Accepted or Confirmed is okay to start, but we prefer Accepted now
+            if (booking.Status != BookingStatus.Accepted && booking.Status != BookingStatus.Confirmed)
+                return Json(new { success = false, message = "Lịch hẹn không hợp lệ để bắt đầu." });
 
-                        // Tìm phòng trống đầu tiên từ 1-10
-                        for (int i = 1; i <= 10; i++)
+            // Logic tự động gán staff và phòng nếu đang chuyển sang InProgress
+            // [NÂNG CAO] Kiểm tra xem KTV này có đang bận thực hiện ca nào khác không?
+            var busyBooking = await _context.BookingDetails
+                .AnyAsync(bd => bd.StaffId == staffId && bd.Booking.Status == BookingStatus.InProgress && bd.BookingId != bookingId);
+            
+            if (busyBooking)
+            {
+                return Json(new { success = false, message = "Bạn đang có một dịch vụ đang thực hiện. Hãy hoàn thành hoặc chuyển ca trước khi bắt đầu dịch vụ mới." });
+            }
+
+            booking.Status = BookingStatus.InProgress;
+            foreach (var detail in booking.BookingDetails)
+            {
+                if (detail.StaffId == null) detail.StaffId = staffId;
+                detail.Status = DetailStatus.InProgress;
+
+                if (detail.RoomNumber == null)
+                {
+                    var occupiedRooms = await _context.BookingDetails
+                        .Where(bd => bd.Booking.Status == BookingStatus.InProgress)
+                        .Select(bd => bd.RoomNumber)
+                        .ToListAsync();
+
+                    for (int i = 1; i <= 20; i++)
+                    {
+                        if (!occupiedRooms.Contains(i))
                         {
-                            if (!occupiedRooms.Contains(i))
-                            {
-                                detail.RoomNumber = i;
-                                break;
-                            }
+                            detail.RoomNumber = i;
+                            break;
                         }
                     }
                 }
             }
-            else if (newStatus == BookingStatus.Confirmed)
-            {
-                foreach(var detail in booking.BookingDetails)
-                {
-                    if (detail.StaffId == null) detail.StaffId = staffId;
-                }
-            }
-            else if (newStatus == BookingStatus.Completed || newStatus == BookingStatus.Cancelled)
-            {
-                // Giải phóng phòng khi hoàn tất hoặc hủy
-                foreach(var detail in booking.BookingDetails)
-                {
-                    detail.RoomNumber = null;
-                }
-            }
 
-            booking.Status = newStatus;
             await _context.SaveChangesAsync();
-
             return Json(new { success = true });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ConfirmBooking(int bookingId) => await UpdateStatus(bookingId, BookingStatus.Confirmed);
-
-        [HttpPost]
-        public async Task<IActionResult> RejectBooking(int bookingId) => await UpdateStatus(bookingId, BookingStatus.Cancelled);
-
-        [HttpPost]
-        public async Task<IActionResult> CheckIn(int bookingId) => await UpdateStatus(bookingId, BookingStatus.InProgress);
 
         [HttpGet]
         public async Task<IActionResult> GetAllServices()
@@ -333,6 +449,126 @@ namespace SpaN5.Areas.Staff.Controllers
             }
 
             return View(history);
+        }
+
+        // Tương tác Điểm danh (Check In / Check Out) Update từ Cổng Nội Bộ Sang
+        [HttpPost]
+        public async Task<IActionResult> ToggleAttendance()
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId)) return Json(new { success = false, message = "Lỗi xác thực" });
+
+            var today = DateTime.Today;
+            var attendance = await _context.Attendances.FirstOrDefaultAsync(a => a.StaffId == staffId && a.Date.Date == today);
+
+            if (attendance == null)
+            {
+                attendance = new Attendance { StaffId = staffId, Date = today, CheckInTime = DateTime.Now };
+                _context.Attendances.Add(attendance);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, state = "checked_in", time = attendance.CheckInTime.Value.ToString("HH:mm") });
+            }
+            else if (attendance.CheckOutTime == null)
+            {
+                attendance.CheckOutTime = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, state = "checked_out", time = attendance.CheckOutTime.Value.ToString("HH:mm") });
+            }
+
+            return Json(new { success = false, message = "Bạn đã hoàn thành ca làm việc hôm nay" });
+        }
+
+        // Modal API - lấy list Materials
+        [HttpGet]
+        public async Task<IActionResult> GetMaterials()
+        {
+            var materials = await _context.Materials.Select(m => new { id = m.MaterialId, name = m.MaterialName, unit = m.Unit }).ToListAsync();
+            return Json(new { success = true, data = materials });
+        }
+
+        // Báo thiếu vật tư
+        [HttpPost]
+        public async Task<IActionResult> ReportMaterial(int materialId, int quantity, string note)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId)) return Json(new { success = false });
+
+            var staff = await _context.Staffs.FindAsync(staffId);
+            var material = await _context.Materials.FindAsync(materialId);
+            if (material == null || staff == null) return Json(new { success = false, message = "Vật tư hoặc nhân sự không tồn tại" });
+
+            var transaction = new StockTransaction
+            {
+                MaterialId = materialId,
+                Type = "Báo thiếu/hao hụt",
+                Quantity = Math.Max(1, quantity),
+                Reason = $"[{staff.FullName}] báo cáo: {note}",
+                CreatedAt = DateTime.Now
+            };
+
+            _context.StockTransactions.Add(transaction);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CompleteWithNote(int bookingId, string note)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId)) return Json(new { success = false, message = "Phiên hết hạn" });
+
+            var booking = await _context.Bookings.Include(b => b.Customer).Include(b => b.BookingDetails).FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            if(booking == null) return Json(new { success = false, message = "Không tìm thấy booking" });
+
+            booking.Status = BookingStatus.Completed;
+            foreach (var d in booking.BookingDetails) d.Status = DetailStatus.Completed;
+
+            if(!string.IsNullOrEmpty(note) && booking.Customer != null)
+            {
+                _context.CustomerNotes.Add(new CustomerNote {
+                    CustomerId = booking.CustomerId, StaffId = staffId, BookingId = bookingId, Note = note, CreatedAt = DateTime.Now
+                });
+            }
+
+            // Giải phóng phòng
+            foreach(var detail in booking.BookingDetails) detail.RoomNumber = null;
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        // Xin chuyển ca (Release staff and notify)
+        [HttpPost]
+        public async Task<IActionResult> RequestTransfer(int bookingId)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId)) return Json(new { success = false });
+
+            var booking = await _context.Bookings.Include(b => b.BookingDetails).FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            if(booking == null) return Json(new { success = false, message = "Không tìm thấy booking" });
+
+            // 1. Phục hồi trạng thái về Confirmed để Lễ tân gán người khác
+            booking.Status = BookingStatus.Confirmed;
+            
+            // 2. Gỡ StaffId khỏi các detail của booking này
+            foreach(var d in booking.BookingDetails)
+            {
+                if(d.StaffId == staffId) d.StaffId = null;
+            }
+
+            // 3. Ghi vào AuditLog để báo cho Lễ tân
+            var staff = await _context.Staffs.FindAsync(staffId);
+            _context.AuditLogs.Add(new AuditLog {
+                UserName = staff?.FullName ?? "Staff",
+                Action = "ShiftTransferRequest",
+                EntityName = "Booking",
+                EntityId = bookingId.ToString(),
+                NewValues = $"Nhân viên {staff?.FullName} yêu cầu chuyển ca cho Booking #{booking.BookingCode}",
+                CreatedAt = DateTime.Now
+            });
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, message = "Đã gửi yêu cầu chuyển ca tới Lễ tân." });
         }
     }
 }

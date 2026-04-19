@@ -191,66 +191,102 @@
 </div>
 
 <div class="row g-4">
-    <!-- Left Column: Operations & Analysis -->
-    <div class="col-lg-8">
-        <div class="glass-card h-100">
-            <div class="section-header">
-                <h3>Phân tích doanh thu & Booking</h3>
-                <div class="dropdown">
-                    <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="dropdown">7 ngày qua <i class="fa-solid fa-chevron-down ms-1"></i></button>
-                    <ul class="dropdown-menu border-0 shadow mt-2">
-                        <li><a class="dropdown-item" href="#">30 ngày qua</a></li>
-                        <li><a class="dropdown-item" href="#">Tháng này</a></li>
-                    </ul>
+    @if (User.IsInRole("Admin"))
+    {
+        <!-- Left Column: Operations & Analysis -->
+        <div class="col-lg-8">
+            <div class="glass-card h-100">
+                <div class="section-header">
+                    <h3>Phân tích doanh thu & Booking</h3>
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="dropdown">7 ngày qua <i class="fa-solid fa-chevron-down ms-1"></i></button>
+                        <ul class="dropdown-menu border-0 shadow mt-2">
+                            <li><a class="dropdown-item" href="#">30 ngày qua</a></li>
+                            <li><a class="dropdown-item" href="#">Tháng này</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="revenueChart"></canvas>
                 </div>
             </div>
-            <div style="height: 300px; position: relative;">
-                <canvas id="revenueChart"></canvas>
-            </div>
         </div>
-    </div>
+    }
 
     <!-- Right Column: Smart Alerts & Staff -->
-    <div class="col-lg-4">
-        <div class="glass-card">
-            <div class="section-header">
-                <h3>Cảnh báo thông minh</h3>
-                <span class="badge bg-danger rounded-pill">03</span>
-            </div>
-            <div class="alert-list">
-                @if (waitingCount > 3) {
-                    <div class="alert-item danger">
-                        <i class="fa-solid fa-triangle-exclamation alert-icon text-danger"></i>
-                        <div class="alert-text">Khách đang đợi quá đông (@waitingCount khách). Cần thêm nhân sự hỗ trợ.</div>
-                    </div>
-                }
-                <div class="alert-item warning">
-                    <i class="fa-solid fa-clock alert-icon text-warning"></i>
-                    <div class="alert-text">Phòng VIP 02 đang trống hơn 2 giờ trong khung giờ vàng.</div>
+    <div class="@(User.IsInRole("Admin") ? "col-lg-4" : "col-lg-12")">
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3>Cảnh báo thông minh</h3>
+                    <span class="badge bg-danger rounded-pill">03</span>
                 </div>
-                <div class="alert-item">
-                    <i class="fa-solid fa-circle-info alert-icon text-primary"></i>
-                    <div class="alert-text">Kho nguyên vật liệu: Tinh dầu Sả chanh sắp hết (Tồn: 200ml).</div>
-                </div>
-            </div>
-        </div>
+                <div class="alert-list">
+                    @if (ViewBag.LeaveRequests is List<LeaveRequest> lrs && lrs.Any())
+                    {
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3" style="font-size: 0.9rem; color: #ef4444;">
+                                <i class="fa-solid fa-calendar-check me-2"></i>Đơn nghỉ cần duyệt (@lrs.Count)
+                            </h5>
+                            @foreach (var lr in lrs)
+                            {
+                                <div class="alert-item warning d-block mb-3" style="border-left: 4px solid #ef4444; background: #fff5f5;">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <div class="fw-bold small text-dark me-2">@lr.Staff?.FullName</div>
+                                        <span class="badge bg-danger" style="font-size: 0.65rem;">XIN NGHỈ</span>
+                                    </div>
+                                    <div class="smaller text-muted mb-2" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-clock me-1"></i>
+                                        @if (lr.FromDate.Date == lr.ToDate.Date) { <span>Ngày @lr.FromDate.ToString("dd/MM")</span> }
+                                        else { <span>Từ @lr.FromDate.ToString("dd/MM") đến @lr.ToDate.ToString("dd/MM")</span> }
+                                    </div>
+                                    <div class="italic text-muted px-2 border-start mb-2" style="font-size: 0.75rem; border-width: 2px !important;">"@lr.Reason"</div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-danger rounded-pill px-3 py-1 fw-bold" style="font-size: 0.7rem;" onclick="approveLeave(@lr.Id)">Duyệt & Gán lại KTV</button>
+                                    </div>
+                                </div>
+                            }
+                            <hr class="opacity-10" />
+                        </div>
+                    }
 
-        <div class="glass-card mt-4">
+                    @if (waitingCount > 3) {
+                        <div class="alert-item danger">
+                            <i class="fa-solid fa-triangle-exclamation alert-icon text-danger"></i>
+                            <div class="alert-text">Khách đang đợi quá đông (@waitingCount khách). Cần thêm nhân sự hỗ trợ.</div>
+                        </div>
+                    }
+                    <div class="alert-item warning">
+                        <i class="fa-solid fa-clock alert-icon text-warning"></i>
+                        <div class="alert-text">Phòng VIP 02 đang trống hơn 2 giờ trong khung giờ vàng.</div>
+                    </div>
+                    <div class="alert-item">
+                        <i class="fa-solid fa-circle-info alert-icon text-primary"></i>
+                        <div class="alert-text">Kho nguyên vật liệu: Tinh dầu Sả chanh sắp hết (Tồn: 200ml).</div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="glass-card @(User.IsInRole("Admin") ? "mt-4" : "")">
             <div class="section-header">
                 <h3>Đội ngũ kỹ thuật viên</h3>
-                <a href="#" class="small fw-bold text-decoration-none" style="color: var(--primary-blue);">Tất cả</a>
+                <a href="/Admin/Staff" class="small fw-bold text-decoration-none" style="color: var(--primary-blue);">Tất cả</a>
             </div>
-            <div class="staff-list">
-                @foreach (var wf in staffWorkflows.Take(5)) {
-                    <div class="d-flex align-items-center mb-3">
+            <div class="staff-list @(User.IsInRole("Admin") ? "" : "row")">
+                @foreach (var wf in staffWorkflows.Take(User.IsInRole("Admin") ? 5 : 12)) {
+                    <div class="@(User.IsInRole("Admin") ? "d-flex" : "col-md-4 d-flex") align-items-center mb-3">
                         <img src="https://ui-avatars.com/api/?name=@wf.Staff.FullName&background=random" class="rounded-pill me-3" width="36" />
                         <div class="flex-grow-1">
                             <div class="fw-bold small">@wf.Staff.FullName</div>
                             <div class="text-muted smaller" style="font-size: 0.7rem;">@wf.Staff.Specialization?.ServiceName</div>
                         </div>
-                        <div class="status-pill @(wf.Staff.Status != "active" ? "secondary" : (wf.IsBusy ? "warning" : "success")) small" style="font-size: 0.6rem;">
+                        <div class="status-pill @(wf.Staff.Status != "active" || wf.IsOnLeave ? "secondary" : (wf.IsBusy ? "warning" : "success")) small" style="font-size: 0.6rem;">
                             @if (wf.Staff.Status != "active") {
                                 <span>NGHỈ</span>
+                            } else if (wf.IsOnLeave) {
+                                <span>ĐANG NGHỈ</span>
                             } else {
                                 @(wf.IsBusy ? "ĐANG BẬN" : "SẴN SÀNG")
                             }
@@ -287,19 +323,38 @@
                                 <div class="fw-bold">@bk.Customer?.FullName</div>
                                 <div class="text-muted smaller" style="font-size: 0.75rem;">@bk.BookingCode</div>
                             </td>
-                            <td><span class="fw-600">@bk.BookingDetails.FirstOrDefault()?.Service?.ServiceName</span></td>
+                            <td>
+                                <div class="fw-600">@bk.BookingDetails.FirstOrDefault()?.Service?.ServiceName</div>
+                                <div class="text-muted smaller" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-user-sparkles me-1 text-primary opacity-50"></i>
+                                    KTV: @(bk.BookingDetails.FirstOrDefault()?.Staff?.FullName ?? "Chưa gán")
+                                </div>
+                            </td>
                             <td>
                                 <div class="fw-bold">@bk.StartTime.ToString("HH:mm")</div>
                                 <div class="text-muted smaller" style="font-size: 0.75rem;">@bk.BookingDate.ToString("dd/MM")</div>
                             </td>
                             <td>
-                                <span class="status-pill @(bk.Status == SpaN5.Models.BookingStatus.Completed ? "success" : (bk.Status == SpaN5.Models.BookingStatus.InProgress ? "primary" : "warning"))">
-                                    @bk.Status.ToString().ToUpper()
+                                @{
+                                    bool isPaid = bk.Payments?.Any(p => p.Status == SpaN5.Models.PaymentStatus.Paid) ?? false;
+                                    bool readyForCheckout = bk.Status == SpaN5.Models.BookingStatus.Completed && !isPaid;
+                                }
+                                <span class="status-pill @(readyForCheckout ? "bg-success text-white" : (isPaid ? "success" : (bk.Status == SpaN5.Models.BookingStatus.InProgress ? "primary" : "warning")))">
+                                    @(readyForCheckout ? "CHỜ THANH TOÁN" : (isPaid ? "ĐÃ THANH TOÁN" : bk.Status.ToString().ToUpper()))
                                 </span>
                             </td>
                             <td class="fw-bold">@bk.TotalAmount.ToString("N0")đ</td>
                             <td class="text-end">
-                                <button class="btn btn-light btn-sm rounded-circle shadow-none border-0" style="width: 32px; height: 32px;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                @if (readyForCheckout)
+                                {
+                                    <button class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="processCheckout(@bk.BookingId, '@bk.BookingCode', @bk.TotalAmount)">
+                                        <i class="fa-solid fa-cash-register me-1"></i> Thanh toán
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-light btn-sm rounded-circle shadow-none border-0" style="width: 32px; height: 32px;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                }
                             </td>
                         </tr>
                     }
@@ -310,36 +365,143 @@
 </div>
 
 @section Scripts {
-    <script>
-        // Revenue Chart Implementation
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7', 'CN'],
-                datasets: [{
-                    label: 'Doanh thu (triệu VNĐ)',
-                    data: [12, 19, 15, 25, 22, 30, 28],
-                    borderColor: '#4318FF',
-                    backgroundColor: 'rgba(67, 24, 255, 0.05)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#4318FF',
-                    pointBorderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { weight: 'bold' }, color: '#A3AED0' } },
-                    y: { grid: { borderDash: [5, 5], color: '#E9EDF7' }, ticks: { font: { weight: 'bold' }, color: '#A3AED0' } }
+    @if (User.IsInRole("Admin"))
+    {
+        <script>
+            // Revenue Chart Implementation
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChartLabels)),
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChartData)),
+                        borderColor: '#4318FF',
+                        backgroundColor: 'rgba(67, 24, 255, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4318FF',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' }, color: '#A3AED0' } },
+                        y: { grid: { borderDash: [5, 5], color: '#E9EDF7' }, ticks: { font: { weight: 'bold' }, color: '#A3AED0', callback: value => value.toLocaleString('vi-VN') } }
+                    }
                 }
+            });
+
+            // --- THÔNG BÁO CHUYỂN CA TỨC THỜI ---
+            let lastTransferId = 0;
+            function checkTransferRequests() {
+                $.get('/Admin/Home/GetTransferRequests', function(res) {
+                    if (res.success && res.data && res.data.length > 0) {
+                        const latest = res.data[0];
+                        if (latest.id > lastTransferId) {
+                            if (lastTransferId !== 0) { // Tránh hiện thông báo cũ khi vừa load trang
+                                Swal.fire({
+                                    title: 'CẢNH BÁO CHUYỂN CA',
+                                    text: latest.message,
+                                    icon: 'warning',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: true,
+                                    confirmButtonText: 'Xem lịch',
+                                    timer: 10000
+                                }).then((result) => {
+                                    if(result.isConfirmed) window.location.href = '/Admin/Home/Bookings';
+                                });
+
+                                // Play notification sound (optional)
+                                try { new Audio('/sounds/notification.mp3').play(); } catch(e) {}
+                            }
+                            lastTransferId = latest.id;
+                        }
+                    }
+                });
             }
-        });
-    </script>
+
+            // Polling mỗi 15 giây
+            setInterval(checkTransferRequests, 15000);
+            checkTransferRequests();
+
+            // --- THANH TOÁN TẠI QUẦY ---
+            function processCheckout(id, code, amount) {
+                Swal.fire({
+                    title: 'Thanh toán Booking #' + code,
+                    html: `
+                        <div class="text-start p-3 bg-light rounded-4 mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tổng tiền:</span>
+                                <strong class="fs-4 text-primary">${amount.toLocaleString()}đ</strong>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold d-block text-start">Phương thức thanh toán:</label>
+                            <select id="paymentMethod" class="form-select rounded-pill p-3 border-2">
+                                <option value="0">Tiền mặt (Cash)</option>
+                                <option value="3">Chuyển khoản (Bank Transfer)</option>
+                                <option value="1">Momo</option>
+                                <option value="2">VNPay</option>
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fa-solid fa-check-circle me-1"></i> Xác nhận đã thu tiền',
+                    confirmButtonColor: '#00B050',
+                    cancelButtonText: 'Đóng',
+                    preConfirm: () => {
+                        const method = document.getElementById('paymentMethod').value;
+                        return $.post('/Admin/Home/CompleteBooking', { bookingId: id, method: method });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (result.value.success) {
+                            Swal.fire('Thành công', 'Đã xác nhận thanh toán!', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', result.value.message || 'Không thể xử lý thanh toán', 'error');
+                        }
+                    }
+                });
+            }
+
+            function approveLeave(id) {
+                Swal.fire({
+                    title: 'Xác nhận duyệt nghỉ',
+                    text: "Hệ thống sẽ tự động gán khách của KTV này cho người khác rảnh. Bạn đồng ý?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý duyệt',
+                    confirmButtonColor: '#00B050'
+                }).then(r => {
+                    if (r.isConfirmed) {
+                        $.post('/Admin/Home/ApproveLeave', { requestId: id }, function(res) {
+                            if (res.success) {
+                                Swal.fire('Thành công', res.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Lỗi', res.message, 'error');
+                            }
+                        });
+                    }
+                });
+            }
+        </script>
+    }
 }

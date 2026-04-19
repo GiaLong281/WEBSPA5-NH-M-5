@@ -4,76 +4,170 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-5" style="margin-top: 80px;">
-    <div class="text-center mb-5">
-        <h1 class="font-playfair text-gold">Hệ thống chi nhánh</h1>
-        <div class="mx-auto bg-gold" style="height: 2px; width: 60px;"></div>
-        <p class="mt-3 text-muted">Trải nghiệm dịch vụ tại các chi nhánh của chúng tôi</p>
-    </div>
+<style>
+    .branch-header {
+        padding: 6rem 0 3rem;
+        text-align: center;
+        background: linear-gradient(180deg, #fbf7f2 0%, #fffdfb 100%);
+        border-bottom: 1px solid rgba(182,138,99,0.1);
+        margin-bottom: 3rem;
+    }
+    
+    .branch-card {
+        border: none;
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+        background: #fff;
+        height: 100%;
+        position: relative;
+    }
+    .branch-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 30px 60px rgba(182,138,99,0.12);
+    }
+    
+    .branch-img-wrapper {
+        height: 240px;
+        position: relative;
+        overflow: hidden;
+    }
+    .branch-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s ease;
+    }
+    .branch-card:hover .branch-img-wrapper img {
+        transform: scale(1.1);
+    }
+    
+    .branch-placeholder {
+        background: linear-gradient(135deg, #2a3441 0%, #12202d 100%);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .branch-placeholder::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5" fill="rgba(255,255,255,0.05)"/></svg>') repeat;
+    }
+    
+    .info-list {
+        list-style: none; padding: 0; margin: 0;
+    }
+    .info-list li {
+        display: flex; align-items: flex-start; gap: 12px;
+        margin-bottom: 12px; color: var(--muted); font-size: 0.95rem;
+    }
+    .info-list i {
+        color: #b68a63; font-size: 1.1rem; margin-top: 2px;
+    }
+    
+    .btn-gold-outline {
+        border: 2px solid #b68a63; color: #b68a63;
+        border-radius: 999px; font-weight: 600; padding: 0.6rem 1.5rem;
+        transition: 0.3s;
+    }
+    .btn-gold-outline:hover {
+        background: #b68a63; color: #fff;
+        box-shadow: 0 10px 20px rgba(182,138,99,0.2);
+    }
+</style>
 
+<div class="branch-header" style="margin-top: 80px;">
+    <div class="container">
+        <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 2px;">Mạng lưới SpaN5</span>
+        <h1 class="display-4 font-playfair fw-bold text-dark mt-2 mb-3">Hệ thống <span class="text-gold">Chi nhánh</span></h1>
+        <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">
+            Trân trọng chào đón quý khách tới trải nghiệm không gian tĩnh lặng và liệu pháp chăm sóc chuẩn Premium tại các cơ sở của chúng tôi.
+        </p>
+    </div>
+</div>
+
+<div class="container mb-5 pb-5">
     @if (!Model.Any())
     {
-        <div class="alert alert-info text-center py-5">
-            <i class="fas fa-store fa-3x mb-3"></i>
-            <p>Hiện chưa có chi nhánh nào.</p>
+        <div class="text-center py-5">
+            <div class="d-inline-flex justify-content-center align-items-center rounded-circle bg-light mb-4" style="width: 100px; height: 100px;">
+                <i class="fas fa-store-slash fa-2x text-muted"></i>
+            </div>
+            <h4 class="font-playfair fw-bold text-dark mb-2">Chưa có chi nhánh nào</h4>
+            <p class="text-muted">Hệ thống đang cập nhật danh sách chi nhánh, mong quý khách quay lại sau.</p>
         </div>
     }
     else
     {
-        <div class="row g-4">
+        <div class="row g-5">
             @foreach (var branch in Model)
             {
-                <div class="col-lg-4 col-md-6">
-                    <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
-                        @if (!string.IsNullOrEmpty(branch.Image))
-                        {
-                            <img src="/images/@branch.Image" class="card-img-top" alt="@branch.BranchName" style="height: 200px; object-fit: cover;">
-                        }
-                        else
-                        {
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="fas fa-store fa-4x text-muted"></i>
+                <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                    <div class="branch-card">
+                        <div class="branch-img-wrapper">
+                            @if (!string.IsNullOrEmpty(branch.Image))
+                            {
+                                <img src="/images/@branch.Image" alt="@branch.BranchName">
+                            }
+                            else
+                            {
+                                <div class="branch-placeholder">
+                                    <i class="fas fa-spa text-white opacity-25" style="font-size: 5rem;"></i>
+                                </div>
+                            }
+                            <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);">
+                                <h4 class="font-playfair text-white fw-bold mb-0">@branch.BranchName</h4>
                             </div>
-                        }
-                        <div class="card-body">
-                            <h5 class="card-title font-playfair">@branch.BranchName</h5>
-                            <div class="mb-2">
-                                <i class="fas fa-map-marker-alt text-gold me-2"></i> @branch.Address
-                                @if (!string.IsNullOrEmpty(branch.District))
-                                {
-                                    <span>, @branch.District</span>
-                                }
-                                <span>, @branch.City</span>
-                            </div>
-                            <div class="mb-2">
-                                <i class="fas fa-phone text-gold me-2"></i> @branch.Phone
+                        </div>
+                        
+                        <div class="card-body p-4 pt-4">
+                            <ul class="info-list mb-4">
+                                <li>
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <div>
+                                        @branch.Address
+                                        @if (!string.IsNullOrEmpty(branch.District)) { <span>, @branch.District</span> }
+                                        <span>, @branch.City</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <i class="fas fa-phone"></i>
+                                    <div>@branch.Phone</div>
+                                </li>
                                 @if (!string.IsNullOrEmpty(branch.Email))
                                 {
-                                    <br /><i class="fas fa-envelope text-gold me-2"></i> @branch.Email
+                                    <li>
+                                        <i class="fas fa-envelope"></i>
+                                        <div>@branch.Email</div>
+                                    </li>
                                 }
-                            </div>
-                            <div class="mb-2">
-                                <i class="far fa-clock text-gold me-2"></i> 
-                                @branch.OpeningTime.ToString(@"hh\:mm") - @branch.ClosingTime.ToString(@"hh\:mm")
-                                @if (!string.IsNullOrEmpty(branch.Workday))
-                                {
-                                    <span>(@branch.Workday)</span>
-                                }
-                            </div>
+                                <li>
+                                    <i class="far fa-clock"></i>
+                                    <div>
+                                        @branch.OpeningTime.ToString(@"hh\:mm") - @branch.ClosingTime.ToString(@"hh\:mm")
+                                        @if (!string.IsNullOrEmpty(branch.Workday)) { <span class="d-block small text-muted mt-1">(@branch.Workday)</span> }
+                                    </div>
+                                </li>
+                            </ul>
+                            
                             @if (!string.IsNullOrEmpty(branch.Description))
                             {
-                                <p class="text-muted small mt-2">@branch.Description</p>
+                                <p class="text-muted small border-top pt-3">@branch.Description</p>
                             }
                         </div>
-                        <div class="card-footer bg-white border-0 pb-3">
+                        
+                        <div class="card-footer bg-white border-0 p-4 pt-0 d-flex gap-2">
                             @if (!string.IsNullOrEmpty(branch.GoogleMapLink))
                             {
-                                <a href="@branch.GoogleMapLink" target="_blank" class="btn btn-sm btn-outline-gold me-2">
-                                    <i class="fas fa-map"></i> Xem bản đồ
+                                <a href="@branch.GoogleMapLink" target="_blank" class="btn btn-light rounded-pill flex-grow-1 fw-bold">
+                                    <i class="fas fa-map-marked-alt me-1 text-gold"></i> Bản đồ
                                 </a>
                             }
-                            <a asp-action="Details" asp-route-id="@branch.BranchId" class="btn btn-sm btn-outline-gold">
-                                Chi tiết <i class="fas fa-arrow-right"></i>
+                            <a asp-action="Details" asp-route-id="@branch.BranchId" class="btn btn-gold-outline flex-grow-1 text-center">
+                                Chi tiết
                             </a>
                         </div>
                     </div>
@@ -82,13 +176,3 @@
         </div>
     }
 </div>
-
-<style>
-    .hover-shadow {
-        transition: all 0.3s ease;
-    }
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    }
-</style>

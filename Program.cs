@@ -99,6 +99,52 @@ using (var scope = app.Services.CreateScope())
     // Đảm bảo Database đã sẵn sàng
     context.Database.EnsureCreated();
 
+    // VÁ LỖI: Tạo thêm các bảng mới nếu chưa có (EnsureCreated không tự cập nhật schema)
+    string[] tableCmds = {
+        @"CREATE TABLE IF NOT EXISTS Shifts (
+            ShiftId INTEGER PRIMARY KEY AUTOINCREMENT,
+            ShiftName TEXT NOT NULL,
+            StartTime TEXT NOT NULL,
+            EndTime TEXT NOT NULL,
+            IsActive INTEGER NOT NULL DEFAULT 1)",
+        @"CREATE TABLE IF NOT EXISTS StaffSchedules (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            StaffId INTEGER NOT NULL,
+            DayOfWeek INTEGER NOT NULL,
+            ShiftId INTEGER NOT NULL,
+            IsOff INTEGER NOT NULL DEFAULT 0)",
+        @"CREATE TABLE IF NOT EXISTS WorkSchedules (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            StaffId INTEGER NOT NULL,
+            Date TEXT NOT NULL,
+            ShiftId INTEGER NULL,
+            Status INTEGER NOT NULL DEFAULT 0,
+            Note TEXT NULL)",
+        @"CREATE TABLE IF NOT EXISTS LeaveRequests (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            StaffId INTEGER NOT NULL,
+            FromDate TEXT NOT NULL,
+            ToDate TEXT NOT NULL,
+            Reason TEXT NOT NULL,
+            Status INTEGER NOT NULL DEFAULT 0,
+            CreatedAt TEXT NOT NULL,
+            AdminNote TEXT NULL)"
+    };
+
+    foreach (var cmd in tableCmds) {
+        context.Database.ExecuteSqlRaw(cmd);
+    }
+
+    // 0. Seed Shifts (Ca làm việc mẫu)
+    if (!context.Shifts.Any()) {
+        context.Shifts.AddRange(
+            new Shift { ShiftName = "Ca Sáng", StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(14, 0, 0) },
+            new Shift { ShiftName = "Ca Chiều", StartTime = new TimeSpan(14, 0, 0), EndTime = new TimeSpan(20, 0, 0) },
+            new Shift { ShiftName = "Full Day", StartTime = new TimeSpan(8, 0, 0), EndTime = new TimeSpan(20, 0, 0) }
+        );
+        context.SaveChanges();
+    }
+
     // 1. Seed Staff & Admin
     if (!context.Users.Any(u => u.Role == "Admin"))
     {
