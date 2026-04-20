@@ -251,20 +251,30 @@
                         </div>
                     }
 
+                    @if (ViewBag.LowStockAlerts != null)
+                    {
+                        foreach (var alert in (dynamic)ViewBag.LowStockAlerts)
+                        {
+                            <div class="alert-item danger">
+                                <i class="fa-solid fa-circle-exclamation alert-icon text-danger"></i>
+                                <div class="alert-text">SẮP HẾT: @alert.MaterialName (Còn lại: @alert.CurrentStock @alert.Unit)</div>
+                            </div>
+                        }
+                    }
+
                     @if (waitingCount > 3) {
                         <div class="alert-item danger">
                             <i class="fa-solid fa-triangle-exclamation alert-icon text-danger"></i>
                             <div class="alert-text">Khách đang đợi quá đông (@waitingCount khách). Cần thêm nhân sự hỗ trợ.</div>
                         </div>
                     }
-                    <div class="alert-item warning">
-                        <i class="fa-solid fa-clock alert-icon text-warning"></i>
-                        <div class="alert-text">Phòng VIP 02 đang trống hơn 2 giờ trong khung giờ vàng.</div>
-                    </div>
-                    <div class="alert-item">
-                        <i class="fa-solid fa-circle-info alert-icon text-primary"></i>
-                        <div class="alert-text">Kho nguyên vật liệu: Tinh dầu Sả chanh sắp hết (Tồn: 200ml).</div>
-                    </div>
+
+                    @if (staffWorkflows.Any(w => w.IsOnLeave)) {
+                        <div class="alert-item warning">
+                            <i class="fa-solid fa-user-slash alert-icon text-warning"></i>
+                            <div class="alert-text">Hôm nay có @staffWorkflows.Count(w => w.IsOnLeave) nhân viên đang nghỉ phép.</div>
+                        </div>
+                    }
                 </div>
             </div>
         }

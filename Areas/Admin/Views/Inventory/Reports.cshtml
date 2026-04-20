@@ -1,0 +1,300 @@
+@{
+    ViewData["Title"] = "Phân tích Tiêu hao & Hiệu suất";
+    Layout = "_AdminLayout";
+    var staffWaste = ViewBag.StaffWaste as IEnumerable<dynamic>;
+    var profitAnalysis = ViewBag.ProfitAnalysis as IEnumerable<dynamic>;
+}
+
+<style>
+    .report-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+    .report-card:hover {
+        transform: translateY(-5px);
+    }
+    .chart-container {
+        min-height: 350px;
+    }
+    .stat-pill {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    .waste-high { color: #EE5D50; background: #FFF5F5; }
+    .waste-low { color: #05CD99; background: #E6F6EC; }
+    .waste-mid { color: #FFB800; background: #FFF9E6; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0 text-main"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Phân tích Hao hụt & Hiệu suất</h2>
+    <div class="text-muted small fw-bold"><i class="fa-solid fa-clock me-1"></i> Cập nhật: @DateTime.Now.ToString("HH:mm dd/MM/yyyy")</div>
+</div>
+
+<!-- Dashboard Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-9">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="report-card">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-circle-notch me-2 text-primary"></i>Tỷ lệ Tiêu thụ thực tế</h5>
+                    <div id="donutChart" class="chart-container"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="report-card">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-bar me-2 text-success"></i>So sánh Định mức vs Thực tế</h5>
+                    <div id="barChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="report-card d-flex flex-column justify-content-between">
+            <div>
+                <h5 class="fw-bold mb-4"><i class="fa-solid fa-lightbulb me-2 text-warning"></i>Thông tin nhanh</h5>
+                @{
+                    var topWaster = staffWaste?.OrderByDescending(x => (double)x.WasteRate).FirstOrDefault();
+                    var mostEfficient = staffWaste?.OrderBy(x => (double)x.WasteRate).FirstOrDefault();
+                }
+                
+                <div class="mb-4">
+                    <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Tỷ lệ hao hụt cao nhất</label>
+                    <div class="d-flex align-items-center">
+                        <div class="h4 fw-bold mb-0 text-danger me-2">@(topWaster?.WasteRate.ToString("N1") ?? "0")%</div>
+                        <div class="small fw-600 text-muted">(@(topWaster?.StaffName ?? "---"))</div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Nhân viên tối ưu nhất</label>
+                    <div class="d-flex align-items-center">
+                        <div class="h4 fw-bold mb-0 text-success me-2">@(mostEfficient?.WasteRate.ToString("N1") ?? "0")%</div>
+                        <div class="small fw-600 text-muted">(@(mostEfficient?.StaffName ?? "---"))</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-light p-3 rounded-4 mt-auto">
+                <div class="small text-muted italic">
+                    <i class="fa-solid fa-circle-info me-1"></i> Biểu đồ giúp bạn nhận diện nhanh các điểm nóng lãng phí vật tư.
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Financial BI Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-12">
+        <div class="report-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-money-bill-trend-up me-2 text-warning"></i>Phân tích Lợi nhuận gộp theo Gói dịch vụ</h5>
+                <span class="badge bg-light text-dark rounded-pill px-3">Đã trừ giá vốn vật tư</span>
+            </div>
+            <div id="profitChart" class="chart-container" style="min-height: 400px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Table Row -->
+<div class="row">
+    <div class="col-12">
+        <div class="glass-card p-4">
+            <h4 class="fw-bold mb-4"><i class="fa-solid fa-table-list me-2 text-primary"></i>Bảng chi tiết chỉ số theo nhân viên</h4>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-muted small text-uppercase fw-bold" style="border-bottom: 2px solid #f1f5f9;">
+                            <th>Kỹ thuật viên</th>
+                            <th class="text-center">Định mức tổng (g)</th>
+                            <th class="text-center">Thực tế dùng (g)</th>
+                            <th class="text-center">Chênh lệch</th>
+                            <th class="text-center">Tỷ lệ Lệch</th>
+                            <th class="text-end">Đánh giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (staffWaste == null || !staffWaste.Any())
+                        {
+                            <tr><td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu tiêu thụ để phân tích.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var s in staffWaste)
+                            {
+                                var diff = s.TotalActual - s.TotalStandard;
+                                var wasteClass = s.WasteRate > 15 ? "waste-high" : (s.WasteRate < 5 ? "waste-low" : "waste-mid");
+                                <tr>
+                                    <td class="fw-bold text-main">@s.StaffName</td>
+                                    <td class="text-center fw-600">@s.TotalStandard.ToString("N1")</td>
+                                    <td class="text-center fw-600">@s.TotalActual.ToString("N1")</td>
+                                    <td class="text-center @(diff > 0 ? "text-danger" : "text-success") fw-bold">
+                                        @(diff > 0 ? "+" : "")@diff.ToString("N1") g
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="stat-pill @wasteClass">
+                                            @(s.WasteRate > 0 ? "+" : "")@s.WasteRate.ToString("N1")%
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (s.WasteRate > 15) { <span class="badge bg-danger rounded-pill px-3">Lãng phí</span> }
+                                        else if (s.WasteRate < 0) { <span class="badge bg-warning text-dark rounded-pill px-3">Cần check</span> }
+                                        else { <span class="badge bg-success rounded-pill px-3">Chuẩn</span> }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Data from C#
+            let rawData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(staffWaste));
+            
+            if (!rawData || rawData.length === 0) {
+                document.querySelector("#donutChart").innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-muted small">Chưa có dữ liệu tiêu thụ</div>`;
+                document.querySelector("#barChart").innerHTML = `<div class="d-flex align-items-center justify-content-center h-100 text-muted small">Chưa có dữ liệu tiêu thụ</div>`;
+                return;
+            }
+
+            const names = rawData.map(d => d.StaffName);
+            const actuals = rawData.map(d => d.TotalActual);
+            const standards = rawData.map(d => d.TotalStandard);
+            const wasteRates = rawData.map(d => d.WasteRate);
+
+            // 1. Donut Chart - Tỷ lệ tiêu thụ
+            const donutOptions = {
+                series: actuals,
+                chart: {
+                    type: 'donut',
+                    height: 350,
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: { enabled: true, delay: 150 },
+                        dynamicAnimation: { enabled: true, speed: 350 }
+                    }
+                },
+                labels: names,
+                colors: ['#0ea5e9', '#0d9488', '#f59e0b', '#ef4444', '#8b5cf6'],
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '70%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Tổng tiêu thụ',
+                                    formatter: function (w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0).toFixed(1) + 'g'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                legend: { position: 'bottom' },
+                dataLabels: { enabled: false }
+            };
+            new ApexCharts(document.querySelector("#donutChart"), donutOptions).render();
+
+            // 2. Bar Chart - So sánh Định mức vs Thực tế
+            const barOptions = {
+                series: [{
+                    name: 'Định mức (G)',
+                    data: standards
+                }, {
+                    name: 'Thực tế dùng (G)',
+                    data: actuals
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    toolbar: { show: false },
+                    animations: { enabled: true, speed: 1000 }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        borderRadius: 5
+                    },
+                },
+                dataLabels: { enabled: false },
+                stroke: { show: true, width: 2, colors: ['transparent'] },
+                xaxis: { categories: names },
+                yaxis: { title: { text: 'Grams (g)' } },
+                fill: { opacity: 1, colors: ['#cbd5e1', '#0ea5e9'] },
+                tooltip: {
+                    y: {
+                        formatter: function (val) { return val + " g" }
+                    }
+                },
+                colors: ['#cbd5e1', '#0ea5e9']
+            };
+            new ApexCharts(document.querySelector("#barChart"), barOptions).render();
+
+            // 3. Profit Analysis Chart
+            const profitData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(profitAnalysis));
+            const serviceNames = profitData.map(d => d.ServiceName);
+            const revenues = profitData.map(d => d.Revenue);
+            const costs = profitData.map(d => d.Cost);
+            const profits = profitData.map(d => d.Profit);
+
+            const profitOptions = {
+                series: [{
+                    name: 'Doanh thu',
+                    data: revenues
+                }, {
+                    name: 'Chi phí vật tư',
+                    data: costs
+                }, {
+                    name: 'Lợi nhuận gộp',
+                    data: profits
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 400,
+                    stacked: false,
+                    toolbar: { show: true }
+                },
+                colors: ['#0ea5e9', '#ef4444', '#10b981'],
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '60%',
+                        borderRadius: 4
+                    },
+                },
+                stroke: { width: 1, colors: ['#fff'] },
+                xaxis: { categories: serviceNames },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) { return val.toLocaleString() + " đ" }
+                    }
+                },
+                fill: { opacity: 1 },
+                legend: { position: 'top', horizontalAlign: 'right' },
+                tooltip: {
+                    y: {
+                        formatter: function (val) { return val.toLocaleString() + " VNĐ" }
+                    }
+                }
+            };
+            new ApexCharts(document.querySelector("#profitChart"), profitOptions).render();
+        });
+    </script>
+}

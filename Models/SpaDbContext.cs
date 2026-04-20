@@ -25,6 +25,13 @@ namespace SpaN5.Models
 
         public DbSet<Material> Materials { get; set; }
         public DbSet<ServiceMaterial> ServiceMaterials { get; set; }
+        public DbSet<MaterialBatch> MaterialBatches { get; set; }
+        public DbSet<MaterialConversion> MaterialConversions { get; set; }
+        public DbSet<MaterialConsumption> MaterialConsumptions { get; set; }
+        public DbSet<ServiceStep> ServiceSteps { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<StaffSchedule> StaffSchedules { get; set; }
@@ -56,6 +63,33 @@ namespace SpaN5.Models
                 .HasOne(sm => sm.Material)
                 .WithMany(m => m.ServiceMaterials)
                 .HasForeignKey(sm => sm.MaterialId);
+
+            modelBuilder.Entity<ServiceMaterial>()
+                .HasOne(sm => sm.ServiceStep)
+                .WithMany(ss => ss.Materials)
+                .HasForeignKey(sm => sm.ServiceStepId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<MaterialBatch>()
+                .HasOne(mb => mb.Material)
+                .WithMany(m => m.Batches)
+                .HasForeignKey(mb => mb.MaterialId);
+
+            modelBuilder.Entity<Material>()
+                .Property(m => m.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<PurchaseOrder>()
+                .Property(po => po.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PurchaseOrderDetail>()
+                .Property(pod => pod.UnitPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PurchaseOrderDetail>()
+                .Property(pod => pod.TotalPrice)
+                .HasPrecision(18, 2);
 
             // 2. Cấu hình quan hệ User (HEAD)
             modelBuilder.Entity<User>()

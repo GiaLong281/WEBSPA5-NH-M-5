@@ -1,58 +1,214 @@
-@{
-    ViewData["Title"] = "Dịch vụ Spa";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+@section Styles {
+    <style>
+        :root {
+            --luxury-gold: #b68a63;
+            --glass-white: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --soft-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background-color: #fbf9f7;
+        }
+
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.5px;
+        }
+
+        /* Glassmorphism Filter */
+        .glass-filter {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(182, 138, 99, 0.1);
+        }
+
+        .glass-filter .form-control, .glass-filter .form-select {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(182, 138, 99, 0.2);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .glass-filter .form-control:focus, .glass-filter .form-select:focus {
+            background: #fff;
+            border-color: var(--luxury-gold);
+            box-shadow: 0 0 0 4px rgba(182, 138, 99, 0.1);
+        }
+
+        /* Luxury Service Card */
+        .service-card {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(182, 138, 99, 0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(182, 138, 99, 0.15);
+            border-color: rgba(182, 138, 99, 0.2);
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            height: 260px;
+            overflow: hidden;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .service-card:hover .card-img-wrapper img {
+            transform: scale(1.1);
+        }
+
+        .overlay-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .service-card:hover .overlay-gradient {
+            opacity: 1;
+        }
+
+        /* Badges */
+        .badge-premium {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-luxury {
+            background: linear-gradient(135deg, #b68a63 0%, #d9b48f 100%);
+            box-shadow: 0 4px 15px rgba(182, 138, 99, 0.4);
+        }
+
+        .badge-pro {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* Staggered entry animation */
+        @@keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-item {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        .btn-reserve {
+            background: var(--luxury-gold);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(182, 138, 99, 0.3);
+        }
+
+        .btn-reserve:hover {
+            background: #9a7452;
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(182, 138, 99, 0.4);
+        }
+
+        .price-tag {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--luxury-gold);
+        }
+    </style>
 }
 
-<div class="container py-5" style="margin-top: 80px;">
-    <div class="text-center mb-5">
-        <h1 class="font-playfair text-gold">Dịch vụ của chúng tôi</h1>
-        <div class="mx-auto bg-gold" style="height: 2px; width: 60px;"></div>
-        <p class="mt-3 text-muted">Trải nghiệm các liệu trình chăm sóc chuyên nghiệp</p>
-    </div>
-
-    <!-- Form lọc -->
-    <div class="card shadow-sm mb-5">
-        <div class="card-body">
-            <form id="filterForm" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Tìm theo tên</label>
-                    <input type="text" id="keyword" class="form-control" placeholder="Nhập tên dịch vụ">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Danh mục</label>
-                    <select id="categoryId" class="form-select">
-                        <option value="">Tất cả</option>
-                        <!-- Danh mục sẽ được load bằng JavaScript -->
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Khoảng giá</label>
-                    <div class="row g-2">
-                        <div class="col">
-                            <input type="number" id="minPrice" class="form-control" placeholder="Từ">
-                        </div>
-                        <div class="col">
-                            <input type="number" id="maxPrice" class="form-control" placeholder="Đến">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Trạng thái</label>
-                    <select id="isActive" class="form-select">
-                        <option value="true">Đang hoạt động</option>
-                        <option value="">Tất cả</option>
-                        <option value="false">Không hoạt động</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-gold w-100">Tìm kiếm</button>
-                </div>
-            </form>
+<div class="container py-5" style="margin-top: 100px;">
+    <!-- Hero Header -->
+    <div class="text-center mb-5 animate-item">
+        <h6 class="text-uppercase fw-bold text-gold mb-2" style="letter-spacing: 4px;">Exclusive Experience</h6>
+        <h1 class="display-4 font-playfair fw-bold mb-3">Dịch vụ của chúng tôi</h1>
+        <div class="d-flex justify-content-center">
+            <div style="height: 3px; width: 80px; background: linear-gradient(90deg, transparent, var(--luxury-gold), transparent);"></div>
         </div>
+        <p class="mt-4 text-muted mx-auto" style="max-width: 600px;">Khám phá nghệ thuật chăm sóc sắc đẹp hoàn mỹ với các liệu trình được thiết kế riêng biệt cho bạn.</p>
     </div>
 
-    <!-- Kết quả hiển thị -->
-    <div id="servicesContainer" class="row g-4">
+    <!-- Glass Filter Bar -->
+    <div class="glass-filter mb-5 animate-item" style="animation-delay: 0.2s;">
+        <form id="filterForm" class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label small fw-bold text-muted">Tên dịch vụ</label>
+                <div class="position-relative">
+                    <input type="text" id="keyword" class="form-control" placeholder="Tìm kiếm dịch vụ...">
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-bold text-muted">Danh mục</label>
+                <select id="categoryId" class="form-select">
+                    <option value="">Tất cả</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label small fw-bold text-muted">Khoảng giá (VNĐ)</label>
+                <div class="d-flex gap-2">
+                    <input type="number" id="minPrice" class="form-control" placeholder="Từ">
+                    <input type="number" id="maxPrice" class="form-control" placeholder="Đến">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-reserve w-100 py-3">
+                    <i class="fas fa-search me-2"></i> Lọc dịch vụ
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    <div id="servicesContainer" class="row g-5">
         <div class="col-12 text-center py-5">
             <div class="spinner-border text-gold" role="status">
                 <span class="visually-hidden">Đang tải...</span>
@@ -60,43 +216,11 @@
         </div>
     </div>
 
-    <!-- Phân trang -->
-    <nav aria-label="Page navigation" class="mt-4">
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-5 animate-item">
         <ul class="pagination justify-content-center" id="pagination"></ul>
     </nav>
 </div>
-
-@section Styles {
-    <style>
-        .badge-luxury {
-            background: linear-gradient(135deg, #b68a63 0%, #d9b48f 100%);
-            color: #fff;
-            padding: 0.35rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            box-shadow: 0 4px 10px rgba(182,138,99,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .badge-luxury i { margin-right: 4px; }
-        
-        .badge-pro {
-            background: linear-gradient(135deg, #6c757d 0%, #a8b2bc 100%);
-            color: #fff;
-            padding: 0.35rem 0.8rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            box-shadow: 0 4px 10px rgba(108,117,125,0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .badge-pro i { margin-right: 4px; }
-    </style>
-}
 
 @section Scripts {
     <script>
@@ -114,92 +238,84 @@
                     option.textContent = cat.name;
                     select.appendChild(option);
                 });
-            } catch (error) {
-                console.error('Lỗi tải danh mục:', error);
-            }
+            } catch (error) {}
         }
 
         async function fetchServices() {
             const keyword = document.getElementById('keyword').value;
-            const categoryId = document.getElementById('categoryId');
+            const categoryId = document.getElementById('categoryId').value;
             const minPrice = document.getElementById('minPrice').value;
             const maxPrice = document.getElementById('maxPrice').value;
-            const isActive = document.getElementById('isActive').value;
 
             const params = new URLSearchParams({
                 page: currentPage,
                 pageSize: pageSize,
                 ...(keyword && { keyword }),
-                ...(categoryId && categoryId.value && { categoryId: categoryId.value }),
+                ...(categoryId && { categoryId }),
                 ...(minPrice && { minPrice }),
                 ...(maxPrice && { maxPrice }),
-                ...(isActive !== '' && { isActive })
+                isActive: true
             });
 
-            const url = `/api/ApiService?${params.toString()}`;
             try {
-                const res = await fetch(url);
+                const res = await fetch(`/api/ApiService?${params.toString()}`);
                 const data = await res.json();
-
                 renderServices(data.items);
                 renderPagination(data.totalPages, data.currentPage);
             } catch (error) {
-                console.error('Lỗi tải dịch vụ:', error);
-                document.getElementById('servicesContainer').innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <div class="alert alert-danger">Không thể tải danh sách dịch vụ. Vui lòng thử lại sau.</div>
-                    </div>`;
+                console.error(error);
             }
         }
 
         function renderServices(services) {
             const container = document.getElementById('servicesContainer');
             if (!services || services.length === 0) {
-                container.innerHTML = `<div class="col-12 text-center py-5"><p class="text-muted">Không tìm thấy dịch vụ phù hợp.</p></div>`;
+                container.innerHTML = `<div class="col-12 text-center py-5 animate-item"><p class="text-muted">Không tìm thấy dịch vụ phù hợp.</p></div>`;
                 return;
             }
 
             let html = '';
-            services.forEach(service => {
+            services.forEach((service, index) => {
                 const imageUrl = (service.image && service.image.startsWith('http')) 
                     ? service.image 
                     : (service.image ? `/images/${service.image}` : '/images/no-image.jpg');
                 
                 let tierBadge = '';
                 if (service.isVip) {
-                    tierBadge = '<span class="badge-luxury position-absolute top-0 start-0 m-3 z-3"><i class="fas fa-crown"></i> Luxury</span>';
+                    tierBadge = '<div class="badge-premium badge-luxury"><i class="fas fa-crown"></i> Luxury</div>';
                 } else if (service.price >= 700000) {
-                    tierBadge = '<span class="badge-pro position-absolute top-0 start-0 m-3 z-3"><i class="fas fa-star"></i> Pro</span>';
+                    tierBadge = '<div class="badge-premium badge-pro"><i class="fas fa-gem"></i> Premium</div>';
                 }
 
-                const statusBadge = service.isActive 
-                    ? '<span class="badge bg-success">Hoạt động</span>' 
-                    : '<span class="badge bg-secondary">Tạm ngưng</span>';
                 html += `
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card h-100 border-0 shadow-sm service-card transition-all position-relative">
-                            <div class="card-img-top overflow-hidden position-relative" style="height: 220px;">
+                    <div class="col-lg-4 col-md-6 animate-item" style="animation-delay: ${0.1 * (index % 3)}s">
+                        <div class="service-card">
+                            <div class="card-img-wrapper">
                                 ${tierBadge}
-                                <img src="${imageUrl}" class="w-100 h-100 transition-all" style="object-fit: cover;" alt="${service.serviceName}" loading="lazy">
+                                <img src="${imageUrl}" alt="${service.serviceName}">
+                                <div class="overlay-gradient"></div>
+                                <div class="position-absolute bottom-0 start-0 p-4 text-white w-100" style="z-index: 5;">
+                                    <span class="badge bg-white text-dark rounded-pill px-3 py-2 mb-2" style="font-size: 0.65rem;">${service.categoryName}</span>
+                                </div>
                             </div>
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h5 class="font-playfair mb-2">${service.serviceName}</h5>
-                                    ${statusBadge}
-                                </div>
-                                <div class="mb-2">
-                                    <span class="badge bg-gold text-dark">${service.categoryName}</span>
-                                </div>
-                                <p class="text-muted mb-3 small">${service.description ? (service.description.length > 100 ? service.description.substring(0,100)+'...' : service.description) : 'Không có mô tả'}</p>
-                                <div class="d-flex justify-content-between align-items-center">
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h4 class="font-playfair fw-bold mb-2">${service.serviceName}</h4>
+                                <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.6;">
+                                    ${service.description ? (service.description.length > 90 ? service.description.substring(0,90)+'...' : service.description) : 'Trải nghiệm liệu trình thư giãn đỉnh cao tại Spa.'}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
                                     <div>
-                                        <span class="fw-bold text-gold">${service.price.toLocaleString()}đ</span>
-                                        <span class="text-muted ms-2"><i class="far fa-clock"></i> ${service.duration} phút</span>
+                                        <div class="price-tag">${service.price.toLocaleString()}đ</div>
+                                        <div class="text-muted smaller"><i class="far fa-clock me-1"></i> ${service.duration} phút</div>
                                     </div>
-                                    <a href="/Booking/Index?serviceId=${service.serviceId}" class="btn btn-sm btn-outline-gold rounded-pill">Đặt lịch</a>
+                                    <div class="d-flex gap-2">
+                                        <a href="/Services/Details/${service.serviceId}" class="btn btn-sm btn-light rounded-circle p-2" style="width: 38px; height: 38px;" title="Xem chi tiết">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                        <a href="/Booking/Index?serviceId=${service.serviceId}" class="btn-reserve text-decoration-none">Đặt ngay</a>
+                                    </div>
                                 </div>
                             </div>
-                            <a href="/Services/Details/${service.serviceId}" class="stretched-link"></a>
                         </div>
                     </div>
                 `;
@@ -209,38 +325,36 @@
 
         function renderPagination(totalPages, currentPage) {
             const pagination = document.getElementById('pagination');
-            if (totalPages <= 1) {
-                pagination.innerHTML = '';
-                return;
-            }
+            if (totalPages <= 1) { pagination.innerHTML = ''; return; }
 
             let html = '';
-            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="#" data-page="${currentPage - 1}">«</a>
+            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''} mx-1">
+                        <a class="page-link rounded-circle" href="#" data-page="${currentPage - 1}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">«</a>
                     </li>`;
             for (let i = 1; i <= totalPages; i++) {
-                html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''} mx-1">
+                            <a class="page-link rounded-circle" href="#" data-page="${i}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">${i}</a>
                          </li>`;
             }
-            html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="#" data-page="${currentPage + 1}">»</a>
+            html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''} mx-1">
+                        <a class="page-link rounded-circle" href="#" data-page="${currentPage + 1}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">»</a>
                     </li>`;
 
             pagination.innerHTML = html;
-
-            document.querySelectorAll('.page-link').forEach(link => {
+            pagination.querySelectorAll('.page-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const page = parseInt(link.getAttribute('data-page'));
                     if (!isNaN(page) && page >= 1 && page <= totalPages) {
                         currentPage = page;
                         fetchServices();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 });
             });
         }
 
+        // Initialize
         loadCategories();
         fetchServices();
 

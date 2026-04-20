@@ -154,6 +154,13 @@ namespace SpaN5.Areas.Admin.Controllers
             ViewBag.ChartLabels = chartLabels;
             ViewBag.ChartData = chartValues;
 
+            // 10. Smart Inventory Alerts (MỚI)
+            var lowStockMaterials = await _context.Materials
+                .Where(m => m.IsActive && m.CurrentStock <= m.MinStock)
+                .Select(m => new { m.MaterialName, m.CurrentStock, m.Unit })
+                .ToListAsync();
+            ViewBag.LowStockAlerts = lowStockMaterials;
+
             return View(allActiveBookings.Where(b => b.BookingDate.Date == today).ToList());
         }
 
@@ -213,6 +220,114 @@ namespace SpaN5.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetTimelineData(string? date)
+        {
+            var targetDate = string.IsNullOrEmpty(date) ? DateTime.Today : DateTime.ParseExact(date, "yyyy-MM-dd", null).Date;
+            
+            var services = await _context.Services.Where(s => s.IsActive).ToListAsync();
+            var resources = new List<object>();
+            
+            foreach(var svc in services) {
+                resources.Add(new { id = $"svc_{svc.ServiceId}", title = svc.ServiceName, isGroup = true });
+                for(int i = 1; i <= 10; i++) {
+                    resources.Add(new { id = $"{svc.ServiceId}_{i}", title = $"P.{i:D2}", parentId = $"svc_{svc.ServiceId}" });
+                }
+            }
+
+            var dbBookings = await _context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
+                .Where(b => b.BookingDate.Date == targetDate && b.Status != BookingStatus.Cancelled)
+                .ToListAsync();
+
+            var events = new List<object>();
+            var unassigned = new List<object>();
+
+            foreach(var b in dbBookings) {
+                var currentStartTime = b.StartTime;
+                foreach(var bd in b.BookingDetails) {
+                    var duration = bd.Service.Duration;
+                    var currentEndTime = currentStartTime.AddMinutes(duration);
+
+                    var eventObj = new {
+                        id = bd.DetailId.ToString(),
+                        title = b.Customer.FullName,
+                        start = b.BookingDate.ToString("yyyy-MM-dd") + "T" + currentStartTime.ToString("HH:mm:ss"),
+                        end = b.BookingDate.ToString("yyyy-MM-dd") + "T" + currentEndTime.ToString("HH:mm:ss"),
+                        extendedProps = new {
+                            customer = b.Customer.FullName,
+                            service = bd.Service.ServiceName,
+                            staff = bd.Staff?.FullName ?? "Chưa gán",
+                            status = bd.Status.ToString(),
+                            code = b.BookingCode
+                        }
+                    };
+
+                    if (bd.RoomNumber != null) {
+                        events.Add(new {
+                            id = eventObj.id,
+                            resourceId = $"{bd.ServiceId}_{bd.RoomNumber}",
+                            title = eventObj.title,
+                            start = eventObj.start,
+                            end = eventObj.end,
+                            color = bd.Status == DetailStatus.InProgress ? "#6366f1" : (bd.Status == DetailStatus.Completed ? "#10b981" : "#f59e0b"),
+                            extendedProps = eventObj.extendedProps
+                        });
+                    } else if (b.Status != BookingStatus.Completed) {
+                        unassigned.Add(new {
+                            id = bd.DetailId.ToString(),
+                            title = b.Customer.FullName,
+                            serviceId = bd.ServiceId,
+                            serviceName = bd.Service.ServiceName,
+                            startTime = currentStartTime.ToString("HH:mm"),
+                            duration = duration // Phút
+                        });
+                    }
+                    currentStartTime = currentEndTime;
+                }
+            }
+
+            return Json(new { resources, events, unassigned });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignRoomFromTimeline(int detailId, string resourceId, string start, string end)
+        {
+            var detail = await _context.BookingDetails
+                .Include(bd => bd.Booking).ThenInclude(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .FirstOrDefaultAsync(bd => bd.DetailId == detailId);
+
+            if (detail == null) return Json(new { success = false, message = "Không tìm thấy lịch hẹn." });
+
+            var parts = resourceId.Split('_');
+            if (parts.Length != 2) return Json(new { success = false, message = "Dữ liệu phòng không hợp lệ." });
+
+            int newRoomNum = int.Parse(parts[1]);
+            detail.RoomNumber = newRoomNum;
+            
+            // Cập nhật lại thời gian của CẢ ĐƠN HÀNG dựa trên vị trí mới của dịch vụ này
+            if (DateTime.TryParse(start, out var startDate))
+            {
+                // Giả định: Dịch vụ được kéo là dịch vụ đầu tiên hoặc ta căn chỉnh StartTime của đơn theo nó
+                // Để đơn giản và chính xác, ta tính toán ngược lại StartTime của Booking
+                // Tìm vị trí của detail này trong danh sách
+                var details = detail.Booking.BookingDetails.OrderBy(d => d.DetailId).ToList();
+                var index = details.IndexOf(detail);
+                
+                var minutesBefore = details.Take(index).Sum(d => d.Service.Duration);
+                detail.Booking.StartTime = startDate.AddMinutes(-minutesBefore);
+                
+                // Tính toán lại EndTime tổng
+                var totalMinutes = details.Sum(d => d.Service.Duration);
+                detail.Booking.EndTime = detail.Booking.StartTime.AddMinutes(totalMinutes);
+            }
+
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetRoomSchedule(int serviceId, int roomNum, string? date)
         {
             var targetDate = string.IsNullOrEmpty(date) ? DateTime.Today : DateTime.ParseExact(date, "yyyy-MM-dd", null).Date;
@@ -250,6 +365,7 @@ namespace SpaN5.Areas.Admin.Controllers
             var query = _context.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .Include(b => b.Payments)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -414,12 +530,20 @@ namespace SpaN5.Areas.Admin.Controllers
                 .Select(lr => lr.StaffId)
                 .ToListAsync();
 
+            // Lấy CategoryId của dịch vụ mục tiêu để lọc nhân viên theo chuyên môn
+            var targetService = await _context.Services.FindAsync(serviceId);
+            var targetCategoryId = targetService?.CategoryId ?? 0;
+
             var allActiveStaffInService = await _context.Staffs
+                .Include(s => s.Specialization)
                 .Where(s => s.Status == "active" && !staffOnLeaveIds.Contains(s.StaffId) 
-                         && (s.Position == "Technician" || s.Position == "Therapist" || s.SpecializationId == serviceId))
+                         && (s.SpecializationId == null 
+                             || s.SpecializationId == serviceId 
+                             || (s.Specialization != null && s.Specialization.CategoryId == targetCategoryId)))
                 .Select(s => new { 
                     s.StaffId, 
-                    s.FullName, 
+                    s.FullName,
+                    specialization = s.Specialization != null ? s.Specialization.ServiceName : "Tổng quát",
                     isBusy = busyStaffIds.Contains(s.StaffId) 
                 })
                 .ToListAsync();
@@ -447,10 +571,18 @@ namespace SpaN5.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> CompleteBooking(int bookingId, PaymentMethod method)
         {
-            var booking = await _context.Bookings.Include(b => b.BookingDetails).FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            var booking = await _context.Bookings
+                .Include(b => b.Payments)
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            
             if (booking == null) return Json(new { success = false, message = "Không tìm thấy booking" });
 
-            if (booking.Status == BookingStatus.Completed) return Json(new { success = false, message = "Đơn hàng đã được hoàn thành trước đó." });
+            // Kiểm tra xem đã thanh toán chưa (dựa trên PaymentStatus)
+            if (booking.Payments != null && booking.Payments.Any(p => p.Status == PaymentStatus.Paid)) 
+            {
+                return Json(new { success = false, message = "Đơn hàng này đã được thanh toán đầy đủ." });
+            }
 
             var payment = new Payment
             {
@@ -463,10 +595,10 @@ namespace SpaN5.Areas.Admin.Controllers
 
             _context.Payments.Add(payment);
 
+            // Chuyển trạng thái booking sang Completed nếu chưa có
             booking.Status = BookingStatus.Completed;
             foreach(var detail in booking.BookingDetails)
             {
-                // STOP clearing RoomNumber to preserve history
                 detail.Status = DetailStatus.Completed;
             }
 

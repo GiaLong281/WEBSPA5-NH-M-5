@@ -132,7 +132,204 @@
         transition: all 0.2s !important;
     }
     .search-input:focus { border-color: var(--primary-blue) !important; background: white !important; box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; }
+
+    /* Timeline Scheduler Specific */
+    #calendar-timeline {
+        background: white;
+        padding: 20px;
+        border-radius: 24px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+        min-height: 600px;
+    }
+    .fc-header-toolbar {
+        margin-bottom: 2rem !important;
+    }
+    .fc-resource-group {
+        background: #f8faff !important;
+        font-weight: 800 !important;
+        color: var(--primary-blue) !important;
+    }
+
+    /* Waiting List Sidebar */
+    #external-events {
+        background: #f8faff;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px dashed var(--luxury-gold);
+        height: 100%;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    .fc-event-external {
+        cursor: grab;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border-left: 4px solid var(--luxury-gold);
+        transition: all 0.2s;
+    }
+    /* LUXURY TIMELINE ENHANCEMENTS */
+    #calendar-timeline {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(15px);
+        border-radius: 24px;
+        padding: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    }
+
+    #calendar-timeline .fc-toolbar-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 800;
+        color: #1a1a1a;
+        letter-spacing: -1px;
+    }
+
+    /* Column Headers & Slots */
+    .fc .fc-timeline-header-cell-cushion {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        padding: 12px 0;
+    }
+
+    .fc .fc-resource-timeline-divider { background: rgba(0,0,0,0.03); }
+    
+    .fc-timeline-slot-label {
+        font-weight: 600;
+        color: #475569;
+    }
+
+    /* Resource Area (Left Side) */
+    .fc .fc-datagrid-cell-cushion {
+        padding: 12px 15px;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .fc .fc-datagrid-header-cell-cushion {
+        font-weight: 900;
+        color: #1e293b;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    /* Event Styling (The Booking Blocks) */
+    .fc-timeline-event {
+        border-radius: 12px !important;
+        border: none !important;
+        padding: 4px 8px !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .fc-timeline-event:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        z-index: 100 !important;
+    }
+
+    .fc-event-main-frame { padding: 4px; }
+    
+    .status-event-inprogress {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    }
+    
+    .status-event-completed {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+
+    .status-event-accepted {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    }
+
+    /* Waiting List Sidebar Refinement */
+    #external-events {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 20px;
+        padding: 20px;
+        height: 100%;
+        min-height: 400px;
+    }
+
+    .waiting-list-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .fc-event-external {
+        background: white;
+        border: 1px solid rgba(0,0,0,0.05);
+        border-left: 4px solid #f59e0b;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+        cursor: grab;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    .fc-event-external:active { cursor: grabbing; }
+
+    .empty-waiting-state {
+        text-align: center;
+        padding: 40px 10px;
+        color: #94a3b8;
+    }
+
+    .empty-waiting-state i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+
+    /* Tab Switcher Upgrade */
+    .view-switcher-pill {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 6px;
+        border-radius: 16px;
+        display: inline-flex;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    
+    .view-switcher-pill .btn {
+        border-radius: 12px;
+        padding: 8px 16px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        border: none;
+        transition: all 0.3s;
+    }
+
+    .view-switcher-pill .btn.active {
+        background: #1a1a1a;
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    .view-switcher-pill .btn:not(.active):hover {
+        background: rgba(0,0,0,0.05);
+    }
 </style>
+
+<!-- FullCalendar Scheduler Library -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.11.3/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.11.3/main.min.js"></script>
 
 <div class="row align-items-center mb-4">
     <div class="col">
@@ -140,9 +337,13 @@
         <p class="text-muted small">Quản lý, điều phối và xử lý lịch đặt của khách hàng</p>
     </div>
     <div class="col-auto">
-        <div class="btn-group p-1 bg-white rounded-pill shadow-sm">
-            <button class="btn btn-sm rounded-pill px-3 fw-bold btn-primary">Bảng biểu</button>
-            <button class="btn btn-sm rounded-pill px-3 fw-bold text-muted border-0">Timeline</button>
+        <div class="view-switcher-pill">
+            <button class="btn active view-toggle-btn" id="btn-table-view">
+                <i class="fa-solid fa-list-ul me-2"></i>Dọc (Bảng)
+            </button>
+            <button class="btn view-toggle-btn" id="btn-timeline-view">
+                <i class="fa-solid fa-chart-gantt me-2"></i>Ngang (Timeline)
+            </button>
         </div>
     </div>
 </div>
@@ -174,8 +375,8 @@
     </form>
 </div>
 
-<!-- Bookings List -->
-<div class="booking-card">
+<!-- Bookings List (Table View) -->
+<div class="booking-card" id="table-view-container">
     <div class="table-responsive">
         <table class="booking-table">
             <thead>
@@ -254,24 +455,30 @@
                         </td>
                         <td>
                             @{
-                                var statusClass = "status-" + bk.Status.ToString().ToLower();
-                                var statusIcon = bk.Status switch {
-                                    SpaN5.Models.BookingStatus.Pending => "fa-clock-rotate-left",
-                                    SpaN5.Models.BookingStatus.Confirmed => "fa-circle-check",
-                                    SpaN5.Models.BookingStatus.Accepted => "fa-user-check",
-                                    SpaN5.Models.BookingStatus.InProgress => "fa-spinner fa-spin",
-                                    SpaN5.Models.BookingStatus.Completed => "fa-check-double",
-                                    SpaN5.Models.BookingStatus.Cancelled => "fa-circle-xmark",
-                                    _ => "fa-info-circle"
-                                };
+                                var isPaid = bk.Payments != null && bk.Payments.Any(p => p.Status == SpaN5.Models.PaymentStatus.Paid);
+                                
                                 var statusName = bk.Status switch {
                                     SpaN5.Models.BookingStatus.Pending => "Đợi duyệt",
                                     SpaN5.Models.BookingStatus.Confirmed => "Đã xác nhận",
                                     SpaN5.Models.BookingStatus.Accepted => "KTV Đã nhận",
                                     SpaN5.Models.BookingStatus.InProgress => "Đang bận",
-                                    SpaN5.Models.BookingStatus.Completed => (bk.Payments != null && bk.Payments.Any(p => p.Status == SpaN5.Models.PaymentStatus.Paid)) ? "Hoàn thành & Đã TT" : "Hoàn thành (Chờ TT)",
+                                    SpaN5.Models.BookingStatus.Completed => isPaid ? "Hoàn thành" : "Chờ thanh toán",
                                     SpaN5.Models.BookingStatus.Cancelled => "Đã hủy",
                                     _ => bk.Status.ToString()
+                                };
+
+                                var statusClass = bk.Status == SpaN5.Models.BookingStatus.Completed && !isPaid 
+                                                ? "status-unpaid" 
+                                                : "status-" + bk.Status.ToString().ToLower();
+
+                                var statusIcon = bk.Status switch {
+                                    SpaN5.Models.BookingStatus.Pending => "fa-clock-rotate-left",
+                                    SpaN5.Models.BookingStatus.Confirmed => "fa-circle-check",
+                                    SpaN5.Models.BookingStatus.Accepted => "fa-user-check",
+                                    SpaN5.Models.BookingStatus.InProgress => "fa-spinner fa-spin",
+                                    SpaN5.Models.BookingStatus.Completed => isPaid ? "fa-circle-check" : "fa-file-invoice-dollar",
+                                    SpaN5.Models.BookingStatus.Cancelled => "fa-circle-xmark",
+                                    _ => "fa-info-circle"
                                 };
                             }
                             <span class="status-pill @statusClass">
@@ -311,8 +518,8 @@
                                         }
                                     }
                                     
-                                    @if(bk.Status == SpaN5.Models.BookingStatus.Completed && !(bk.Payments?.Any(p => p.Status == SpaN5.Models.PaymentStatus.Paid) ?? false)) {
-                                        <li><button class="dropdown-item dropdown-item-success rounded-3 fw-bold" onclick="showCompleteModal(@bk.BookingId, @bk.TotalAmount)"><i class="fa-solid fa-file-invoice-dollar"></i> Thanh toán</button></li>
+                                    @if(bk.Status == SpaN5.Models.BookingStatus.Completed && !isPaid) {
+                                        <li><button class="dropdown-item dropdown-item-success rounded-3 fw-bold" onclick="showCompleteModal(@bk.BookingId, @bk.TotalAmount)"><i class="fa-solid fa-file-invoice-dollar"></i> Thanh toán ngay</button></li>
                                     }
                                     
                                     @if(bk.Status != SpaN5.Models.BookingStatus.Completed && bk.Status != SpaN5.Models.BookingStatus.Cancelled) {
@@ -326,6 +533,30 @@
                 }
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Timeline View Container (Hidden) -->
+<div id="timeline-view-container" style="display: none;">
+    <div class="row g-4">
+        <div class="col-md-3 col-lg-2">
+            <div id="external-events">
+                <div class="waiting-list-title">
+                    <i class="fa-solid fa-user-clock text-warning"></i>
+                    <span>Khách Đang Chờ</span>
+                </div>
+                <div id="external-events-list">
+                    <!-- Danh sách chờ được load bằng AJAX -->
+                    <div class="empty-waiting-state">
+                        <i class="fa-solid fa-hourglass-empty"></i>
+                        <p class="small">Hiện không có khách chờ điều phối</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 col-lg-10">
+            <div id="calendar-timeline"></div>
+        </div>
     </div>
 </div>
 
@@ -465,6 +696,200 @@
         const completeModal = new bootstrap.Modal(document.getElementById('completeModal'));
         const rescheduleModal = new bootstrap.Modal(document.getElementById('rescheduleModal'));
         let selectedBookingId = 0;
+        let calendar = null;
+
+        // View Toggling
+        $('#btn-table-view').click(function() {
+            $('.view-toggle-btn').removeClass('active');
+            $(this).addClass('active');
+            $('#table-view-container').fadeIn();
+            $('#timeline-view-container').hide();
+        });
+
+        $('#btn-timeline-view').click(function() {
+            $('.view-toggle-btn').removeClass('active');
+            $(this).addClass('active');
+            $('#table-view-container').hide();
+            $('#timeline-view-container').fadeIn();
+            
+            initTimeline();
+        });
+
+        function initTimeline() {
+            const calendarEl = document.getElementById('calendar-timeline');
+            const containerEl = document.getElementById('external-events-list');
+
+            if (calendar) {
+                calendar.render();
+                return;
+            }
+
+            // Initialize External Draggable
+            new FullCalendar.Draggable(containerEl, {
+                itemSelector: '.fc-event-external',
+                eventData: function(eventEl) {
+                    return {
+                        id: eventEl.getAttribute('data-id'),
+                        title: eventEl.getAttribute('data-title'),
+                        duration: eventEl.getAttribute('data-duration'),
+                        create: true
+                    };
+                }
+            });
+
+            const targetDate = '@(string.IsNullOrEmpty(Context.Request.Query["date"]) ? DateTime.Today.ToString("yyyy-MM-dd") : DateTime.ParseExact(Context.Request.Query["date"], "dd/MM/yyyy", null).ToString("yyyy-MM-dd"))';
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                initialView: 'resourceTimelineDay',
+                initialDate: targetDate,
+                locale: 'vi',
+                slotMinTime: '08:00:00',
+                slotMaxTime: '22:00:00',
+                resourceOrder: 'id',
+                resourceAreaWidth: '25%',
+                resourceAreaHeaderContent: 'Dịch vụ & Phòng',
+                slotMinWidth: 100,
+                height: 'auto',
+                contentHeight: 650,
+                nowIndicator: true,
+                allDaySlot: false,
+                editable: true,
+                droppable: true,
+                eventClassNames: function(arg) {
+                    const status = arg.event.extendedProps.status?.toLowerCase() || 'accepted';
+                    return ['status-event-' + status];
+                },
+                buttonText: {
+                    today: 'Hôm nay'
+                },
+                resources: function(info, successCallback, failureCallback) {
+                    fetch(`/Admin/Home/GetTimelineData?date=${targetDate}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            renderWaitingList(data.unassigned);
+                            successCallback(data.resources);
+                        });
+                },
+                events: function(info, successCallback, failureCallback) {
+                    fetch(`/Admin/Home/GetTimelineData?date=${targetDate}`)
+                        .then(r => r.json())
+                        .then(data => successCallback(data.events));
+                },
+                eventReceive: function(info) {
+                    // Xử lý khi kéo từ Waiting List vào
+                    const detailId = info.event.id;
+                    const resourceId = info.event.getResources()[0].id;
+                    const start = info.event.startStr;
+                    const end = info.event.endStr;
+
+                    saveAssignment(detailId, resourceId, start, end);
+                },
+                eventDrop: function(info) {
+                    // Xử lý khi di chuyển lịch đã gán
+                    const detailId = info.event.id;
+                    const resourceId = info.event.getResources()[0].id;
+                    const start = info.event.startStr;
+                    const end = info.event.endStr;
+
+                    saveAssignment(detailId, resourceId, start, end);
+                },
+                eventContent: function(arg) {
+                    const props = arg.event.extendedProps;
+                    return {
+                        html: `
+                            <div class="p-1" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                <div class="fw-bold" style="font-size: 0.8rem; color: #fff;">${arg.event.title}</div>
+                                <div style="font-size: 0.7rem; color: rgba(255,255,255,0.9);">${props.service || ""}</div>
+                                <div style="font-size: 0.65rem; margin-top: 2px; color: rgba(255,255,255,0.8);">KTV: ${props.staff || "Chờ gán"}</div>
+                            </div>
+                        `
+                    };
+                },
+                eventClick: function(info) {
+                    const props = info.event.extendedProps;
+                    Swal.fire({
+                        title: 'Chi tiết điều phối',
+                        html: `
+                            <div class="text-start">
+                                <p><strong>Khách hàng:</strong> ${props.customer || info.event.title}</p>
+                                <p><strong>Dịch vụ:</strong> ${props.service || "Massage"}</p>
+                                <p><strong>Nhân viên:</strong> ${props.staff || "Chờ gán"}</p>
+                                <p><strong>Trạng thái:</strong> ${props.status || "Accepted"}</p>
+                            </div>
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Xem lịch chi tiết',
+                        cancelButtonText: 'Đóng'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/Booking/Details?bookingCode=${props.code}`;
+                        }
+                    });
+                }
+            });
+
+            calendar.render();
+        }
+
+        function renderWaitingList(unassigned) {
+            const listEl = document.getElementById('external-events-list');
+            if (!unassigned || unassigned.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-waiting-state">
+                        <i class="fa-solid fa-hourglass-empty"></i>
+                        <p class="small">Hiện không có khách chờ điều phối</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            unassigned.forEach(ev => {
+                // Định dạng duration từ số phút (ví dụ 60) thành HH:mm (01:00)
+                const hrs = Math.floor(ev.duration / 60);
+                const mins = ev.duration % 60;
+                const durationFormatted = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
+                html += `
+                    <div class="fc-event-external" 
+                         data-id="${ev.id}" 
+                         data-title="${ev.title}" 
+                         data-duration="${durationFormatted}">
+                        <div class="fw-bold small">${ev.title}</div>
+                        <div class="smaller text-muted">${ev.serviceName}</div>
+                        <div class="smaller fw-bold text-primary mt-1">${ev.startTime}</div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        function saveAssignment(detailId, resourceId, start, end) {
+            $.post('/Admin/Home/AssignRoomFromTimeline', {
+                detailId: detailId,
+                resourceId: resourceId,
+                start: start,
+                end: end
+            }, function(res) {
+                if (res.success) {
+                    Toast.fire({ icon: 'success', title: 'Đã điều phối thành công' });
+                    calendar.refetchResources();
+                    calendar.refetchEvents();
+                } else {
+                    Swal.fire('Lỗi', res.message, 'error');
+                }
+            });
+        }
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
 
         function updateStatus(id, action) {
             if(action === 'CheckIn') {
@@ -496,10 +921,12 @@
                 .then(data => {
                     if(data.success) {
                         const sSelect = document.getElementById('selectStaff');
+                        sSelect.innerHTML = '<option value="">-- Chọn nhân viên --</option>';
                         data.staff.forEach(s => {
                             const disabled = s.isBusy ? 'disabled' : '';
-                            const busyText = s.isBusy ? ' (Đang làm)' : '';
-                            sSelect.innerHTML += `<option value="${s.staffId}" ${disabled}>${s.fullName}${busyText}</option>`;
+                            const busyStatus = s.isBusy ? ' (Đang bận)' : ' (Rảnh)';
+                            const specText = s.specialization ? ` [${s.specialization}]` : '';
+                            sSelect.innerHTML += `<option value="${s.staffId}" ${disabled}>${s.fullName}${specText}${busyStatus}</option>`;
                         });
                         checkInModal.show();
                     }

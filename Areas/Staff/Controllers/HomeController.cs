@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
+using SpaN5.Services;
 using System.Security.Claims;
 
 namespace SpaN5.Areas.Staff.Controllers
@@ -11,10 +12,12 @@ namespace SpaN5.Areas.Staff.Controllers
     public class HomeController : Controller
     {
         private readonly SpaDbContext _context;
+        private readonly IInventoryService _inventoryService;
 
-        public HomeController(SpaDbContext context)
+        public HomeController(SpaDbContext context, IInventoryService inventoryService)
         {
             _context = context;
+            _inventoryService = inventoryService;
         }
 
         public async Task<IActionResult> Index(string view = "day")
@@ -511,16 +514,69 @@ namespace SpaN5.Areas.Staff.Controllers
             return Json(new { success = true });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetBookingMaterials(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                    .ThenInclude(bd => bd.Service)
+                        .ThenInclude(s => s.ServiceMaterials)
+                            .ThenInclude(sm => sm.Material)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null) return Json(new { success = false });
+
+            // Lấy dịch vụ chính của nhân viên này trong booking
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            int? staffId = int.TryParse(staffIdClaim, out int sId) ? sId : null;
+            
+            var detail = booking.BookingDetails.FirstOrDefault(bd => bd.StaffId == staffId);
+            var serviceName = detail?.Service?.ServiceName ?? "Dịch vụ của bạn";
+
+            var materials = booking.BookingDetails
+                .Where(bd => bd.StaffId == staffId)
+                .SelectMany(bd => bd.Service.ServiceMaterials)
+                .Select(sm => new {
+                    id = sm.MaterialId,
+                    name = sm.Material.MaterialName,
+                    unit = sm.Material.Unit,
+                    standardQty = sm.Quantity
+                })
+                .GroupBy(m => m.id)
+                .Select(g => g.First())
+                .ToList();
+
+            return Json(new { success = true, serviceName, materials });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> CompleteWithNote(int bookingId, string note)
+        public async Task<IActionResult> CompleteWithUsage(int bookingId, string note, List<MaterialUsageInput> usage)
         {
             var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
-            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId)) return Json(new { success = false, message = "Phiên hết hạn" });
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId)) 
+                return Json(new { success = false, message = "Phiên hết hạn" });
 
-            var booking = await _context.Bookings.Include(b => b.Customer).Include(b => b.BookingDetails).FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            var booking = await _context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.BookingDetails)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
             if(booking == null) return Json(new { success = false, message = "Không tìm thấy booking" });
 
+            // 1. Trừ kho thông qua InventoryService (Hệ thống FEFO và Transaction nằm ở đây)
+            var consumptions = usage?.Select(u => (u.MaterialId, u.ActualQuantity)).ToList() ?? new List<(int, double)>();
+            
+            // Lấy DetailId chính của KTV này (Giả định mỗi booking có 1 detail per staff trong flow hiện tại)
+            var mainDetail = booking.BookingDetails.FirstOrDefault(bd => bd.StaffId == staffId);
+            if (mainDetail != null && consumptions.Any())
+            {
+                var stockResult = await _inventoryService.DeductStockAsync(mainDetail.DetailId, consumptions);
+                if (!stockResult) return Json(new { success = false, message = "Lỗi khi trừ kho nguyên liệu. Vui lòng kiểm tra lại số tồn." });
+            }
+
+            // 2. Hoàn tất Booking
             booking.Status = BookingStatus.Completed;
+            booking.EndTime = DateTime.Now;
             foreach (var d in booking.BookingDetails) d.Status = DetailStatus.Completed;
 
             if(!string.IsNullOrEmpty(note) && booking.Customer != null)
@@ -535,6 +591,12 @@ namespace SpaN5.Areas.Staff.Controllers
 
             await _context.SaveChangesAsync();
             return Json(new { success = true });
+        }
+
+        public class MaterialUsageInput
+        {
+            public int MaterialId { get; set; }
+            public double ActualQuantity { get; set; }
         }
 
         // Xin chuyển ca (Release staff and notify)
