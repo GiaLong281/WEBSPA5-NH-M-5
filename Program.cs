@@ -27,6 +27,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AuditService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IAIntelligenceService, AIntelligenceService>();
 
 var app = builder.Build();
 
@@ -107,31 +108,31 @@ using (var scope = app.Services.CreateScope()) {
 
     if (context.Materials.Count() < 10) {
         var mats = new List<Material> {
-            new Material { MaterialName = "Tinh dầu Oải hương", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 5000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Tinh dầu Cam ngọt", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 4500, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Tinh sả chanh", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 3000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Serum Vitamin C", Unit = "ml", CurrentStock = 500, MinStock = 50, PurchasePrice = 25000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Serum Collagen Tươi", Unit = "ml", CurrentStock = 300, MinStock = 30, PurchasePrice = 45000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Serum Hyaluronic Acid", Unit = "ml", CurrentStock = 400, MinStock = 40, PurchasePrice = 35000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Mặt nạ Cánh hoa hồng", Unit = "miếng", CurrentStock = 100, MinStock = 10, PurchasePrice = 15000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Mặt nạ Bùn khoáng", Unit = "g", CurrentStock = 2000, MinStock = 200, PurchasePrice = 200, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Tẩy tế bào chết Cà phê", Unit = "g", CurrentStock = 5000, MinStock = 500, PurchasePrice = 150, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Kem dưỡng Body Bơ", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 1200, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Nước hoa hồng (Toner)", Unit = "ml", CurrentStock = 1500, MinStock = 150, PurchasePrice = 800, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Sữa rửa mặt Thảo mộc", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 1500, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Dầu dừa tinh khiết", Unit = "ml", CurrentStock = 3000, MinStock = 300, PurchasePrice = 600, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Khăn bông cao cấp", Unit = "cái", CurrentStock = 200, MinStock = 20, PurchasePrice = 45000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Nến lá dứa thư giãn", Unit = "cái", CurrentStock = 50, MinStock = 5, PurchasePrice = 30000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Đá muối Hi-ma-lay-a", Unit = "viên", CurrentStock = 80, MinStock = 10, PurchasePrice = 120000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Bột ngọc trai nguyên chất", Unit = "g", CurrentStock = 500, MinStock = 50, PurchasePrice = 8500, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Tinh chất Tổ yến", Unit = "ml", CurrentStock = 100, MinStock = 10, PurchasePrice = 150000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Kem massage Trà xanh", Unit = "g", CurrentStock = 2500, MinStock = 200, PurchasePrice = 450, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Sáp Waxing mật ong", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 2500, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Bông tẩy trang", Unit = "gói", CurrentStock = 100, MinStock = 10, PurchasePrice = 35000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Mặt nạ Tinh chất Vàng", Unit = "tuýp", CurrentStock = 30, MinStock = 5, PurchasePrice = 650000, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Sữa tắm cánh hoa", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 950, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Dầu Gội Bồ Kết", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 850, SupplierId = supplier.SupplierId },
-            new Material { MaterialName = "Dầu Xả Bưởi rừng", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 900, SupplierId = supplier.SupplierId }
+            new Material { MaterialName = "Tinh dầu Oải hương", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Tinh dầu Cam ngọt", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 450, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Tinh sả chanh", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 300, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Serum Vitamin C", Unit = "ml", CurrentStock = 500, MinStock = 50, PurchasePrice = 2500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Serum Collagen Tươi", Unit = "ml", CurrentStock = 300, MinStock = 30, PurchasePrice = 4500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Serum Hyaluronic Acid", Unit = "ml", CurrentStock = 400, MinStock = 40, PurchasePrice = 3500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Mặt nạ Cánh hoa hồng", Unit = "miếng", CurrentStock = 100, MinStock = 10, PurchasePrice = 1500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Mặt nạ Bùn khoáng", Unit = "g", CurrentStock = 2000, MinStock = 200, PurchasePrice = 20, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Tẩy tế bào chết Cà phê", Unit = "g", CurrentStock = 5000, MinStock = 500, PurchasePrice = 15, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Kem dưỡng Body Bơ", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 120, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Nước hoa hồng (Toner)", Unit = "ml", CurrentStock = 1500, MinStock = 150, PurchasePrice = 80, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Sữa rửa mặt Thảo mộc", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 150, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Dầu dừa tinh khiết", Unit = "ml", CurrentStock = 3000, MinStock = 300, PurchasePrice = 60, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Khăn bông cao cấp", Unit = "cái", CurrentStock = 200, MinStock = 20, PurchasePrice = 4500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Nến lá dứa thư giãn", Unit = "cái", CurrentStock = 50, MinStock = 5, PurchasePrice = 3000, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Đá muối Hi-ma-lay-a", Unit = "viên", CurrentStock = 80, MinStock = 10, PurchasePrice = 12000, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Bột ngọc trai nguyên chất", Unit = "g", CurrentStock = 500, MinStock = 50, PurchasePrice = 850, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Tinh chất Tổ yến", Unit = "ml", CurrentStock = 100, MinStock = 10, PurchasePrice = 15000, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Kem massage Trà xanh", Unit = "g", CurrentStock = 2500, MinStock = 200, PurchasePrice = 45, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Sáp Waxing mật ong", Unit = "ml", CurrentStock = 1000, MinStock = 100, PurchasePrice = 250, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Bông tẩy trang", Unit = "gói", CurrentStock = 100, MinStock = 10, PurchasePrice = 3500, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Mặt nạ Tinh chất Vàng", Unit = "tuýp", CurrentStock = 30, MinStock = 5, PurchasePrice = 65000, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Sữa tắm cánh hoa", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 95, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Dầu Gội Bồ Kết", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 85, SupplierId = supplier.SupplierId },
+            new Material { MaterialName = "Dầu Xả Bưởi rừng", Unit = "ml", CurrentStock = 2000, MinStock = 200, PurchasePrice = 90, SupplierId = supplier.SupplierId }
         };
         foreach(var m in mats) { if (!context.Materials.Any(existing => existing.MaterialName == m.MaterialName)) context.Materials.Add(m); }
         context.SaveChanges();

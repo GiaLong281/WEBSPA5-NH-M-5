@@ -1,0 +1,177 @@
+@model SpaN5.Models.Booking
+@{
+    ViewData["Title"] = "Bàn giao Dịch vụ & Vật tư";
+    Layout = "~/Areas/Staff/Views/Shared/_StaffLayout.cshtml";
+    var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+    int staffId = int.Parse(staffIdClaim ?? "0");
+    var staff = ViewBag.Staff as SpaN5.Models.Staff;
+    var detail = Model.BookingDetails.FirstOrDefault(bd => bd.StaffId == staffId);
+}
+
+<style>
+    .input-page-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+    }
+    .client-hero-card {
+        background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        border-radius: 24px;
+        color: white;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.2);
+    }
+    .material-entry-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+    .material-entry-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+    .qty-control {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 5px;
+        width: fit-content;
+    }
+    .qty-btn {
+        width: 36px; height: 36px; border-radius: 8px;
+        background: white; border: 1px solid #e2e8f0;
+        display: flex; align-items: center; justify-content: center;
+        color: #64748b; font-weight: 700; cursor: pointer;
+    }
+    .qty-input {
+        width: 60px; text-align: center; border: none; background: transparent;
+        font-weight: 800; color: #1e293b; font-size: 1.1rem;
+    }
+    .qty-input:focus { outline: none; }
+
+    .bottom-action-bar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+        display: flex; gap: 15px;
+        z-index: 1000;
+    }
+    .nav-breadcrumb { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 15px; }
+</style>
+
+<div class="input-page-container">
+    <div class="client-hero-card">
+        <div class="nav-breadcrumb"><i class="bi bi-chevron-left me-1"></i> Quay lại lịch trình</div>
+        <div class="d-flex align-items-center gap-4">
+            <div class="rounded-circle bg-white text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                @Model.Customer?.FullName.FirstOrDefault()
+            </div>
+            <div>
+                <a href="@Url.Action("CustomerDetails", new { id = Model.CustomerId })" class="text-decoration-none">
+                    <h2 class="fw-bold mb-1 text-white">@Model.Customer?.FullName</h2>
+                </a>
+                <div class="small opacity-75">Dịch vụ: <strong>@detail?.Service?.ServiceName</strong></div>
+                <div class="badge bg-white bg-opacity-20 rounded-pill px-3 mt-2">Bàn giao hoàn tất</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i>Ghi chú tiến trình (Bắt buộc)</h5>
+        <textarea id="noteText" class="form-control" rows="3" 
+                  placeholder="VD: Khách thích lực mạnh, da nhạy cảm vùng trán, đã upsell thêm liệu trình tắm trắng..."
+                  style="border-radius: 16px; border: 2px solid #e2e8f0; padding: 15px;"></textarea>
+    </div>
+
+    <div class="mb-5">
+        <h5 class="fw-bold text-dark mb-4"><i class="bi bi-box-seam me-2 text-primary"></i>Khai báo vật tư sử dụng</h5>
+        @if (detail?.Service?.ServiceMaterials == null || !detail.Service.ServiceMaterials.Any())
+        {
+            <div class="alert alert-warning rounded-4 border-0 shadow-sm d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                <div>Dịch vụ này chưa được cấu hình định mức vật tư. Bạn có thể nhấn hoàn tất ngay.</div>
+            </div>
+        }
+        else
+        {
+            foreach (var sm in detail.Service.ServiceMaterials)
+            {
+                <div class="material-entry-card d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold text-dark">@sm.Material.MaterialName</div>
+                        <div class="small text-muted">Định mức chuẩn: <span class="fw-bold text-primary">@sm.Quantity @sm.Material.Unit</span></div>
+                    </div>
+                    <div class="qty-control">
+                        <div class="qty-btn" onclick="adjustQty(this, -1)">-</div>
+                        <input type="number" class="qty-input material-input" data-id="@sm.MaterialId" value="@sm.Quantity" step="0.1">
+                        <div class="qty-btn" onclick="adjustQty(this, 1)">+</div>
+                        <div class="ms-2 me-3 small fw-bold text-muted">@sm.Material.Unit</div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="bottom-action-bar">
+    <button class="btn btn-light rounded-pill px-4 py-3 fw-bold flex-grow-1" onclick="window.history.back()">Hủy</button>
+    <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold flex-grow-1 shadow-lg" onclick="saveConsumption()">Hoàn tất & Lưu Nhật ký</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function adjustQty(btn, delta) {
+        const input = btn.parentElement.querySelector('input');
+        let val = parseFloat(input.value) || 0;
+        val = Math.max(0, val + delta);
+        input.value = Math.round(val * 10) / 10;
+    }
+
+    function saveConsumption() {
+        const note = document.getElementById('noteText').value;
+        if (!note) {
+            Swal.fire('Thiếu thông tin', 'Vui lòng nhập ghi chú tiến trình để AI có đủ dữ liệu phân tích nhé!', 'warning');
+            return;
+        }
+
+        const usage = [];
+        document.querySelectorAll('.material-input').forEach(input => {
+            usage.push({
+                materialId: parseInt(input.getAttribute('data-id')),
+                actualQuantity: parseFloat(input.value) || 0
+            });
+        });
+
+        Swal.fire({
+            title: 'Đang lưu dữ liệu...',
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.post('/Staff/Home/SaveConsumption', {
+            bookingId: @Model.BookingId,
+            note: note,
+            usage: usage
+        }, function(res) {
+            if (res.success) {
+                Swal.fire({
+                    title: 'Đã Hoàn Tất!',
+                    text: 'Số liệu đã được cập nhật vào hệ thống AI 100%.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '/Staff/Home/Index';
+                });
+            } else {
+                Swal.fire('Lỗi', res.message, 'error');
+            }
+        });
+    }
+</script>

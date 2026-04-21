@@ -53,7 +53,9 @@
                             <div class="small text-muted">@booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")</div>
                         </td>
                         <td>
-                            <div class="fw-bold">@booking.Customer?.FullName</div>
+                            <div class="fw-bold">
+                                <a href="@Url.Action("CustomerDetails", new { id = booking.CustomerId })" class="text-decoration-none text-dark hover-primary">@booking.Customer?.FullName</a>
+                            </div>
                             <div class="small text-muted">@booking.Customer?.Phone</div>
                         </td>
                         <td>
@@ -73,9 +75,9 @@
                             }
                         </td>
                         <td class="pe-4 text-end">
-                            <button class="btn btn-sm btn-outline-navy rounded-circle" disabled title="Xem chi tiết (Sắp ra mắt)">
+                            <a href="@Url.Action("CustomerDetails", new { id = booking.CustomerId })" class="btn btn-sm btn-outline-navy rounded-circle" title="Xem Hồ sơ Chuyên sâu">
                                 <i class="fas fa-eye"></i>
-                            </button>
+                            </a>
                         </td>
                     </tr>
                 }

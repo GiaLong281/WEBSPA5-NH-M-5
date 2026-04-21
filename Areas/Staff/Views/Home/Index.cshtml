@@ -240,7 +240,9 @@
                                     <div class="t-time">@b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")</div>
                                     <div class="t-badge @badgeClass">@badgeText</div>
                                 </div>
-                                <div class="t-customer">@b.Customer?.FullName</div>
+                                <div class="t-customer">
+                                    <a href="@Url.Action("CustomerDetails", new { id = b.CustomerId })" class="text-decoration-none text-dark hover-primary">@b.Customer?.FullName</a>
+                                </div>
                                 <div class="t-detail">
                                     <span><i class="bi bi-flower1 me-1"></i> @(bd?.Service?.ServiceName ?? "Dịch vụ")</span>
                                     <span><i class="bi bi-door-closed me-1"></i> Phòng @(bd?.RoomNumber?.ToString() ?? "Chưa gán")</span>
@@ -257,7 +259,7 @@
                                         <div class="timer-label" style="font-size: 0.6rem; font-weight: 600; color: var(--serene-blue-strong); text-transform: uppercase;">Còn lại</div>
                                         <div class="timer-text" style="font-size: 1.1rem; font-weight: 700; color: var(--serene-blue-strong);">@remain'</div>
                                     </div>
-                                    <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" onclick="showCompleteForm(@b.BookingId)">Hoàn tất</button>
+                                    <a class="btn btn-sm btn-success rounded-pill px-3 fw-bold" href="@Url.Action("ConsumptionInput", new { bookingId = b.BookingId })">Hoàn tất</a>
                                 }
                                 else if (isAccepted)
                                 {

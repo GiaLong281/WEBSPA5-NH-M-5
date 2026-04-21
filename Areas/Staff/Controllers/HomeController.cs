@@ -632,5 +632,52 @@ namespace SpaN5.Areas.Staff.Controllers
             await _context.SaveChangesAsync();
             return Json(new { success = true, message = "Đã gửi yêu cầu chuyển ca tới Lễ tân." });
         }
+        [HttpGet]
+        public async Task<IActionResult> ConsumptionInput(int bookingId)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
+                return RedirectToAction("Login", "Auth", new { area = "Admin" });
+
+            var booking = await _context.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service).ThenInclude(s => s.ServiceMaterials).ThenInclude(sm => sm.Material)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null) return NotFound();
+
+            // Lấy thông tin Staff để hiện Team
+            var staff = await _context.Staffs.Include(s => s.Specialization).FirstOrDefaultAsync(s => s.StaffId == staffId);
+            ViewBag.Staff = staff;
+
+            return View(booking);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveConsumption(int bookingId, string note, List<MaterialUsageInput> usage)
+        {
+            // Tận dụng logic đã có trong CompleteWithUsage nhưng tách ra để linh hoạt
+            return await CompleteWithUsage(bookingId, note, usage);
+        }
+        [HttpGet]
+        public async Task<IActionResult> CustomerDetails(int id)
+        {
+            var customer = await _context.Customers
+                .Include(c => c.Bookings).ThenInclude(b => b.BookingDetails).ThenInclude(bd => bd.Service)
+                .Include(c => c.Bookings).ThenInclude(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
+                .Include(c => c.Reviews)
+                .FirstOrDefaultAsync(c => c.CustomerId == id);
+
+            if (customer == null) return NotFound();
+
+            // Lấy thêm các ghi chú kỹ thuật từ bảng CustomerNote (nếu có)
+            ViewBag.HistoryNotes = await _context.CustomerNotes
+                .Include(cn => cn.Staff)
+                .Where(cn => cn.CustomerId == id)
+                .OrderByDescending(cn => cn.CreatedAt)
+                .ToListAsync();
+
+            return View(customer);
+        }
     }
 }

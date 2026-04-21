@@ -12,11 +12,13 @@ namespace SpaN5.Areas.Admin.Controllers
     {
         private readonly SpaDbContext _context;
         private readonly IInventoryService _inventoryService;
+        private readonly IAIntelligenceService _aiService;
 
-        public InventoryController(SpaDbContext context, IInventoryService inventoryService)
+        public InventoryController(SpaDbContext context, IInventoryService inventoryService, IAIntelligenceService aiService)
         {
             _context = context;
             _inventoryService = inventoryService;
+            _aiService = aiService;
         }
 
         public async Task<IActionResult> Index(string? search, string? filter)
@@ -189,13 +191,17 @@ namespace SpaN5.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Reports()
         {
+            var now = DateTime.Now;
+            var sevenDaysAgo = now.AddDays(-7);
+            var fourteenDaysAgo = now.AddDays(-14);
+
+            // 1. Phân tích dữ liệu tiêu thụ (vẫn giữ để vẽ biểu đồ bar/donut bên dưới)
             var consumptions = await _context.MaterialConsumptions
                 .Include(c => c.Material)
                 .Include(c => c.Staff)
-                .Include(c => c.BookingDetail).ThenInclude(bd => bd.Service)
+                .Where(c => c.CreatedAt >= fourteenDaysAgo)
                 .ToListAsync();
 
-            // 1. Phân tích hao hụt theo nhân viên
             var staffWaste = consumptions
                 .GroupBy(c => (c.Staff != null ? c.Staff.FullName : "Unknown"))
                 .Select(g => new {
@@ -204,17 +210,25 @@ namespace SpaN5.Areas.Admin.Controllers
                     TotalStandard = g.Sum(c => c.StandardQuantity),
                     WasteRate = g.Sum(c => c.StandardQuantity) > 0 
                         ? (g.Sum(c => c.ActualQuantity) - g.Sum(c => c.StandardQuantity)) / g.Sum(c => c.StandardQuantity) * 100 
-                        : 0
+                        : 0,
+                    // Top lãng phí của người này
+                    TopLeakedMaterials = g.GroupBy(x => x.Material?.MaterialName ?? "Khác")
+                        .Select(mg => new { 
+                            Name = mg.Key, 
+                            Diff = mg.Sum(x => x.ActualQuantity - x.StandardQuantity) 
+                        })
+                        .OrderByDescending(x => x.Diff)
+                        .Take(3)
+                        .ToList()
                 })
                 .OrderByDescending(x => x.WasteRate)
                 .ToList();
 
-            // 2. Phân tích Lợi nhuận gộp (BI)
-            // Lấy doanh thu từ BookingDetails đã hoàn thành
+            // 2. Phân tích doanh thu & lợi nhuận
             var financeData = await _context.BookingDetails
-                .Include(bd => bd.Booking)
+                .Include(bd => bd.Booking).ThenInclude(b => b.Customer)
                 .Include(bd => bd.Service)
-                .Where(bd => bd.Booking.Status == BookingStatus.Completed)
+                .Where(bd => bd.Booking.Status == BookingStatus.Completed && bd.Booking.BookingDate >= sevenDaysAgo)
                 .ToListAsync();
 
             var profitAnalysis = financeData
@@ -222,8 +236,8 @@ namespace SpaN5.Areas.Admin.Controllers
                 .Select(g => {
                     var revenue = g.Sum(bd => bd.PriceAtTime);
                     var materialCost = consumptions
-                        .Where(c => g.Select(x => x.DetailId).Contains(c.BookingDetailId))
-                        .Sum(c => (decimal)c.ActualQuantity * (c.Material?.PurchasePrice ?? 0));
+                        .Where(c => c.CreatedAt >= sevenDaysAgo && g.Select(x => x.DetailId).Contains(c.BookingDetailId))
+                        .Sum(c => (decimal)c.ActualQuantity * (c.Material?.PurchasePrice ?? 0) / 20);
                     
                     return new {
                         ServiceName = g.Key,
@@ -235,8 +249,27 @@ namespace SpaN5.Areas.Admin.Controllers
                 .OrderByDescending(x => x.Profit)
                 .ToList();
 
+            // 3. Top vật tư bị lãng phí toàn Spa
+            var topMaterialLeaks = consumptions
+                .GroupBy(c => c.Material?.MaterialName ?? "Khác")
+                .Select(g => new {
+                    MaterialName = g.Key,
+                    TotalDiff = g.Sum(c => c.ActualQuantity - c.StandardQuantity),
+                    LeakRate = g.Sum(c => c.StandardQuantity) > 0 ? (g.Sum(c => c.ActualQuantity - c.StandardQuantity) / g.Sum(c => c.StandardQuantity) * 100) : 0
+                })
+                .OrderByDescending(x => x.TotalDiff)
+                .Take(5)
+                .ToList();
+
+            // 4. AI PRO MAX DATA
+            ViewBag.StaffKPIs = await _aiService.GetStaffRadarDataAsync();
+            ViewBag.HeatmapData = await _aiService.GetBookingHeatmapAsync();
+            ViewBag.AIInsights = await _aiService.GetStrategicRecommendationsAsync();
+            
             ViewBag.StaffWaste = staffWaste;
             ViewBag.ProfitAnalysis = profitAnalysis;
+            ViewBag.TopMaterialLeaks = topMaterialLeaks;
+            
             return View();
         }
 
@@ -279,6 +312,35 @@ namespace SpaN5.Areas.Admin.Controllers
                 return Json(new { success = true });
             }
             return Json(new { success = false, message = "Vật tư này đã có trong gói!" });
+        }
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ConsumptionLog(string? search, DateTime? fromDate, DateTime? toDate)
+        {
+            var query = _context.MaterialConsumptions
+                .Include(c => c.Material)
+                .Include(c => c.Staff)
+                .Include(c => c.BookingDetail).ThenInclude(bd => bd.Service)
+                .Include(c => c.BookingDetail).ThenInclude(bd => bd.Booking).ThenInclude(b => b.Customer)
+                .OrderByDescending(c => c.CreatedAt)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(c => c.Staff.FullName.Contains(search) || 
+                                         c.Material.MaterialName.Contains(search) || 
+                                         c.BookingDetail.Service.ServiceName.Contains(search) ||
+                                         c.BookingDetail.Booking.Customer.FullName.Contains(search));
+            }
+
+            if (fromDate.HasValue) query = query.Where(c => c.CreatedAt >= fromDate.Value);
+            if (toDate.HasValue) query = query.Where(c => c.CreatedAt <= toDate.Value.AddDays(1));
+
+            var logs = await query.ToListAsync();
+            ViewBag.Search = search;
+            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+
+            return View(logs);
         }
     }
 }
