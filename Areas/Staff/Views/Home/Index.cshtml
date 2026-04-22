@@ -189,10 +189,27 @@
                     <div class="cal-day @(currentDt == DateTime.Today ? "today" : "")">
                         <div class="cal-num">@d</div>
                         
+                        @{
+                            var attendances = ViewBag.Attendances as List<Attendance> ?? new List<Attendance>();
+                            var attendance = attendances.FirstOrDefault(a => a.Date.Date == currentDt.Date);
+                        }
+
                         @if (currentLeave != null)
                         {
                             <div class="cal-leave" title="Lý do: @currentLeave.Reason">
                                 <i class="bi bi-calendar-x-fill"></i> NGHỈ PHÉP
+                            </div>
+                        }
+                        else if (attendance != null)
+                        {
+                            <div class="cal-event bg-success text-white border-0" style="font-size: 0.6rem;">
+                                <i class="bi bi-patch-check-fill me-1"></i> ĐI LÀM
+                            </div>
+                        }
+                        else if (currentDt < DateTime.Today)
+                        {
+                             <div class="cal-event bg-danger text-white border-0 opacity-75" style="font-size: 0.6rem;">
+                                <i class="bi bi-x-circle-fill me-1"></i> VẮNG
                             </div>
                         }
 
@@ -249,7 +266,14 @@
                                 </div>
                             </div>
                             
-                            <div class="text-end d-flex align-items-center gap-3">
+                            <div class="text-end d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                                @if (bd != null)
+                                {
+                                    <a class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" href="@Url.Action("ServiceGuide", new { id = bd.ServiceId, bookingId = b.BookingId })">
+                                        <i class="bi bi-journal-text me-1"></i>Quy trình
+                                    </a>
+                                }
+
                                 @if (isDoing)
                                 {
                                     var remain = (int)Math.Max(0, b.EndTime.Subtract(DateTime.Now).TotalMinutes);
@@ -263,12 +287,12 @@
                                 }
                                 else if (isAccepted)
                                 {
-                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold me-1" onclick="requestTransfer(@b.BookingId)">Chuyển ca</button>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold" onclick="requestTransfer(@b.BookingId)">Chuyển ca</button>
                                     <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="startService(@b.BookingId)">Bắt đầu</button>
                                 }
                                 else if (!isDone)
                                 {
-                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold me-1" onclick="requestTransfer(@b.BookingId)">Chuyển ca</button>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-bold" onclick="requestTransfer(@b.BookingId)">Chuyển ca</button>
                                     <button class="btn btn-sm btn-info text-white rounded-pill px-3 fw-bold" onclick="acceptBooking(@b.BookingId)">Nhận nhiệm vụ</button>
                                 }
                                 else

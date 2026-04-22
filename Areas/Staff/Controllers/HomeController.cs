@@ -76,6 +76,11 @@ namespace SpaN5.Areas.Staff.Controllers
                 .Where(lr => lr.FromDate <= endDate && lr.ToDate >= startDate)
                 .ToListAsync();
 
+            // Lấy dữ liệu chấm công
+            ViewBag.Attendances = await _context.Attendances
+                .Where(a => a.StaffId == staffId && a.Date >= startDate && a.Date <= endDate)
+                .ToListAsync();
+
             // Tính hiệu suất (Tính trên toàn bộ lịch được lấy ra để bao quát cả Tuần/Tháng)
             int totalCa = allBookings.Count;
             int hoanThanh = allBookings.Count(b => b.Status == BookingStatus.Completed);
@@ -678,6 +683,99 @@ namespace SpaN5.Areas.Staff.Controllers
                 .ToListAsync();
 
             return View(customer);
+        }
+
+        public async Task<IActionResult> ServiceGuide(int id, int? bookingId = null)
+        {
+            var service = await _context.Services
+                .Include(s => s.Category)
+                .Include(s => s.ServiceSteps.OrderBy(st => st.Order))
+                .Include(s => s.ServiceMaterials).ThenInclude(sm => sm.Material)
+                .FirstOrDefaultAsync(s => s.ServiceId == id);
+
+            if (service == null) return NotFound();
+
+            // Lấy StaffId để kiểm tra quyền hiển thị giá (tùy chọn)
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            ViewBag.ShowPrice = User.IsInRole("Admin"); // Chỉ Admin mới thấy giá trong guide mặc định
+            ViewBag.BookingId = bookingId;
+
+            if (bookingId.HasValue)
+            {
+                var booking = await _context.Bookings.Include(b => b.Customer).FirstOrDefaultAsync(b => b.BookingId == bookingId);
+                ViewBag.CustomerName = booking?.Customer?.FullName;
+                ViewBag.CustomerId = booking?.CustomerId;
+            }
+
+            return View(service);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveServiceAssessment(int customerId, int? bookingId, string skinType, string improvement, string recommended, int? nextDays, string internalNote)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
+                return Json(new { success = false, message = "Phiên đăng nhập hết hạn." });
+
+            var note = new CustomerNote
+            {
+                CustomerId = customerId,
+                BookingId = bookingId,
+                StaffId = staffId,
+                SkinType = skinType,
+                ImprovementStatus = improvement,
+                RecommendedService = recommended,
+                NextServiceAfterDays = nextDays,
+                InternalNote = internalNote,
+                CreatedAt = DateTime.Now,
+                Note = $"Báo cáo dịch vụ ca #{bookingId}"
+            };
+
+            _context.CustomerNotes.Add(note);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Dữ liệu đã được lưu vào hồ sơ khách hàng." });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckInQR(string code)
+        {
+            // Mã bí mật cố định để test, thực tế nên đổi thường xuyên hoặc dùng token
+            const string SECRET = "SPA_ZEN_2024"; 
+            
+            if (code != SECRET)
+            {
+                return Content("Mã QR không hợp lệ hoặc đã hết hạn.");
+            }
+
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
+            {
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var today = DateTime.Today;
+            var attendance = await _context.Attendances.FirstOrDefaultAsync(a => a.StaffId == staffId && a.Date == today);
+
+            if (attendance == null)
+            {
+                attendance = new Attendance
+                {
+                    StaffId = staffId,
+                    Date = today,
+                    CheckInTime = DateTime.Now,
+                    Note = "Chấm công qua QR"
+                };
+                _context.Attendances.Add(attendance);
+                await _context.SaveChangesAsync();
+                ViewBag.Message = "Chào mừng bạn! Chấm công VÀO qua QR thành công.";
+            }
+            else
+            {
+                ViewBag.Message = "Bạn đã chấm công trước đó rồi.";
+            }
+
+            return View("AttendanceResult");
         }
     }
 }

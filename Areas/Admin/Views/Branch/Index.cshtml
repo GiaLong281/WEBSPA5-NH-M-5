@@ -1,0 +1,331 @@
+@model IEnumerable<SpaN5.Models.Branch>
+
+@{
+    ViewData["Title"] = "Quản lý Chi nhánh";
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .branch-card {
+        background: var(--white);
+        border-radius: 20px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .branch-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0px 25px 50px rgba(112, 144, 176, 0.2);
+    }
+
+    .branch-img-container {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .branch-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .branch-card:hover .branch-img {
+        transform: scale(1.1);
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 6px 15px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        backdrop-filter: blur(10px);
+        z-index: 2;
+    }
+
+    .status-active { background: rgba(1, 181, 116, 0.2); color: #01B574; border: 1px solid rgba(1, 181, 116, 0.3); }
+    .status-inactive { background: rgba(238, 93, 93, 0.2); color: #EE5D5D; border: 1px solid rgba(238, 93, 93, 0.3); }
+
+    .branch-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .branch-name {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+
+    .branch-info {
+        color: var(--secondary-blue);
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .branch-info i {
+        color: var(--primary-blue);
+        width: 16px;
+    }
+
+    .branch-footer {
+        padding: 1.2rem 1.5rem;
+        background: rgba(244, 247, 254, 0.5);
+        border-top: 1px solid var(--accent-blue);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .staff-counter {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--text-main);
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-edit { background: var(--accent-blue); color: var(--primary-blue); }
+    .btn-edit:hover { background: var(--primary-blue); color: white; }
+
+    .btn-delete { background: #FFEAEA; color: #EE5D5D; }
+    .btn-delete:hover { background: #EE5D5D; color: white; }
+
+    .btn-add-new {
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 15px;
+        padding: 12px 25px;
+        font-weight: 700;
+        box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
+        transition: all 0.3s;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-add-new:hover {
+        transform: scale(1.05);
+        color: white;
+        box-shadow: 0px 15px 30px rgba(67, 24, 255, 0.3);
+    }
+
+    .stats-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        background: var(--accent-blue);
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stats-info h4 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .stats-info p {
+        margin: 0;
+        color: var(--secondary-blue);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Header Actions -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-extrabold mb-0" style="color: var(--text-main);">Hệ thống Chi nhánh</h2>
+            <p class="text-muted small">Quản lý các địa điểm và hoạt động của Spa</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="@Url.Action("Create")" class="btn btn-add-new d-inline-flex">
+                <i class="fa-solid fa-plus"></i> Thêm Chi Nhánh Mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon"><i class="fa-solid fa-building"></i></div>
+                <div class="stats-info">
+                    <h4>@Model.Count()</h4>
+                    <p>Tổng Chi Nhánh</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon"><i class="fa-solid fa-user-tie"></i></div>
+                <div class="stats-info">
+                    <h4>@Model.Sum(b => b.Staffs.Count)</h4>
+                    <p>Tổng Nhân Sự</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(1, 181, 116, 0.1); color: #01B574;"><i class="fa-solid fa-check-circle"></i></div>
+                <div class="stats-info">
+                    <h4>@Model.Count(b => b.IsActive)</h4>
+                    <p>Đang Hoạt Động</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(255, 185, 0, 0.1); color: #FFB900;"><i class="fa-solid fa-clock"></i></div>
+                <div class="stats-info">
+                    <h4>8h - 21h</h4>
+                    <p>Giờ Phục Vụ TB</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Branch Grid -->
+    <div class="row g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col-xl-4 col-md-6">
+                <div class="branch-card">
+                    <div class="branch-img-container">
+                        @if (!string.IsNullOrEmpty(item.Image))
+                        {
+                            <img src="~/uploads/branches/@item.Image" class="branch-img" alt="@item.BranchName">
+                        }
+                        else
+                        {
+                            <img src="https://images.unsplash.com/photo-1519415943484-9fa1873496d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" class="branch-img" alt="Default Branch">
+                        }
+                        <span class="status-badge @(item.IsActive ? "status-active" : "status-inactive")">
+                            @(item.IsActive ? "Đang hoạt động" : "Tạm dừng")
+                        </span>
+                    </div>
+
+                    <div class="branch-body">
+                        <h3 class="branch-name">@item.BranchName</h3>
+                        <div class="branch-info">
+                            <i class="fa-solid fa-location-dot"></i> @item.Address, @item.City
+                        </div>
+                        <div class="branch-info">
+                            <i class="fa-solid fa-phone"></i> @item.Phone
+                        </div>
+                        <div class="branch-info">
+                            <i class="fa-solid fa-clock"></i> @item.OpeningTime.ToString(@"hh\:mm") - @item.ClosingTime.ToString(@"hh\:mm")
+                        </div>
+                    </div>
+
+                    <div class="branch-footer">
+                        <div class="staff-counter">
+                            <i class="fa-solid fa-users-gear text-primary"></i>
+                            <span>@item.Staffs.Count Nhân viên</span>
+                        </div>
+                        <div class="action-btns">
+                            <a href="@Url.Action("Details", new { id = item.BranchId })" class="btn-action btn-edit" title="Chi tiết">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <a href="@Url.Action("Edit", new { id = item.BranchId })" class="btn-action btn-edit" title="Chỉnh sửa">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <button onclick="deleteBranch(@item.BranchId, '@item.BranchName')" class="btn-action btn-delete" title="Xóa">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteBranch(id, name) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: `Bạn có chắc chắn muốn xóa chi nhánh "${name}" không?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EE5D5D',
+                cancelButtonColor: '#707EAE',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy',
+                borderRadius: '15px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Admin/Branch/Delete/' + id,
+                        type: 'POST',
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    title: 'Đã xóa!',
+                                    text: 'Chi nhánh đã được loại bỏ khỏi hệ thống.',
+                                    icon: 'success',
+                                    borderRadius: '15px'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi!', res.message, 'error');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

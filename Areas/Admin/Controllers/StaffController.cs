@@ -142,6 +142,41 @@ namespace SpaN5.Areas.Admin.Controllers
             return Json(new { success = true });
         }
 
+        // GET: Admin/Staff/Timesheet/5
+        public async Task<IActionResult> Timesheet(int id, int? month, int? year)
+        {
+            var staff = await _context.Staffs.FindAsync(id);
+            if (staff == null) return NotFound();
+
+            var currentMonth = month ?? DateTime.Today.Month;
+            var currentYear = year ?? DateTime.Today.Year;
+            var startDate = new DateTime(currentYear, currentMonth, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var attendances = await _context.Attendances
+                .Where(a => a.StaffId == id && a.Date >= startDate && a.Date <= endDate)
+                .ToListAsync();
+
+            var leaves = await _context.LeaveRequests
+                .Where(l => l.StaffId == id && l.Status == LeaveRequestStatus.Approved && l.FromDate <= endDate && l.ToDate >= startDate)
+                .ToListAsync();
+
+            var bookings = await _context.Bookings
+                .Include(b => b.BookingDetails)
+                .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate && b.Status == BookingStatus.Completed)
+                .Where(b => b.BookingDetails.Any(bd => bd.StaffId == id))
+                .ToListAsync();
+
+            ViewBag.Staff = staff;
+            ViewBag.Month = currentMonth;
+            ViewBag.Year = currentYear;
+            ViewBag.Attendances = attendances;
+            ViewBag.Leaves = leaves;
+            ViewBag.BookingsCount = bookings.Count;
+
+            return View();
+        }
+
         private bool StaffExists(int id)
         {
             return _context.Staffs.Any(e => e.StaffId == id);

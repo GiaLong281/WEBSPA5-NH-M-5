@@ -366,6 +366,11 @@
                 {
                     <div class="menu-label">Báo cáo & Hệ thống</div>
                     <div class="nav-item">
+                        <a href="/Admin/Branch" class="nav-link @(Context.Request.Path.ToString().StartsWith("/Admin/Branch") ? "active" : "")">
+                            <i class="fa-solid fa-code-branch"></i> Hệ thống Chi nhánh
+                        </a>
+                    </div>
+                    <div class="nav-item">
                         <a href="/Admin/Inventory/Reports" class="nav-link @(Context.Request.Path == "/Admin/Inventory/Reports" ? "active" : "")">
                             <i class="fa-solid fa-chart-line"></i> Phân tích
                         </a>

@@ -29,6 +29,7 @@ namespace SpaN5.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public ICollection<ServiceMaterial> ServiceMaterials { get; set; } = new List<ServiceMaterial>();
+        public ICollection<ServiceStep> ServiceSteps { get; set; } = new List<ServiceStep>();
         public ICollection<BookingDetail> BookingDetails { get; set; } = new List<BookingDetail>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }

@@ -1,0 +1,319 @@
+@model SpaN5.Models.Service
+@{
+    ViewData["Title"] = "Hướng dẫn thực hiện dịch vụ";
+    Layout = "_StaffLayout";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header: Thông tin chung -->
+    <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 15px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2" style="background: transparent; padding: 0;">
+                            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")" class="text-decoration-none text-muted">Dashboard</a></li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">Quy trình dịch vụ</li>
+                        </ol>
+                    </nav>
+                    <h2 class="fw-bold text-dark mb-1">@Model.ServiceName</h2>
+                    <p class="text-muted mb-0">Phân loại: <span class="badge bg-soft-primary text-primary px-3">@Model.Category?.Name</span></p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="d-inline-flex gap-3 align-items-center bg-white p-3 rounded-4 shadow-sm">
+                        <div class="text-center">
+                            <small class="text-muted d-block mb-1">Thời gian chuẩn</small>
+                            <span class="h5 fw-bold text-primary mb-0"><i class="bi bi-clock-history me-1"></i> @Model.Duration phút</span>
+                        </div>
+                        @if (ViewBag.ShowPrice)
+                        {
+                            <div class="vr mx-2"></div>
+                            <div class="text-center">
+                                <small class="text-muted d-block mb-1">Giá dịch vụ</small>
+                                <span class="h5 fw-bold text-success mb-0">@Model.Price.ToString("N0")đ</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Cột trái: Hướng dẫn chi tiết & Video -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-play-circle-fill text-danger me-2"></i>Hướng dẫn kỹ thuật</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                    {
+                        <div class="ratio ratio-16x9 mb-4 rounded-4 overflow-hidden shadow-sm">
+                            <iframe src="@Model.VideoUrl" title="Service Video" allowfullscreen></iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border-0 text-center py-5 rounded-4 mb-4" style="background: #f8fafc;">
+                            <i class="bi bi-camera-video text-muted display-4 mb-3 d-block"></i>
+                            <p class="text-muted mb-0">Dịch vụ này chưa có video hướng dẫn cụ thể.</p>
+                        </div>
+                    }
+
+                    <div class="description-section">
+                        <h6 class="fw-bold text-dark mb-3">Mô tả quy trình tổng quát:</h6>
+                        <div class="p-4 bg-light rounded-4" style="line-height: 1.8; color: #475569;">
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                @Html.Raw(Model.Description)
+                            }
+                            else
+                            {
+                                <p class="text-muted italic">Chưa có mô tả chi tiết cho quy trình này.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-dark mb-3">Vật tư cần chuẩn bị:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.ServiceMaterials.Any())
+                            {
+                                @foreach (var mat in Model.ServiceMaterials)
+                                {
+                                    <span class="badge border text-dark fw-normal px-3 py-2 bg-white shadow-xs" style="border-radius: 10px;">
+                                        <i class="bi bi-box-seam me-1 text-primary"></i> @mat.Material.MaterialName (@mat.Quantity @mat.Material.Unit)
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <small class="text-muted">Không có vật tư đặc biệt.</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Checklist các bước thực hiện -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-list-check text-primary me-2"></i>Checklist thực hiện</h5>
+                    <span class="badge bg-primary rounded-pill progress-text">0%</span>
+                </div>
+                <div class="card-body">
+                    <!-- Thanh tiến độ -->
+                    <div class="progress mb-4" style="height: 10px; border-radius: 5px;">
+                        <div id="serviceProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <div class="checklist-container">
+                        @if (Model.ServiceSteps.Any())
+                        {
+                            int index = 1;
+                            @foreach (var step in Model.ServiceSteps)
+                            {
+                                <div class="step-item d-flex p-3 mb-3 rounded-4 border transition-all" data-step-id="@step.Id" style="cursor: pointer; background: #fff;">
+                                    <div class="form-check me-3">
+                                        <input class="form-check-input step-checkbox" type="checkbox" style="width: 24px; height: 24px;">
+                                    </div>
+                                    <div class="step-content">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="fw-bold text-dark">Bước @index: @step.StepName</span>
+                                            @if (step.Duration.HasValue)
+                                            {
+                                                <small class="text-muted"><i class="bi bi-clock me-1"></i>@step.Duration'</small>
+                                            }
+                                        </div>
+                                        <p class="small text-muted mb-0">Thực hiện kỹ thuật theo đúng quy trình chuẩn.</p>
+                                    </div>
+                                </div>
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <img src="/images/empty-checklist.svg" class="mb-3" style="width: 120px; opacity: 0.5;" />
+                                <p class="text-muted">Chưa có danh sách các bước chi tiết.</p>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-4 d-grid">
+                        <button id="btnCompleteChecklist" class="btn btn-primary py-3 rounded-4 fw-bold shadow-sm disabled">
+                            <i class="bi bi-check-circle-fill me-2"></i>Xác nhận hoàn thành quy trình
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Đánh giá & Báo cáo Ca làm -->
+<div class="modal fade" id="assessmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h4 class="modal-title fw-bold text-dark"><i class="bi bi-clipboard2-pulse text-primary me-2"></i>Báo cáo & Đánh giá ca làm</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="assessmentForm">
+                    <input type="hidden" name="customerId" value="@ViewBag.CustomerId" />
+                    <input type="hidden" name="bookingId" value="@ViewBag.BookingId" />
+
+                    <div class="row g-4">
+                        <!-- 1. Ghi chú tình trạng khách -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase text-muted">1. Tình trạng da khách hàng</label>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                @foreach (var type in new[] { "Da khô", "Da dầu", "Da hỗn hợp", "Da mụn", "Nhạy cảm" })
+                                {
+                                    <input type="radio" class="btn-check" name="skinType" id="skin_@type" value="@type" autocomplete="off">
+                                    <label class="btn btn-outline-secondary btn-sm rounded-pill px-3" for="skin_@type">@type</label>
+                                }
+                            </div>
+                            <label class="form-label fw-bold small text-uppercase text-muted">Mức độ cải thiện sau buổi</label>
+                            <textarea class="form-control rounded-4 shadow-none" name="improvement" rows="3" placeholder="VD: Da sáng hơn, giảm mụn đỏ..."></textarea>
+                        </div>
+
+                        <!-- 2. Đề xuất dịch vụ tiếp theo -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase text-muted">2. Đề xuất & Hẹn gặp</label>
+                            <div class="mb-3">
+                                <label class="small text-muted mb-1">Số ngày nên quay lại</label>
+                                <div class="input-group">
+                                    <input type="number" name="nextDays" class="form-control rounded-start-4" value="7">
+                                    <span class="input-group-text rounded-end-4 bg-light">ngày</span>
+                                </div>
+                            </div>
+                            <label class="small text-muted mb-1">Dịch vụ đề xuất tiếp theo</label>
+                            <input type="text" name="recommended" class="form-control rounded-4 shadow-none mb-3" placeholder="VD: Gói cấp ẩm sâu, Trị mụn level 2...">
+                        </div>
+
+                        <!-- 3. Ghi chú nội bộ (Tuyệt mật) -->
+                        <div class="col-12">
+                            <div class="p-3 rounded-4" style="background-color: #fffbeb; border: 1px dashed #f59e0b;">
+                                <label class="form-label fw-bold small text-uppercase" style="color: #b45309;">
+                                    <i class="bi bi-shield-lock-fill me-1"></i> 3. Ghi chú nội bộ (Chỉ nhân viên & Admin thấy)
+                                </label>
+                                <textarea class="form-control border-0 bg-transparent shadow-none p-0" name="internalNote" rows="2" placeholder="VD: Khách thích trà ít đường, khó tính vùng cổ, da dễ kích ứng..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" id="btnSubmitAssessment" class="btn btn-primary rounded-pill px-5 fw-bold">
+                    <i class="bi bi-cloud-arrow-up-fill me-2"></i>Lưu & Hoàn tất ca làm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft-primary { background-color: rgba(13, 148, 136, 0.1); }
+    .transition-all { transition: all 0.3s ease; }
+    .step-item:hover { transform: translateX(5px); border-color: #0d9488 !important; }
+    .step-item.completed { background-color: #f0fdfa !important; border-color: #0d9488 !important; }
+    .step-item.completed .fw-bold { text-decoration: line-through; color: #0d9488 !important; }
+    
+    .form-check-input:checked {
+        background-color: #0d9488;
+        border-color: #0d9488;
+    }
+    
+    .shadow-xs { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+    .btn-check:checked + .btn-outline-secondary {
+        background-color: #0d9488;
+        border-color: #0d9488;
+        color: white;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const totalSteps = $('.step-item').length;
+            
+            function updateProgress() {
+                const checkedSteps = $('.step-checkbox:checked').length;
+                const progress = totalSteps > 0 ? Math.round((checkedSteps / totalSteps) * 100) : 0;
+                
+                $('#serviceProgressBar').css('width', progress + '%').attr('aria-valuenow', progress);
+                $('.progress-text').text(progress + '%');
+                
+                if (progress === 100) {
+                    $('#btnCompleteChecklist').removeClass('disabled');
+                } else {
+                    $('#btnCompleteChecklist').addClass('disabled');
+                }
+            }
+
+            $('.step-item').on('click', function(e) {
+                if ($(e.target).is('input')) return;
+                const checkbox = $(this).find('.step-checkbox');
+                checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+            });
+
+            $('.step-checkbox').on('change', function() {
+                const stepItem = $(this).closest('.step-item');
+                if (this.checked) {
+                    stepItem.addClass('completed');
+                } else {
+                    stepItem.removeClass('completed');
+                }
+                updateProgress();
+            });
+
+            $('#btnCompleteChecklist').click(function() {
+                const bookingId = '@ViewBag.BookingId';
+                if (!bookingId) {
+                    Swal.fire('Thông báo', 'Duyệt quy trình hoàn tất (Chế độ xem thử).', 'success');
+                    return;
+                }
+                $('#assessmentModal').modal('show');
+            });
+
+            $('#btnSubmitAssessment').click(function() {
+                const formData = $('#assessmentForm').serialize();
+                
+                Swal.fire({
+                    title: 'Đang lưu báo cáo...',
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                $.post('@Url.Action("SaveServiceAssessment", "Home")', formData, function(res) {
+                    if (res.success) {
+                        confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                        
+                        Swal.fire({
+                            title: 'Thành công!',
+                            text: res.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '@Url.Action("Index", "Home")';
+                        });
+                    } else {
+                        Swal.fire('Lỗi', res.message, 'error');
+                    }
+                });
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+}

@@ -62,6 +62,13 @@ using (var scope = app.Services.CreateScope()) {
         if (!materialCols.Contains("SupplierId")) SafeExecuteSql("ALTER TABLE Materials ADD COLUMN SupplierId INTEGER");
         var smCols = context.Database.SqlQueryRaw<string>("SELECT name FROM pragma_table_info('ServiceMaterials')").ToList();
         if (!smCols.Contains("ServiceStepId")) SafeExecuteSql("ALTER TABLE ServiceMaterials ADD COLUMN ServiceStepId INTEGER");
+
+        var noteCols = context.Database.SqlQueryRaw<string>("SELECT name FROM pragma_table_info('CustomerNotes')").ToList();
+        if (!noteCols.Contains("SkinType")) SafeExecuteSql("ALTER TABLE CustomerNotes ADD COLUMN SkinType TEXT");
+        if (!noteCols.Contains("ImprovementStatus")) SafeExecuteSql("ALTER TABLE CustomerNotes ADD COLUMN ImprovementStatus TEXT");
+        if (!noteCols.Contains("RecommendedService")) SafeExecuteSql("ALTER TABLE CustomerNotes ADD COLUMN RecommendedService TEXT");
+        if (!noteCols.Contains("NextServiceAfterDays")) SafeExecuteSql("ALTER TABLE CustomerNotes ADD COLUMN NextServiceAfterDays INTEGER");
+        if (!noteCols.Contains("InternalNote")) SafeExecuteSql("ALTER TABLE CustomerNotes ADD COLUMN InternalNote TEXT");
     } catch { }
 
     string[] tableCmds = {

@@ -1,0 +1,152 @@
+@{
+    ViewData["Title"] = "Bảng công nhân viên";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var staff = ViewBag.Staff as SpaN5.Models.Staff;
+    int month = ViewBag.Month;
+    int year = ViewBag.Year;
+    var attendances = ViewBag.Attendances as List<SpaN5.Models.Attendance> ?? new List<SpaN5.Models.Attendance>();
+    var leaves = ViewBag.Leaves as List<SpaN5.Models.LeaveRequest> ?? new List<SpaN5.Models.LeaveRequest>();
+    int bookingsCount = ViewBag.BookingsCount;
+
+    var daysInMonth = DateTime.DaysInMonth(year, month);
+    var firstDay = new DateTime(year, month, 1);
+    int startOffset = ((int)firstDay.DayOfWeek + 6) % 7;
+}
+
+<style>
+    .ts-card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: none; }
+    .ts-header { background: linear-gradient(135deg, #4318FF 0%, #707EAE 100%); color: white; border-radius: 20px 20px 0 0; padding: 30px; }
+    
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .cal-header { font-weight: 800; color: #707EAE; text-align: center; font-size: 0.75rem; text-transform: uppercase; padding: 10px; }
+    .cal-day { 
+        min-height: 100px; background: #F4F7FE; border-radius: 15px; padding: 10px; 
+        transition: all 0.2s; border: 2px solid transparent;
+    }
+    .cal-day:hover { background: #E9EDF7; border-color: #4318FF; }
+    .cal-day.empty { background: transparent; }
+    
+    .day-num { font-weight: 800; color: #2B3674; font-size: 1.1rem; margin-bottom: 5px; }
+    .status-badge { font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; display: block; text-align: center; margin-top: 5px; }
+    .status-present { background: #00B050; color: white; }
+    .status-absent { background: #FF5B5B; color: white; }
+    .status-leave { background: #F59E0B; color: white; }
+
+    .stat-box { background: #F4F7FE; border-radius: 15px; padding: 20px; text-align: center; }
+    .stat-val { font-size: 1.8rem; font-weight: 800; color: #4318FF; display: block; }
+    .stat-label { font-size: 0.75rem; color: #707EAE; font-weight: 600; text-transform: uppercase; }
+</style>
+
+<div class="ts-card mb-4">
+    <div class="ts-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-4">
+                <img src="https://ui-avatars.com/api/?name=@staff.FullName&size=128" class="rounded-4 border border-4 border-white shadow-sm" style="width: 80px; height: 80px;">
+                <div>
+                    <h2 class="fw-800 mb-1">Bảng công: @staff.FullName</h2>
+                    <p class="mb-0 opacity-75">Tháng @month / @year • Chức vụ: @staff.Position</p>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="btn-group shadow-sm">
+                    <a href="?month=@(month == 1 ? 12 : month - 1)&year=@(month == 1 ? year - 1 : year)" class="btn btn-white text-primary fw-bold px-3 border-end"><i class="fa-solid fa-chevron-left"></i></a>
+                    <button class="btn btn-white text-dark fw-bold px-4" disabled>Tháng @month / @year</button>
+                    <a href="?month=@(month == 12 ? 1 : month + 1)&year=@(month == 12 ? year + 1 : year)" class="btn btn-white text-primary fw-bold px-3 border-start"><i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4">
+        <!-- Thống kê nhanh -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <span class="stat-val">@attendances.Count</span>
+                    <span class="stat-label">Ngày đi làm</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <span class="stat-val text-warning">@leaves.Count</span>
+                    <span class="stat-label">Ngày nghỉ phép</span>
+                </div>
+            </div>
+            @{
+                int workDaysSoFar = DateTime.Today.Month == month ? DateTime.Today.Day : daysInMonth;
+                int absent = workDaysSoFar - attendances.Count - leaves.Count;
+                if (absent < 0) absent = 0;
+            }
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <span class="stat-val text-danger">@absent</span>
+                    <span class="stat-label">Ngày vắng</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-box">
+                    <span class="stat-val text-success">@bookingsCount</span>
+                    <span class="stat-label">Số ca phục vụ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lịch -->
+        <div class="calendar-grid">
+            @foreach (var day in new[] { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật" })
+            {
+                <div class="cal-header">@day</div>
+            }
+
+            @for (int i = 0; i < startOffset; i++)
+            {
+                <div class="cal-day empty"></div>
+            }
+
+            @for (int d = 1; d <= daysInMonth; d++)
+            {
+                var date = new DateTime(year, month, d);
+                var att = attendances.FirstOrDefault(a => a.Date.Date == date.Date);
+                var leave = leaves.FirstOrDefault(l => date.Date >= l.FromDate.Date && date.Date <= l.ToDate.Date);
+                
+                <div class="cal-day @(date.Date == DateTime.Today ? "border-primary" : "")">
+                    <div class="day-num">@d</div>
+                    
+                    @if (leave != null)
+                    {
+                        <span class="status-badge status-leave" title="@leave.Reason">NGHỈ PHÉP</span>
+                    }
+                    else if (att != null)
+                    {
+                        <span class="status-badge status-present">ĐI LÀM</span>
+                        <div class="smaller text-muted mt-1" style="font-size: 0.55rem;">
+                            <i class="fa-solid fa-clock me-1"></i>@att.CheckInTime?.ToString("HH:mm")
+                        </div>
+                    }
+                    else if (date.Date < DateTime.Today)
+                    {
+                        <span class="status-badge status-absent">VẮNG</span>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="mt-5 p-4 rounded-4 bg-light border">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-calculator text-primary me-2"></i>Tính lương dự kiến (Tháng @month)</h5>
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="small text-muted">Lương cơ bản (Ngày công)</div>
+                    <div class="h4 fw-bold mb-0 text-dark">@((attendances.Count * 250000).ToString("N0"))đ</div>
+                </div>
+                <div class="col-md-4 border-start">
+                    <div class="small text-muted">Hoa hồng dịch vụ (@bookingsCount ca)</div>
+                    <div class="h4 fw-bold mb-0 text-success">+ @((bookingsCount * 50000).ToString("N0"))đ</div>
+                </div>
+                <div class="col-md-4 border-start text-end">
+                    <div class="small text-muted">TỔNG LƯƠNG NHẬN</div>
+                    <div class="h3 fw-800 mb-0 text-primary">@(((attendances.Count * 250000) + (bookingsCount * 50000)).ToString("N0"))đ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
