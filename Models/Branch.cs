@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SpaN5.Models
 {
@@ -19,7 +19,9 @@ namespace SpaN5.Models
         [Required]
         public string City { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Số điện thoại là bắt buộc")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Số điện thoại phải đúng 10 số")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Số điện thoại chỉ được chứa 10 chữ số")]
         public string Phone { get; set; } = string.Empty;
 
         public string? Email { get; set; }

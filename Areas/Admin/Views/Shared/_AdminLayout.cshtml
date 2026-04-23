@@ -449,6 +449,36 @@
             if($(window).width() < 992) {
                 $("#wrapper").removeClass("toggled");
             }
+
+            // --- Validation Số điện thoại 10 số ---
+            // Tự động tìm các input có name là Phone
+            $(document).on('input', 'input[name$="Phone"]', function() {
+                let phone = $(this).val();
+                // Loại bỏ các ký tự không phải số
+                phone = phone.replace(/\D/g, '');
+                $(this).val(phone);
+
+                // Kiểm tra độ dài
+                if (phone.length > 0 && phone.length !== 10) {
+                    $(this).addClass('is-invalid');
+                    if ($(this).next('.phone-warning').length === 0) {
+                        $(this).after('<div class="phone-warning text-danger small mt-1">Số điện thoại phải đúng 10 chữ số!</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.phone-warning').remove();
+                }
+            });
+
+            // Giới hạn tối đa 10 ký tự
+            $(document).on('keydown', 'input[name$="Phone"]', function(e) {
+                if ($(this).val().length >= 10 && e.keyCode !== 8 && e.keyCode !== 46) {
+                    // Cho phép xóa (Backbox/Delete) nhưng không cho nhập thêm
+                    if (![37, 38, 39, 40].includes(e.keyCode)) { // Cho phép phím mũi tên
+                        e.preventDefault();
+                    }
+                }
+            });
         });
     </script>
     
