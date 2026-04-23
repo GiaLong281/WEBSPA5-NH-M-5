@@ -740,18 +740,34 @@ namespace SpaN5.Areas.Staff.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckInQR(string code)
         {
-            // Mã bí mật cố định để test, thực tế nên đổi thường xuyên hoặc dùng token
-            const string SECRET = "SPA_ZEN_2024"; 
-            
-            if (code != SECRET)
-            {
-                return Content("Mã QR không hợp lệ hoặc đã hết hạn.");
-            }
+            // Mã bí mật riêng biệt cho từng bộ phận
+            const string KTV_SECRET = "SPA_KTV_2024";
+            const string LETAN_SECRET = "SPA_LETAN_2024";
 
             var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
             if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
             {
                 return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var staff = await _context.Staffs.FindAsync(staffId);
+            if (staff == null) return NotFound();
+
+            // Kiểm tra mã quét có khớp với vị trí không
+            bool isValid = false;
+            if (code == KTV_SECRET && (staff.Position?.Contains("Kỹ thuật") == true || staff.Position?.Contains("Staff") == true))
+            {
+                isValid = true;
+            }
+            else if (code == LETAN_SECRET && (staff.Position?.Contains("Lễ tân") == true || staff.Position?.Contains("Receptionist") == true || staff.Position?.Contains("Admin") == true))
+            {
+                isValid = true;
+            }
+
+            if (!isValid)
+            {
+                ViewBag.Error = "Mã QR không đúng với vị trí công việc của bạn hoặc mã không hợp lệ.";
+                return View("AttendanceResult");
             }
 
             var today = DateTime.Today;
@@ -764,17 +780,21 @@ namespace SpaN5.Areas.Staff.Controllers
                     StaffId = staffId,
                     Date = today,
                     CheckInTime = DateTime.Now,
-                    Note = "Chấm công qua QR"
+                    Note = $"Chấm công QR ({staff.Position})"
                 };
                 _context.Attendances.Add(attendance);
                 await _context.SaveChangesAsync();
-                ViewBag.Message = "Chào mừng bạn! Chấm công VÀO qua QR thành công.";
+                ViewBag.Success = true;
+                ViewBag.Message = "Chào mừng bạn! Chấm công VÀO thành công.";
             }
             else
             {
-                ViewBag.Message = "Bạn đã chấm công trước đó rồi.";
+                ViewBag.Success = true;
+                ViewBag.Message = "Bạn đã ghi nhận ngày làm việc hôm nay.";
             }
 
+            ViewBag.Staff = staff;
+            ViewBag.Attendance = attendance;
             return View("AttendanceResult");
         }
     }

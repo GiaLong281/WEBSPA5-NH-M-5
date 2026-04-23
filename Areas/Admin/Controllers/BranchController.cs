@@ -39,6 +39,8 @@ namespace SpaN5.Areas.Admin.Controllers
 
             if (branch == null) return NotFound();
 
+            ViewBag.TotalSystemStaff = await _context.Staffs.CountAsync();
+
             return View(branch);
         }
 
@@ -119,6 +121,49 @@ namespace SpaN5.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(branch);
+        }
+
+        // GET: Admin/Branch/Seed
+        public async Task<IActionResult> Seed()
+        {
+            var branch = await _context.Branches.FirstOrDefaultAsync();
+
+            if (branch == null)
+            {
+                branch = new Branch
+                {
+                    BranchName = "Azure Spa - Premium",
+                    BranchCode = "BR-001",
+                    Address = "123 Lê Lợi",
+                    District = "Quận 1",
+                    City = "Hồ Chí Minh",
+                    Phone = "0909123456",
+                    Email = "long@azurespa.vn",
+                    OpeningTime = new TimeSpan(8, 0, 0),
+                    ClosingTime = new TimeSpan(21, 0, 0),
+                    GoogleMapLink = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1d3919.460232422501!2d106.6998!3d10.7745!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3f1!2zMTIzIEzDqiBM4bujaSwgQuG6v24gVGjDoG5oLCBRdeG6rW4gMSwgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1713800000000!5m2!1svi!2s",
+                    Description = "Chi nhánh trung tâm tọa lạc tại con đường sầm uất bậc nhất Sài Gòn.",
+                    IsActive = true,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+                _context.Branches.Add(branch);
+            }
+            else
+            {
+                branch.BranchCode = "BR-001";
+                branch.Email = "long@azurespa.vn";
+                branch.Address = "123 Lê Lợi";
+                branch.District = "Quận 1";
+                branch.City = "Hồ Chí Minh";
+                branch.Phone = "0909123456";
+                branch.OpeningTime = new TimeSpan(8, 0, 0);
+                branch.ClosingTime = new TimeSpan(21, 0, 0);
+                branch.GoogleMapLink = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m13!1d3919.460232422501!2d106.6998!3d10.7745!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3f1!2zMTIzIEzDqiBM4bujaSwgQuG6v24gVGjDoG5oLCBRdeG6rW4gMSwgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1713800000000!5m2!1svi!2s";
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = branch.BranchId });
         }
 
         // POST: Admin/Branch/Delete/5

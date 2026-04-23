@@ -411,8 +411,9 @@
             <button class="fab-btn" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-plus"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mb-2" style="min-width: 220px;">
-                <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="toggleAttendance()"><i class="bi bi-fingerprint text-success fs-5"></i> Cập nhật Chấm Công</a></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mb-2" style="min-width: 250px;">
+                <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="showQRGuide()"><i class="bi bi-qr-code-scan text-primary fs-5"></i> Quét QR tại quầy (Khuyên dùng)</a></li>
+                <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="toggleAttendance()"><i class="bi bi-fingerprint text-success fs-5"></i> Chấm công thủ công</a></li>
                 <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="showLeaveRequest()"><i class="bi bi-calendar-minus text-danger fs-5"></i> Đăng ký nghỉ/vắng face</a></li>
                 <li><a class="dropdown-item py-2 px-3 rounded d-flex align-items-center gap-3 fw-medium" href="javascript:void(0)" onclick="showMaterialReport()"><i class="bi bi-box-seam text-warning fs-5"></i> Báo thiếu vật tư</a></li>
             </ul>
@@ -523,6 +524,26 @@
                 }
             });
         }
+        function showQRGuide() {
+            Swal.fire({
+                title: 'Hướng dẫn Chấm công QR',
+                html: `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-qr-code-scan text-primary" style="font-size: 4rem;"></i>
+                        </div>
+                        <p class="fw-bold">Bạn hãy dùng Camera điện thoại hoặc Zalo để quét mã QR hiển thị tại màn hình Lễ tân.</p>
+                        <div class="alert alert-warning small text-start">
+                            <i class="bi bi-info-circle me-1"></i> 
+                            Hệ thống sẽ tự động ghi nhận giờ vào ca sau khi bạn quét thành công. Không cần bấm nút thủ công.
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: 'Đã hiểu',
+                confirmButtonColor: '#0ea5e9'
+            });
+        }
+
         function toggleAttendance() {
             Swal.fire({
                 title: 'Xác nhận Điểm danh',

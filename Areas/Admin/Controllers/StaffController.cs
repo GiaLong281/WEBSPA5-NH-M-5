@@ -177,6 +177,14 @@ namespace SpaN5.Areas.Admin.Controllers
             return View();
         }
 
+        // GET: Admin/Staff/AttendanceQR
+        public IActionResult AttendanceQR()
+        {
+            // Mã bí mật khớp với logic trong Staff/HomeController/CheckInQR
+            ViewBag.QRCodeValue = "SPA_ZEN_2024";
+            return View();
+        }
+
         private bool StaffExists(int id)
         {
             return _context.Staffs.Any(e => e.StaffId == id);

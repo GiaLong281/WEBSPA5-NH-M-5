@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "Mã QR Chấm Công Hệ Thống";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    
+    // Lấy Base URL của trang web (vd: https://localhost:5001 hoặc domain của bạn)
+    var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+
+    // Tạo Link tuyệt đối để quét là nó nhảy vào trang chấm công luôn
+    var ktvLink = baseUrl + "/Staff/Home/CheckInQR?code=SPA_KTV_2024";
+    var letanLink = baseUrl + "/Staff/Home/CheckInQR?code=SPA_LETAN_2024";
+
+    // Mã hóa URL để đưa vào api tạo QR
+    var ktvQrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(ktvLink)}";
+    var letanQrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(letanLink)}";
+}
+
+<style>
+    .qr-page-container {
+        max-width: 1000px;
+        margin: 40px auto;
+    }
+    .qr-card {
+        background: white;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(67, 24, 255, 0.1);
+        text-align: center;
+        border: 1px solid rgba(67, 24, 255, 0.1);
+        height: 100%;
+        transition: transform 0.3s;
+    }
+    .qr-card:hover { transform: translateY(-10px); }
+    .qr-image-wrapper {
+        background: #f4f7fe;
+        padding: 20px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 20px;
+        border: 2px solid #4318FF;
+    }
+    .qr-image-wrapper img { width: 220px; height: 220px; }
+    .role-label {
+        display: inline-block;
+        padding: 5px 20px;
+        border-radius: 20px;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        margin-bottom: 15px;
+    }
+    .label-ktv { background: #E0F2FE; color: #0369A1; }
+    .label-letan { background: #FEF3C7; color: #92400E; }
+</style>
+
+<div class="qr-page-container">
+    <div class="text-center mb-5">
+        <h2 class="fw-800 text-primary">TRUNG TÂM CHẤM CÔNG CÔNG NGHỆ</h2>
+        <p class="text-muted">Vui lòng chọn đúng mã QR tương ứng với vị trí công việc của bạn.</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- QR KỸ THUẬT VIÊN -->
+        <div class="col-md-6">
+            <div class="qr-card">
+                <span class="role-label label-ktv">Dành cho Kỹ thuật viên</span>
+                <h3 class="fw-700 mb-3">CHẤM CÔNG KTV</h3>
+                <div class="qr-image-wrapper">
+                    <img src="@ktvQrUrl" alt="KTV QR" />
+                </div>
+                <p class="small text-muted px-4">Áp dụng cho đội ngũ KTV thực hiện dịch vụ tại phòng.</p>
+            </div>
+        </div>
+
+        <!-- QR LỄ TÂN -->
+        <div class="col-md-6">
+            <div class="qr-card">
+                <span class="role-label label-letan">Dành cho Lễ tân / Admin</span>
+                <h3 class="fw-700 mb-3">CHẤM CÔNG LỄ TÂN</h3>
+                <div class="qr-image-wrapper" style="border-color: #F59E0B;">
+                    <img src="@letanQrUrl" alt="Letan QR" />
+                </div>
+                <p class="small text-muted px-4">Áp dụng cho nhân viên trực quầy và bộ phận văn phòng.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info rounded-4 mt-5 d-flex align-items-center gap-3">
+        <i class="fa-solid fa-circle-info fs-3"></i>
+        <div>
+            <strong class="d-block">Lưu ý bảo mật:</strong>
+            Hệ thống sẽ kiểm tra chức vụ tài khoản của bạn khi quét. Nếu quét sai mã QR của bộ phận khác, hệ thống sẽ từ chối ghi nhận công.
+        </div>
+    </div>
+</div>

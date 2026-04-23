@@ -313,7 +313,7 @@
                 {
                     <div class="menu-label">Người dùng</div>
                     <div class="nav-item">
-                        <a href="/Admin/Staff" class="nav-link @(Context.Request.Path.ToString().StartsWith("/Admin/Staff") ? "active" : "")">
+                        <a href="/Admin/Staff" class="nav-link @(Context.Request.Path.ToString().StartsWith("/Admin/Staff") && !Context.Request.Path.ToString().Contains("AttendanceQR") ? "active" : "")">
                             <i class="fa-solid fa-user-shield"></i> Quản lý Nhân sự
                         </a>
                     </div>
@@ -334,6 +334,11 @@
                 }
 
                 <div class="menu-label">Vận hành</div>
+                <div class="nav-item">
+                    <a href="/Admin/Staff/AttendanceQR" class="nav-link @(Context.Request.Path == "/Admin/Staff/AttendanceQR" ? "active" : "")">
+                        <i class="fa-solid fa-qrcode"></i> Chấm công QR (Dành cho NV)
+                    </a>
+                </div>
                 <div class="nav-item">
                     <a href="/Admin/ManageServices" class="nav-link">
                         <i class="fa-solid fa-spa"></i> Dịch vụ
