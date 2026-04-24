@@ -179,6 +179,19 @@ namespace SpaN5.Models
                       .HasForeignKey(r => r.CustomerId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+            modelBuilder.Entity<Staff>(entity =>
+            {
+                entity.Property(s => s.FullName).IsRequired(false);
+                entity.Property(s => s.Phone).IsRequired(false);
+                entity.Property(s => s.Email).IsRequired(false);
+                entity.Property(s => s.Gender).IsRequired(false);
+                entity.Property(s => s.Position).IsRequired(false);
+                entity.Property(s => s.Avatar).IsRequired(false);
+                entity.Property(s => s.Status).IsRequired(false);
+                entity.Property(s => s.CreatedAt).IsRequired(false);
+                entity.Property(s => s.BranchId).IsRequired(false);
+                entity.Property(s => s.SpecializationId).IsRequired(false);
+            });
         }
     }
 }

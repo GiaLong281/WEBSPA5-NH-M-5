@@ -16,6 +16,13 @@ namespace SpaN5.Areas.Admin.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
+        public async Task<IActionResult> DebugStaff()
+        {
+            var data = await _context.Staffs.ToListAsync();
+            return Json(data);
+        }
+
         public async Task<IActionResult> Index()
         {
             var today = DateTime.Today;
@@ -54,6 +61,7 @@ namespace SpaN5.Areas.Admin.Controllers
 
             // 5. Trạng thái thực tế của nhân viên (Chỉ lấy KTV/Therapist)
             var allStaff = await _context.Staffs
+                .AsNoTracking()
                 .Include(s => s.Specialization)
                 .Where(s => s.Position == "Technician" || s.Position == "Therapist")
                 .ToListAsync();
