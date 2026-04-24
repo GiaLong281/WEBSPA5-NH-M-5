@@ -1,0 +1,114 @@
+@{
+    ViewData["Title"] = "Chấm công";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var todayAttendance = ViewBag.TodayAttendance as SpaN5.Models.Attendance;
+    var recentAttendances = ViewBag.RecentAttendances as List<SpaN5.Models.Attendance> ?? new List<SpaN5.Models.Attendance>();
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-gold text-white text-center">
+                    <h3 class="mb-0">Chấm công hôm nay</h3>
+                    <small>@DateTime.Now.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("vi-VN"))</small>
+                </div>
+                <div class="card-body text-center py-5">
+                    @if (todayAttendance?.CheckInTime == null)
+                    {
+                        <form method="post" asp-action="CheckIn">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <input type="text" name="note" class="form-control" placeholder="Ghi chú (tùy chọn)">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                <i class="fas fa-sign-in-alt"></i> CHECK-IN
+                            </button>
+                        </form>
+                    }
+                    else if (todayAttendance.CheckOutTime == null)
+                    {
+                        <div class="mb-3">
+                            <p class="text-success"><i class="fas fa-check-circle"></i> Đã check-in lúc @todayAttendance.CheckInTime?.ToString("HH:mm:ss")</p>
+                        </div>
+                        <form method="post" asp-action="CheckOut">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <input type="text" name="note" class="form-control" placeholder="Ghi chú (tùy chọn)">
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-lg px-5">
+                                <i class="fas fa-sign-out-alt"></i> CHECK-OUT
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            <p><strong>Đã check-in:</strong> @todayAttendance.CheckInTime?.ToString("HH:mm:ss")</p>
+                            <p><strong>Đã check-out:</strong> @todayAttendance.CheckOutTime?.ToString("HH:mm:ss")</p>
+                            <p><strong>Tổng thời gian:</strong>
+                                @{
+                                    var duration = todayAttendance.CheckOutTime - todayAttendance.CheckInTime;
+                                }
+                                @duration?.Hours giờ @duration?.Minutes phút
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Lịch sử chấm công (30 ngày gần nhất)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Thời gian làm</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var att in recentAttendances)
+                                {
+                                    var duration = att.CheckOutTime.HasValue && att.CheckInTime.HasValue 
+                                        ? att.CheckOutTime - att.CheckInTime 
+                                        : null;
+                                    <tr>
+                                        <td>@att.Date.ToString("dd/MM/yyyy")</td>
+                                        <td>@(att.CheckInTime?.ToString("HH:mm") ?? "--:--")</td>
+                                        <td>@(att.CheckOutTime?.ToString("HH:mm") ?? "--:--")</td>
+                                        <td>
+                                            @if (duration.HasValue)
+                                            {
+                                                @($"{duration.Value.Hours}h{duration.Value.Minutes}p")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Chưa check-out</span>
+                                            }
+                                        </td>
+                                        <td>@att.Note</td>
+                                    </tr>
+                                }
+                                @if (!recentAttendances.Any())
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-3">Chưa có dữ liệu chấm công</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

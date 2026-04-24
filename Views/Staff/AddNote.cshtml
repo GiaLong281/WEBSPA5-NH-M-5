@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Thêm ghi chú khách hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var booking = ViewBag.Booking as SpaN5.Models.Booking;
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-gold text-white">
+                    <h4 class="mb-0">Ghi chú khách hàng</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p><strong>Khách hàng:</strong> @booking?.Customer?.FullName</p>
+                        <p><strong>Mã lịch:</strong> @booking?.BookingCode</p>
+                        <p><strong>Dịch vụ:</strong>
+                            @foreach (var detail in booking?.BookingDetails ?? new List<SpaN5.Models.BookingDetail>())
+                            {
+                                @detail.Service?.ServiceName<span> </span>
+                            }
+                        </p>
+                    </div>
+
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="bookingId" value="@booking?.BookingId" />
+                        <div class="mb-3">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea name="note" class="form-control" rows="5" 
+                                      placeholder="Nhập ghi chú về tình trạng khách hàng, yêu cầu đặc biệt, lưu ý cho lần sau..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-gold">Lưu ghi chú</button>
+                            <a asp-action="Details" asp-route-id="@booking?.BookingId" class="btn btn-secondary">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

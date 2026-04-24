@@ -1,0 +1,180 @@
+@model IEnumerable<SpaN5.Models.Feedback>
+
+@{
+    ViewData["Title"] = "Đánh giá dịch vụ";
+    Layout = "_Layout";
+}
+
+<style>
+    /* Styling for the star rating input */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .star-rating input {
+        display: none;
+    }
+    .star-rating label {
+        color: #ccc;
+        font-size: 2.5rem;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out, transform 0.2s ease;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #D4AF37; /* text-gold */
+    }
+    .star-rating label:hover {
+        transform: scale(1.1);
+    }
+    
+    /* Styling for displayed stars */
+    .display-stars {
+        color: #D4AF37;
+        font-size: 1.1rem;
+    }
+    
+    .feedback-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feedback-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    }
+    
+    .page-header {
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/images/feedback-bg.jpg') center/cover;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-top: 76px; /* Offset for fixed navbar */
+    }
+</style>
+
+<div class="page-header" data-aos="fade-in">
+    <div class="text-center">
+        <h1 class="font-playfair display-4 fw-bold">Khách Hàng Nói Gì Về <span class="text-gold">SpaN5</span></h1>
+        <p class="lead text-white-50">Chúng tôi luôn lắng nghe để mang đến trải nghiệm tuyệt vời nhất</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" data-aos="fade-down">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-5">
+        <!-- Vùng hiển thị form gửi đánh giá -->
+        <div class="col-lg-5" data-aos="fade-right">
+            <div class="card shadow-lg border-0 rounded-4 p-4 sticky-top" style="top: 100px;">
+                <h3 class="font-playfair text-gold mb-4 text-center">Gửi Đánh Giá Của Bạn</h3>
+                
+                <form asp-controller="Feedback" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Họ và Tên</label>
+                        <input type="text" name="CustomerName" class="form-control form-control-lg bg-light" placeholder="Nhập tên của bạn" required />
+                    </div>
+                    
+                    <div class="mb-4 text-center">
+                        <label class="form-label fw-bold d-block">Mức Độ Hài Lòng</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="Rating" value="5" required />
+                            <label for="star5" title="5 sao"><i class="fas fa-star"></i></label>
+                            
+                            <input type="radio" id="star4" name="Rating" value="4" />
+                            <label for="star4" title="4 sao"><i class="fas fa-star"></i></label>
+                            
+                            <input type="radio" id="star3" name="Rating" value="3" />
+                            <label for="star3" title="3 sao"><i class="fas fa-star"></i></label>
+                            
+                            <input type="radio" id="star2" name="Rating" value="2" />
+                            <label for="star2" title="2 sao"><i class="fas fa-star"></i></label>
+                            
+                            <input type="radio" id="star1" name="Rating" value="1" />
+                            <label for="star1" title="1 sao"><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Nhận Xét (Không bắt buộc)</label>
+                        <textarea name="Comment" class="form-control bg-light" rows="4" placeholder="Chia sẻ cảm nhận của bạn về dịch vụ..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-gold w-100 py-3 rounded-pill fw-bold fs-5">
+                        <i class="fas fa-paper-plane me-2"></i> Gửi Đánh Giá
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Vùng hiển thị danh sách đánh giá -->
+        <div class="col-lg-7" data-aos="fade-left" data-aos-delay="200">
+            <h3 class="font-playfair mb-4 px-2">Đánh Giá Gần Đây Của Khách Hàng</h3>
+            
+            @if (Model != null && Model.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var feedback in Model)
+                    {
+                        <div class="col-12" data-aos="fade-up">
+                            <div class="feedback-card p-4 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-gold text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 1.5rem; font-weight: bold;">
+                                            @(feedback.CustomerName?.Substring(0, 1).ToUpper() ?? "U")
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0 fw-bold">@feedback.CustomerName</h5>
+                                            <small class="text-muted">@feedback.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                        </div>
+                                    </div>
+                                    <div class="display-stars">
+                                        @for (var i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= feedback.Rating)
+                                            {
+                                                <i class="fas fa-star"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star text-muted" style="opacity: 0.3;"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(feedback.Comment))
+                                {
+                                    <p class="mb-0 text-secondary" style="font-style: italic;">"@feedback.Comment"</p>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <img src="/images/no-feedback.png" alt="No Feedback" style="width: 150px; opacity: 0.5;" onerror="this.style.display='none'" />
+                    <h5 class="mt-3 text-muted">Chưa có đánh giá nào</h5>
+                    <p class="text-muted">Hãy là người đầu tiên chia sẻ cảm nhận về dịch vụ của chúng tôi!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

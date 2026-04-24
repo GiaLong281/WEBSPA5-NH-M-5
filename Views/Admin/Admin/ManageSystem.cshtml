@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Hệ thống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5">
+    <h1>Quản lý hệ thống</h1>
+    <p>Chức năng đang được phát triển.</p>
+    <!-- Có thể thêm cài đặt thông số, backup, v.v -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Cài đặt thông số</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-primary" asp-action="Settings">Cấu hình hệ thống</button>
+                <button class="btn btn-info">Quản lý người dùng</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Backup & Restore</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-success" asp-action="BackupDatabase">Backup dữ liệu</button>
+                <button class="btn btn-warning">Khôi phục dữ liệu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Logs & Monitoring</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-secondary">Xem nhật ký hệ thống</button>
+                <button class="btn btn-secondary">Kiểm tra tình trạng</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Bảo trì</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-danger">Dọn dẹp dữ liệu tạm</button>
+                <button class="btn btn-danger">Tối ưu hóa cơ sở dữ liệu</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

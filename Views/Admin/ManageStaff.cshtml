@@ -1,0 +1,39 @@
+@model IEnumerable<SpaN5.Models.Staff>
+@{
+    ViewData["Title"] = "Quản lý nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5" style="margin-top: 80px;">
+    <h1>Quản lý nhân viên</h1>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    <a asp-action="CreateUser" class="btn btn-success mb-3">Tạo tài khoản mới</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>ID</th><th>Họ tên</th><th>Điện thoại</th><th>Email</th><th>Chức vụ</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.StaffId</td>
+                    <td>@item.FullName</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Email</td>
+                    <td>@item.Position</td>
+                    <td>
+                        <a asp-action="EditStaff" asp-route-id="@item.StaffId" class="btn btn-sm btn-warning">Sửa</a>
+                        <form asp-action="DeleteStaff" asp-route-id="@item.StaffId" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa?')">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

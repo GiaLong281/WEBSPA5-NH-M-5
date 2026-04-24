@@ -1,0 +1,219 @@
+@model IEnumerable<SpaN5.Models.Material>
+@{
+    ViewData["Title"] = "Quản lý Kho Nguyên liệu";
+    Layout = "_AdminLayout";
+    var predictions = ViewBag.Predictions as Dictionary<int, int> ?? new Dictionary<int, int>();
+    int lowStockCount = Model.Count(m => m.CurrentStock <= m.MinStock);
+}
+
+<style>
+    .inventory-card {
+        background: var(--white);
+        border-radius: 20px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s;
+    }
+    .inventory-card:hover { transform: translateY(-5px); }
+    .stat-box {
+        padding: 1.5rem;
+        border-radius: 16px;
+        background: var(--white);
+        box-shadow: var(--card-shadow);
+    }
+    .prediction-badge {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+    }
+    .capacity-high { background: #E6F6EC; color: #05CD99; }
+    .capacity-mid { background: #FFF9E6; color: #FFB800; }
+    .capacity-low { background: #FFF5F5; color: #EE5D50; }
+</style>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-box d-flex align-items-center">
+            <div class="icon-circle bg-primary text-white me-3 p-3 rounded-4 shadow-sm">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-bold">Tổng Vật tư</div>
+                <div class="h4 fw-bold mb-0">@Model.Count()</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-box d-flex align-items-center">
+            <div class="icon-circle bg-danger text-white me-3 p-3 rounded-4 shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-bold">Sắp hết hàng</div>
+                <div class="h4 fw-bold mb-0 text-danger">@lowStockCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="stat-box d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle bg-success text-white me-3 p-3 rounded-4 shadow-sm">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold">Dự báo vận hành</div>
+                    <div class="small fw-600">Kho đang đảm bảo phục vụ tốt</div>
+                </div>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="$('#addMaterialModal').modal('show')">
+                <i class="fa-solid fa-plus me-1"></i> Thêm vật tư
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <ul class="nav nav-pills gap-2 p-2 bg-white rounded-pill shadow-sm" style="width: fit-content;">
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold @(Context.Request.Path == "/Admin/Inventory" ? "active" : "")" href="/Admin/Inventory">
+                    <i class="fa-solid fa-boxes-stacked me-1"></i> Kho vật tư
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold @(Context.Request.Path.ToString().Contains("PurchaseOrders") ? "active" : "")" href="/Admin/Inventory/PurchaseOrders">
+                    <i class="fa-solid fa-file-invoice me-1"></i> Đơn nhập hàng (PO)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold @(Context.Request.Path.ToString().Contains("Suppliers") ? "active" : "")" href="/Admin/Inventory/Suppliers">
+                    <i class="fa-solid fa-truck-field me-1"></i> Nhà cung cấp
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold @(Context.Request.Path.ToString().Contains("ServicePackages") ? "active" : "")" href="/Admin/Inventory/ServicePackages">
+                    <i class="fa-solid fa-gift me-1"></i> Gói Dịch Vụ
+                </a>
+            </li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill fw-bold @(Context.Request.Path.ToString().Contains("Reports") ? "active" : "")" href="/Admin/Inventory/Reports">
+                        <i class="fa-solid fa-chart-pie me-1"></i> Báo cáo Hao hụt
+                    </a>
+                </li>
+            }
+            <li class="nav-item">
+        </ul>
+    </div>
+</div>
+
+<div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2 text-primary"></i>Danh mục vật tư</h3>
+        <form method="get" class="d-flex gap-2">
+            <div class="header-search" style="display:block; width: 300px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="search" value="@ViewBag.Search" placeholder="Tìm theo Tên hoặc ID sản phẩm...">
+            </div>
+            <select name="filter" class="form-select rounded-pill border-0 shadow-sm px-3 fw-bold" style="background: var(--admin-bg);">
+                <option value="">Tất cả</option>
+                <option value="low" selected="@(ViewBag.Filter == "low")">Sắp hết hàng</option>
+            </select>
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lọc</button>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr class="text-muted small text-uppercase fw-bold" style="border-bottom: 2px solid var(--accent-blue);">
+                    <th class="ps-0">ID</th>
+                    <th>Nguyên liệu / Vật tư</th>
+                    <th>Tồn thực tế</th>
+                    <th>Định mức tối thiểu</th>
+                    <th>Dự báo Capacity</th>
+                    <th>Nhà cung cấp</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var capacity = predictions.ContainsKey(item.MaterialId) ? predictions[item.MaterialId] : 0;
+                    var capacityClass = capacity > 50 ? "capacity-high" : (capacity > 10 ? "capacity-mid" : "capacity-low");
+                    
+                    <tr>
+                        <td class="fw-bold text-muted ps-0">#MS-@item.MaterialId</td>
+                        <td>
+                            <div class="fw-bold text-main">@item.MaterialName</div>
+                            <div class="text-smaller">Đơn vị: @item.Unit</div>
+                        </td>
+                        <td>
+                            <div class="h5 fw-bold mb-0 @(item.CurrentStock <= item.MinStock ? "text-danger" : "text-success")">
+                                @item.CurrentStock.ToString("N0") <small class="fw-normal">@item.Unit</small>
+                            </div>
+                        </td>
+                        <td class="text-muted fw-600">@item.MinStock.ToString("N0") @item.Unit</td>
+                        <td>
+                            <span class="prediction-badge @capacityClass">
+                                <i class="fa-solid fa-user-check me-1"></i>Còn đủ cho ~@capacity khách
+                            </span>
+                        </td>
+                        <td>
+                            <div class="fw-600 small">@(item.SupplierEntity?.Name ?? item.Supplier ?? "Chưa gán")</div>
+                        </td>
+                        <td class="text-end pe-0">
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm rounded-circle shadow-sm" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4">
+                                    <li><a class="dropdown-item py-2 fw-bold" href="/Admin/Inventory/Batches/@item.MaterialId"><i class="fa-solid fa-layer-group me-2 text-primary"></i> Quản lý Lô (FEFO)</a></li>
+                                    <li><a class="dropdown-item py-2 fw-bold" href="#"><i class="fa-solid fa-pen-to-square me-2 text-info"></i> Sửa thông tin</a></li>
+                                    <li><hr class="dropdown-divider opacity-50"></li>
+                                    <li><a class="dropdown-item py-2 fw-bold text-danger" href="#"><i class="fa-solid fa-trash-can me-2"></i> Ngừng sử dụng</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm vật tư (Placeholder) -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Thêm vật tư mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMaterialForm">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Tên nguyên liệu</label>
+                        <input type="text" class="form-control rounded-3" required />
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label small fw-bold">Đơn vị (gram/ml...)</label>
+                            <input type="text" class="form-control rounded-3" placeholder="VD: gram" required />
+                        </div>
+                        <div class="col">
+                            <label class="form-label small fw-bold">Tồn tối thiểu</label>
+                            <input type="number" class="form-control rounded-3" required />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>

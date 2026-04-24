@@ -1,9 +1,10 @@
-﻿namespace SpaN5.Models
+namespace SpaN5.Models
 {
     public enum BookingStatus
     {
         Pending,
         Confirmed,
+        Accepted,
         InProgress,
         Completed,
         Cancelled
@@ -13,7 +14,8 @@
     {
         Cash,
         Momo,
-        VNPay
+        VNPay,
+        BankTransfer
     }
 
     public enum PaymentStatus
@@ -21,5 +23,13 @@
         Pending,
         Paid,
         Failed
+    }
+
+    public enum DetailStatus
+    {
+        Pending,
+        InProgress,
+        Completed,
+        Cancelled
     }
 }

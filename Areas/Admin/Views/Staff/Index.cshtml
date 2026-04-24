@@ -1,0 +1,137 @@
+@model IEnumerable<SpaN5.Models.Staff>
+@{
+    ViewData["Title"] = "Danh sách Nhân sự";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var users = ViewBag.Users as List<SpaN5.Models.User> ?? new List<SpaN5.Models.User>();
+}
+
+<style>
+    .staff-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+        transition: transform 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .staff-card:hover { transform: translateY(-5px); }
+    .staff-avatar {
+        width: 60px; height: 60px; border-radius: 15px; object-fit: cover; margin-bottom: 15px;
+    }
+    .role-badge {
+        font-size: 0.65rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
+    }
+    .badge-receptionist { background: #E9EDF7; color: #4318FF; }
+    .badge-therapist { background: #E6F6ED; color: #00B050; }
+    .badge-admin { background: #FEEEEE; color: #FF5B5B; }
+    
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    .status-active { background: #00B050; }
+    .status-off { background: #A3AED0; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-800 mb-0">Hệ thống Nhân sự</h2>
+        <p class="text-muted small mb-0">Quản lý tài khoản và phân quyền cán bộ nhân viên Spa.</p>
+    </div>
+    <a href="/Admin/Staff/Create" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+        <i class="fa-solid fa-plus me-2"></i> Thêm nhân sự mới
+    </a>
+</div>
+
+<div class="row g-4">
+    @foreach (var staff in Model)
+    {
+        var user = users.FirstOrDefault(u => u.StaffId == staff.StaffId);
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="staff-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <img src="https://ui-avatars.com/api/?name=@staff.FullName&background=random&size=128" class="staff-avatar" />
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm rounded-circle shadow-none" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                            <li><a class="dropdown-item py-2" href="/Admin/Staff/Edit/@staff.StaffId"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Chỉnh sửa</a></li>
+                            <li><a class="dropdown-item py-2" href="/Admin/Staff/Timesheet/@staff.StaffId"><i class="fa-solid fa-calendar-check me-2 text-success"></i> Chấm công</a></li>
+                            <li><hr class="dropdown-divider opacity-50"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="javascript:void(0)" onclick="deleteStaff(@staff.StaffId)"><i class="fa-solid fa-trash-can me-2"></i> Xóa</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h5 class="fw-bold mb-1">@staff.FullName</h5>
+                    <div class="text-muted smaller mb-2">@staff.Email</div>
+                    
+                    <div class="d-flex flex-wrap gap-1">
+                        @if (user != null)
+                        {
+                            <span class="role-badge @(user.Role == "Admin" ? "badge-admin" : (user.Role == "Receptionist" ? "badge-receptionist" : "badge-therapist"))">
+                                @user.Role
+                            </span>
+                        }
+
+                        @if (staff.Specialization != null)
+                        {
+                            var svcName = staff.Specialization.ServiceName;
+                            string teamName = "General";
+                            string teamColor = "#0ea5e9";
+                            string teamIcon = "fa-user-gear";
+
+                            if (svcName.Contains("Massage")) { teamName = "Zen Therapy"; teamColor = "#78350f"; teamIcon = "fa-leaf"; }
+                            else if (svcName.Contains("Da Mặt")) { teamName = "Skin Clinical"; teamColor = "#0d9488"; teamIcon = "fa-hand-holding-medical"; }
+                            else if (svcName.Contains("Thảo Dược")) { teamName = "Nature Herbal"; teamColor = "#15803d"; teamIcon = "fa-seedling"; }
+                            else if (svcName.Contains("VIP")) { teamName = "Royal VIP"; teamColor = "#7e22ce"; teamIcon = "fa-crown"; }
+
+                            <span class="role-badge shadow-sm" style="background: @(teamColor + "15"); color: @teamColor; border: 1px solid @(teamColor + "30")">
+                                <i class="fa-solid @teamIcon me-1"></i> @teamName
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                    <div class="small fw-600">
+                        <span class="status-dot @(staff.Status == "active" ? "status-active" : "status-off")"></span>
+                        @(staff.Status == "active" ? "Đang làm" : "Nghỉ việc")
+                    </div>
+                    <div class="smaller text-muted">@staff.Position</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function deleteStaff(id) {
+            Swal.fire({
+                title: 'Bạn có chắc chắn?',
+                text: "Toàn bộ dữ liệu nhân sự và tài khoản sẽ bị xóa vĩnh viễn!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4318FF',
+                cancelButtonColor: '#A3AED0',
+                confirmButtonText: 'Đồng ý xóa',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Admin/Staff/Delete/' + id, function(res) {
+                        if(res.success) {
+                            Swal.fire('Đã xóa!', 'Nhân sự đã được gỡ khỏi hệ thống.', 'success')
+                            .then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi!', 'Không thể xóa nhân sự này.', 'error');
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}

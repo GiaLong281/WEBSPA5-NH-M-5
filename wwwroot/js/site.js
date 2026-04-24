@@ -1,28 +1,60 @@
-// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+// SpaN5 Luxury JS Logic
 
-// Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", function () {
-    // Preloader Logic
+    // 1. Preloader Logic
     const preloader = document.getElementById('spa-preloader');
     if (preloader) {
         window.addEventListener('load', function () {
             setTimeout(function() {
-                preloader.classList.add('fade-out');
-            }, 800); // Đợi 800ms để người dùng thấy logo
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 600); 
         });
     }
 
+    // 2. Navbar Scroll Logic
     const navbar = document.querySelector('.spa-navbar');
-    
-    // Add scroll effect for navbar
-    window.addEventListener('scroll', function () {
-        if (window.scrollY > 50) {
-            navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)";
-            navbar.style.padding = "10px 0";
-        } else {
-            navbar.style.boxShadow = "none";
-            navbar.style.padding = "15px 0";
-        }
+    if (navbar) {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Initial check
+    }
+
+    // 3. Smooth Scrolling for Anchor Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === "#") return;
+            
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                const navHeight = 80;
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
     });
+
+    // 4. AOS Initialization (if available)
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+    }
 });

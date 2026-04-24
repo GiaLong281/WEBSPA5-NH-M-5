@@ -1,0 +1,353 @@
+@model IEnumerable<SpaN5.Models.Service>
+@{
+    ViewData["Title"] = "Sơ đồ Phòng Dịch vụ";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var activeDetails = ViewBag.ActiveDetails as List<SpaN5.Models.BookingDetail> ?? new List<SpaN5.Models.BookingDetail>();
+    var maintRooms = ViewBag.MaintenanceRooms as List<string> ?? new List<string>();
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<style>
+    .service-section {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+    }
+    .service-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed var(--accent-blue);
+    }
+    .service-icon {
+        width: 48px; height: 48px; border-radius: 14px;
+        background: var(--primary-blue);
+        color: white;
+        display: flex; align-items: center; justify-content: center;
+        margin-right: 15px; font-size: 1.2rem;
+    }
+    .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 15px;
+    }
+    .room-item {
+        border-radius: 16px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid var(--accent-blue);
+        position: relative;
+        cursor: pointer;
+        background: #fff;
+    }
+    .room-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    
+    .room-item.occupied {
+        border-color: #FF5B5B;
+        background: #FFF5F5;
+    }
+    .room-item.available {
+        border-color: #00B050;
+        background: #F6FFF9;
+    }
+    .room-item.maintenance {
+        border-color: #F59E0B;
+        background: #FEF3C7;
+    }
+    
+    .room-number { font-weight: 800; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+    .room-status { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .room-client { font-size: 0.75rem; font-weight: 600; margin-top: 8px; color: var(--text-main); }
+    
+    .occupancy-badge {
+        font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+        background: var(--accent-blue); color: var(--primary-blue); margin-left: auto;
+    }
+
+    /* Schedule Timeline Modal Styles */
+    .schedule-container {
+        max-height: 300px;
+        overflow-y: auto;
+        text-align: left;
+        margin-top: 15px;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    .schedule-item {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 18px;
+        background: #fdfaf7;
+        border-left: 4px solid var(--primary-blue);
+        transition: all 0.2s;
+    }
+    .schedule-item:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .schedule-time {
+        font-weight: 800;
+        min-width: 100px;
+        color: var(--primary-blue);
+        font-size: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 2px dashed rgba(67, 24, 255, 0.1);
+        padding-right: 15px;
+    }
+    .schedule-info {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .schedule-status {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-top: 8px;
+        width: fit-content;
+        background: #e9ecef;
+    }
+
+    /* Requirement 4: Hover Tooltip */
+    .service-header { position: relative; }
+    .service-schedule-tooltip {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 320px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        z-index: 1050;
+        padding: 15px;
+        display: none;
+        animation: fadeInDown 0.3s ease;
+        border: 1px solid var(--accent-blue);
+    }
+    .service-header:hover .service-schedule-tooltip { display: block; }
+    
+    .tooltip-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .tooltip-item:last-child { border-bottom: none; }
+
+    @@keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-800 mb-1">Hệ thống Sơ đồ & Lịch Phòng</h2>
+        <p class="text-muted smaller mb-0">Theo dõi trạng thái, bảo trì và xem lịch trình đặt phòng trong tương lai.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="location.reload()"><i class="fa-solid fa-arrows-rotate me-2"></i> Làm mới</button>
+    </div>
+</div>
+
+@foreach (var svc in Model)
+{
+    var svcRooms = activeDetails.Where(d => d.ServiceId == svc.ServiceId).ToList();
+    <div class="service-section">
+        <div class="service-header">
+            <div class="service-icon"><i class="fa-solid fa-spa"></i></div>
+            <div>
+                <h4 class="fw-bold mb-0">@svc.ServiceName <i class="fa-solid fa-circle-info ms-1 text-muted fs-6"></i></h4>
+                <div class="text-muted smaller">Khu vực chuyên biệt @svc.ServiceName (Rê chuột xem lịch chuẩn bị)</div>
+            </div>
+            <div class="occupancy-badge">
+                @(svcRooms.Select(r => r.RoomNumber).Distinct().Count())/10 Phòng đang bận
+            </div>
+
+            <!-- TOOLTIP LIST LỊCH SẮP TỚI (Requirement 4) -->
+            <div class="service-schedule-tooltip">
+                <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-calendar-day text-primary"></i> 
+                    Lịch hẹn hôm nay (@svc.ServiceName)
+                </h6>
+                @{
+                    var upcoming = (ViewBag.UpcomingGrouped as List<SpaN5.Models.Booking>)
+                                   ?.Where(b => b.BookingDetails.Any(d => d.ServiceId == svc.ServiceId))
+                                   .ToList();
+                }
+                @if (upcoming != null && upcoming.Any())
+                {
+                    foreach (var ub in upcoming)
+                    {
+                        var ubDetail = ub.BookingDetails.FirstOrDefault(d => d.ServiceId == svc.ServiceId);
+                        <div class="tooltip-item">
+                            <div>
+                                <div class="fw-bold small">@ub.StartTime.ToString("HH:mm") - @ub.Customer.FullName</div>
+                                <div class="smaller text-muted">NV: @(ubDetail?.Staff?.FullName ?? "Chưa gán")</div>
+                            </div>
+                            <span class="badge @(ub.Status == SpaN5.Models.BookingStatus.Accepted ? "bg-info" : "bg-light text-dark")" style="font-size: 0.6rem;">
+                                @ub.Status
+                            </span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3 small">
+                        <i class="fa-solid fa-calendar-xmark mb-1 d-block opacity-50"></i>
+                        Không có lịch đặt trước
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <div class="room-grid">
+            @for (int i = 1; i <= 10; i++)
+            {
+                var roomKey = $"{svc.ServiceId}_{i}";
+                bool isMaint = maintRooms.Contains(roomKey);
+                var room = svcRooms.FirstOrDefault(r => r.RoomNumber == i);
+                
+                string roomClass = isMaint ? "maintenance" : (room != null ? "occupied" : "available");
+                
+                <div class="room-item @roomClass" 
+                     onclick="showRoomSchedule(@svc.ServiceId, '@svc.ServiceName', @i, @(isMaint ? "true" : "false"))">
+                    <span class="room-number">P.@i.ToString("D2")</span>
+                    @if (isMaint)
+                    {
+                        <div class="room-status text-warning">ĐANG BẢO TRÌ</div>
+                    }
+                    else if (room != null)
+                    {
+                        <div class="room-status text-danger">ĐANG PHỤC VỤ</div>
+                        <div class="room-client text-truncate">@room.Booking.Customer.FullName</div>
+                    }
+                    else
+                    {
+                        <div class="room-status text-success">CÒN TRỐNG</div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Quick Info Script -->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const isAdminUser = @(isAdmin.ToString().ToLower());
+
+        function showRoomSchedule(serviceId, serviceName, roomNum, isMaint) {
+            // Hiển thị loading Swal
+            Swal.fire({
+                title: 'Đang tải lịch trình...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // GỌI AJAX LẤY LỊCH CỦA PHÒNG
+            $.ajax({
+                url: '/Admin/Home/GetRoomSchedule',
+                type: 'GET',
+                data: { serviceId: serviceId, roomNum: roomNum },
+                success: function (res) {
+                    let scheduleHtml = '';
+                    if (res.data && res.data.length > 0) {
+                        scheduleHtml = '<div class="schedule-container"><h6 class="fw-800 mb-3 text-primary"><i class="fa-regular fa-calendar-check me-2"></i>Chi tiết lịch điều phối:</h6>';
+                        res.data.forEach(item => {
+                            const isNow = item.status === 'InProgress';
+                            scheduleHtml += `
+                                <div class="schedule-item" style="${isNow ? 'border-left-color: #FF5B5B; background: #FFF5F5;' : ''}">
+                                    <div class="schedule-time ${isNow ? 'text-danger' : ''}">
+                                        <span class="fs-6 opacity-75 fw-600 mb-1">Thời gian</span>
+                                        ${item.start} - ${item.end}
+                                    </div>
+                                    <div class="schedule-info">
+                                        <div class="fs-5 fw-800 text-dark mb-1">${item.customer}</div>
+                                        <div class="small text-muted d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-user-sparkles text-primary"></i> 
+                                            <span>Nhân viên: <strong class="text-dark">${item.technician}</strong></span>
+                                        </div>
+                                        <div class="schedule-status ${isNow ? 'bg-danger text-white' : ''}">
+                                            <i class="fa-solid ${isNow ? 'fa-spinner fa-spin' : 'fa-check'} me-1"></i>
+                                            ${item.statusText}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        scheduleHtml += '</div>';
+                    } else {
+                        scheduleHtml = `
+                            <div class="schedule-container text-center text-muted p-4">
+                                <i class="fa-regular fa-calendar-xmark fa-3x mb-2 opacity-50"></i>
+                                <p class="mb-0 fw-bold">Không có lịch hẹn nào được phân bổ trong ngày hôm nay.</p>
+                                <p class="smaller">Vui lòng kiểm tra lại danh sách đặt lịch.</p>
+                            </div>
+                        `;
+                    }
+
+                    let btnHtml = '';
+                    if (isAdminUser) {
+                        let btnText = isMaint ? "Hủy Bảo Trì (Mở Lại Phòng)" : "Chuyển Sang Bảo Trì";
+                        let btnColor = isMaint ? "btn-success" : "btn-warning";
+                        btnHtml = `
+                            <hr />
+                            <button class="btn ${btnColor} w-100 fw-bold" onclick="toggleMaintenance(${serviceId}, ${roomNum})">
+                                <i class="fa-solid fa-wrench me-2"></i> ${btnText}
+                            </button>
+                        `;
+                    } else if (isMaint) {
+                        btnHtml = `<hr /><div class="alert alert-warning text-center fw-bold mb-0"><i class="fa-solid fa-triangle-exclamation"></i> Phòng đang được bảo trì</div>`;
+                    }
+
+                    // Render Popup
+                    Swal.fire({
+                        title: `Phòng ${roomNum.toString().padStart(2, '0')} - ${serviceName}`,
+                        html: `<div class="p-2">
+                                ${scheduleHtml}
+                                ${btnHtml}
+                              </div>`,
+                        showConfirmButton: !isAdminUser && !isMaint,
+                        confirmButtonText: 'Đóng',
+                        showCloseButton: true,
+                        width: '500px',
+                        customClass: {
+                            popup: 'rounded-4'
+                        }
+                    });
+                },
+                error: function () {
+                    Swal.fire('Lỗi', 'Không thể lấy dữ liệu lịch phòng', 'error');
+                }
+            });
+        }
+
+        function toggleMaintenance(serviceId, roomNum) {
+            $.ajax({
+                url: '/Admin/Home/ToggleMaintenanceRoom',
+                type: 'POST',
+                data: { serviceId: serviceId, roomNum: roomNum },
+                success: function (res) {
+                    if (res.success) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    </script>
+}

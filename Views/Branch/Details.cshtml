@@ -1,0 +1,72 @@
+@model SpaN5.Models.Branch
+@{
+    ViewData["Title"] = Model.BranchName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            @if (!string.IsNullOrEmpty(Model.Image))
+            {
+                <img src="@Model.Image" class="img-fluid rounded-3 shadow" alt="@Model.BranchName">
+            }
+            else
+            {
+                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="fas fa-store fa-5x text-muted"></i>
+                </div>
+            }
+        </div>
+        <div class="col-lg-6">
+            <h1 class="font-playfair text-gold">@Model.BranchName</h1>
+            <div class="mb-3">
+                <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                    @(Model.IsActive ? "Đang hoạt động" : "Tạm đóng cửa")
+                </span>
+            </div>
+            <div class="mb-3">
+                <h5><i class="fas fa-map-marker-alt text-gold me-2"></i> Địa chỉ</h5>
+                <p>@Model.Address, @Model.District, @Model.City</p>
+            </div>
+            <div class="mb-3">
+                <h5><i class="fas fa-phone-alt text-gold me-2"></i> Điện thoại</h5>
+                <p>@Model.Phone</p>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Email))
+            {
+                <div class="mb-3">
+                    <h5><i class="fas fa-envelope text-gold me-2"></i> Email</h5>
+                    <p>@Model.Email</p>
+                </div>
+            }
+            <div class="mb-3">
+                <h5><i class="far fa-clock text-gold me-2"></i> Giờ mở cửa</h5>
+                <p>@Model.OpeningTime.ToString(@"hh\:mm") - @Model.ClosingTime.ToString(@"hh\:mm")</p>
+                @if (!string.IsNullOrEmpty(Model.Workday))
+                {
+                    <p><strong>Ngày làm việc:</strong> @Model.Workday</p>
+                }
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="mb-3">
+                    <h5><i class="fas fa-info-circle text-gold me-2"></i> Mô tả</h5>
+                    <p>@Model.Description</p>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.GoogleMapLink))
+            {
+                <a href="@Model.GoogleMapLink" target="_blank" class="btn btn-outline-gold rounded-pill me-2">
+                    <i class="fab fa-google"></i> Xem bản đồ
+                </a>
+            }
+            @if (!string.IsNullOrEmpty(Model.FacebookLink))
+            {
+                <a href="@Model.FacebookLink" target="_blank" class="btn btn-outline-gold rounded-pill">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </a>
+            }
+        </div>
+    </div>
+</div>

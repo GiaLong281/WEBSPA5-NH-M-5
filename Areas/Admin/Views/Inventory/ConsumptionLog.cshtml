@@ -1,0 +1,298 @@
+@model IEnumerable<SpaN5.Models.MaterialConsumption>
+@{
+    ViewData["Title"] = "Deep Audit - Báo cáo Chuyên sâu";
+    Layout = "_AdminLayout";
+    
+    // Gom nhóm dữ liệu theo Dịch vụ (ServiceName)
+    var groupedByService = Model
+        .GroupBy(m => m.BookingDetail?.Service?.ServiceName ?? "Khác")
+        .OrderByDescending(g => g.Count());
+}
+
+<style>
+    :root {
+        --audit-primary: #4318FF;
+        --audit-bg: #f4f7fe;
+        --text-dark: #1B254B;
+        --text-grey: #707EAE;
+    }
+
+    .audit-container {
+        background-color: var(--audit-bg);
+        min-height: 100vh;
+        padding-bottom: 50px;
+    }
+
+    .service-group-card {
+        background: white;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #E9EDF7;
+        overflow: hidden;
+        box-shadow: 0px 10px 30px rgba(112, 144, 176, 0.08);
+    }
+
+    .service-header {
+        background: #F8F9FD;
+        padding: 20px 30px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.3s;
+    }
+
+    .service-header:hover {
+        background: #F0F4FF;
+    }
+
+    .service-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .service-stats {
+        font-size: 0.85rem;
+        color: var(--text-grey);
+        font-weight: 600;
+    }
+
+    .instance-card {
+        border-bottom: 1px solid #F0F3F9;
+        padding: 25px 30px;
+        transition: background 0.2s;
+    }
+
+    .instance-card:last-child {
+        border-bottom: none;
+    }
+
+    .instance-card:hover {
+        background: #FAFBFF;
+    }
+
+    .label-mini {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--text-grey);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .data-main {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .material-list-item {
+        background: #F8F9FD;
+        border-radius: 12px;
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cost-badge {
+        background: #E8F0FE;
+        color: #1A73E8;
+        font-weight: 800;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+
+    .diff-pill {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 50px;
+    }
+
+    .diff-up { background: #fee2e2; color: #ef4444; }
+    .diff-ok { background: #dcfce7; color: #10b981; }
+
+    /* Fix visibility */
+    .text-dark { color: #1B254B !important; }
+    .text-grey { color: #707EAE !important; }
+    
+    .btn-premium {
+        background: var(--audit-primary);
+        color: white;
+        border-radius: 15px;
+        padding: 12px 25px;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
+        transition: all 0.3s;
+    }
+    
+    .btn-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 15px 30px rgba(67, 24, 255, 0.3);
+        color: white;
+    }
+
+    .search-box-premium {
+        background: white;
+        border: 2px solid #E9EDF7;
+        border-radius: 15px;
+        padding: 10px 20px;
+        transition: all 0.3s;
+    }
+    .search-box-premium:focus {
+        border-color: var(--audit-primary);
+        box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.05);
+        outline: none;
+    }
+</style>
+
+<div class="audit-container">
+    <div class="container-fluid py-4">
+        <div class="row mb-5 align-items-center">
+            <div class="col-md-7">
+                <h1 class="fw-800 text-dark" style="font-size: 2.2rem; letter-spacing: -1.5px;">Nhật ký Truy vết Chuyên sâu</h1>
+                <p class="text-grey">Dữ liệu tiêu hao chi tiết theo từng Dịch vụ & Khách hàng. Cập nhật thời gian thực.</p>
+            </div>
+            <div class="col-md-5 text-end">
+                <button onclick="window.print()" class="btn btn-outline-primary border-2 rounded-4 px-4 py-2 me-2 fw-bold">
+                    <i class="bi bi-printer me-2"></i>In Báo Cáo
+                </button>
+                <a href="@Url.Action("Reports", "Inventory")" class="btn-premium">
+                    <i class="bi bi-arrow-left me-2"></i>Quay lại Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white rounded-5 shadow-sm p-4 mb-4 border border-light">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="label-mini ms-2">Tìm kiếm nhanh</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control search-box-premium" placeholder="Tên khách, KTV hoặc vật tư...">
+                </div>
+                <div class="col-md-2">
+                    <label class="label-mini ms-2">Từ ngày</label>
+                    <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control search-box-premium">
+                </div>
+                <div class="col-md-2">
+                    <label class="label-mini ms-2">Đến ngày</label>
+                    <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control search-box-premium">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn-premium w-100 py-3">Áp dụng Bộ lọc</button>
+                </div>
+            </form>
+        </div>
+
+        @if (!groupedByService.Any())
+        {
+            <div class="text-center py-5">
+                <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-4816075-4015701.png" style="width: 200px;" class="mb-4">
+                <h4 class="text-grey fw-bold">Chưa tìm thấy nhật ký tiêu hao nào.</h4>
+            </div>
+        }
+
+        @foreach (var serviceGroup in groupedByService)
+        {
+            <div class="service-group-card">
+                <div class="service-header" data-bs-toggle="collapse" data-bs-target="#collapse-@serviceGroup.Key.GetHashCode()">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-2">
+                            <i class="bi bi-collection-fill fs-4"></i>
+                        </div>
+                        <h3 class="service-title">@serviceGroup.Key</h3>
+                    </div>
+                    <div class="text-end">
+                        <span class="service-stats">@serviceGroup.Select(x => x.BookingDetailId).Distinct().Count() lượt làm • @serviceGroup.Count() lượt dùng vật tư</span>
+                        <i class="bi bi-chevron-down ms-3 text-grey"></i>
+                    </div>
+                </div>
+
+                <div id="collapse-@serviceGroup.Key.GetHashCode()" class="collapse show">
+                    <div class="p-0">
+                        @* Group theo từng lần thực hiện cụ thể (BookingDetailId) *@
+                        @{
+                            var instances = serviceGroup.GroupBy(x => x.BookingDetailId).OrderByDescending(x => x.First().CreatedAt);
+                        }
+                        @foreach (var instance in instances)
+                        {
+                            var first = instance.First();
+                            var totalCost = instance.Sum(x => x.ActualQuantity * (double)x.Material.PurchasePrice);
+                            
+                            <div class="instance-card">
+                                <div class="row align-items-start">
+                                    <div class="col-md-2">
+                                        <div class="label-mini">Thời gian</div>
+                                        <div class="data-main">@first.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                                        <div class="badge bg-light text-grey mt-1">#@first.BookingDetailId</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="label-mini">Khách hàng</div>
+                                        <div class="data-main">@first.BookingDetail.Booking?.Customer?.FullName.ToUpper()</div>
+                                        <div class="small text-grey">SĐT: @first.BookingDetail.Booking?.Customer?.Phone</div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="label-mini">Kỹ thuật viên</div>
+                                        <div class="data-main text-primary">@first.Staff.FullName</div>
+                                        <div class="small text-grey">Team: @first.Staff.Position</div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="d-flex justify-content-between align-items-end mb-2">
+                                            <div class="label-mini">Vật tư & Giá vốn thực tế</div>
+                                            <div class="text-end">
+                                                <span class="small text-grey fw-bold">Tổng vốn: </span>
+                                                <span class="h6 fw-bold text-success mb-0">@totalCost.ToString("N0") đ</span>
+                                            </div>
+                                        </div>
+                                        
+                                        @foreach (var material in instance)
+                                        {
+                                            var mDiff = material.ActualQuantity - material.StandardQuantity;
+                                            <div class="material-list-item">
+                                                <div class="small fw-bold text-dark">
+                                                    @material.Material.MaterialName
+                                                    @if (mDiff != 0)
+                                                    {
+                                                        <span class="diff-pill @(mDiff > 0 ? "diff-up" : "diff-ok") ms-2">
+                                                            @(mDiff > 0 ? "+" : "")@mDiff.ToString("N1") @material.Material.Unit
+                                                        </span>
+                                                    }
+                                                </div>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="small text-grey">@material.ActualQuantity.ToString("N1") @material.Material.Unit</span>
+                                                    <span class="cost-badge">@((material.ActualQuantity * (double)material.Material.PurchasePrice).ToString("N0")) đ</span>
+                                                </div>
+                                            </div>
+                                        }
+                                        
+                                        @if (!string.IsNullOrEmpty(first.BookingDetail.TechnicianNote))
+                                        {
+                                            <div class="mt-2 p-2 rounded-3 bg-light smaller italic text-grey" style="font-size: 0.75rem;">
+                                                <i class="bi bi-chat-left-text me-2"></i>Ghi chú KTV: "@first.BookingDetail.TechnicianNote"
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Ensure white on white doesn't happen by forcing CSS specificity
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("Deep Audit Premium Loaded");
+        });
+    </script>
+}

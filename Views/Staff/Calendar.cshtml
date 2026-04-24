@@ -1,0 +1,90 @@
+@model Dictionary<DateTime, List<SpaN5.Models.BookingDetail>>
+@{
+    ViewData["Title"] = "Lịch làm việc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var calendarData = Model ?? new Dictionary<DateTime, List<SpaN5.Models.BookingDetail>>();
+    var startOfWeek = ViewBag.StartOfWeek != null ? (DateTime)ViewBag.StartOfWeek : DateTime.Today;
+    var currentDate = ViewBag.CurrentDate != null ? (DateTime)ViewBag.CurrentDate : DateTime.Today;
+}
+
+<div class="container-fluid py-4" style="margin-top: 70px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="font-playfair text-gold">Lịch làm việc</h1>
+            <p class="mb-0 text-muted">Tuần từ @startOfWeek.ToString("dd/MM/yyyy") đến @((startOfWeek.AddDays(6)).ToString("dd/MM/yyyy"))</p>
+        </div>
+        <div>
+            <a asp-action="Calendar" asp-route-date="@startOfWeek.AddDays(-7)" class="btn btn-outline-gold">
+                <i class="fas fa-chevron-left"></i> Tuần trước
+            </a>
+            <a asp-action="Calendar" asp-route-date="@DateTime.Today" class="btn btn-gold mx-2">
+                <i class="fas fa-calendar-day"></i> Hôm nay
+            </a>
+            <a asp-action="Calendar" asp-route-date="@startOfWeek.AddDays(7)" class="btn btn-outline-gold">
+                Tuần sau <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var day in Enumerable.Range(0, 7).Select(i => startOfWeek.AddDays(i)))
+        {
+            var isToday = day.Date == DateTime.Today;
+            var bookings = calendarData.ContainsKey(day) ? calendarData[day] : new List<SpaN5.Models.BookingDetail>();
+
+            <div class="col-md-6 col-lg mb-3">
+                <div class="card h-100 @(isToday ? "border-gold shadow" : "")">
+                    <div class="card-header bg-light @(isToday ? "bg-gold text-white" : "")">
+                        <h5 class="mb-0">@day.ToString("dd/MM/yyyy")</h5>
+                        <small>@day.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"))</small>
+                    </div>
+                    <div class="card-body p-2" style="max-height: 400px; overflow-y: auto;">
+                        @if (!bookings.Any())
+                        {
+                            <p class="text-muted text-center small my-3">Không có lịch</p>
+                        }
+                        else
+                        {
+                            foreach (var bd in bookings.OrderBy(b => b.Booking.StartTime))
+                            {
+                                var statusClass = bd.Booking.Status switch
+                                {
+                                    SpaN5.Models.BookingStatus.Pending => "warning",
+                                    SpaN5.Models.BookingStatus.Confirmed => "info",
+                                    SpaN5.Models.BookingStatus.InProgress => "primary",
+                                    SpaN5.Models.BookingStatus.Completed => "success",
+                                    _ => "secondary"
+                                };
+                                <div class="card mb-2 border-0 shadow-sm">
+                                    <div class="card-body p-2">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong>@bd.Booking.StartTime.ToString("HH:mm")</strong> - 
+                                                @bd.Booking.EndTime.ToString("HH:mm")
+                                                <div class="small">
+                                                    <i class="fas fa-user"></i> @(bd.Booking.Customer?.FullName ?? "Khách")
+                                                    <br>
+                                                    <i class="fas fa-spa"></i> @bd.Service?.ServiceName
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-@statusClass">@bd.Booking.Status</span>
+                                        </div>
+                                        <a asp-action="Details" asp-route-id="@bd.BookingId" 
+                                           class="btn btn-sm btn-outline-gold mt-2 w-100">Chi tiết</a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .border-gold { border: 2px solid #c9a96e !important; }
+    .bg-gold { background-color: #c9a96e; }
+    .btn-outline-gold { border-color: #c9a96e; color: #c9a96e; }
+    .btn-outline-gold:hover { background-color: #c9a96e; color: white; }
+</style>

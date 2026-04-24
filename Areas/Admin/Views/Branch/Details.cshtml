@@ -1,0 +1,214 @@
+@model SpaN5.Models.Branch
+
+@{
+    ViewData["Title"] = "Chi tiết Chi nhánh";
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .detail-container {
+        background: var(--white);
+        border-radius: 25px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .detail-header {
+        position: relative;
+        height: 350px;
+        color: white;
+    }
+
+    .detail-header-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .detail-header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .detail-body {
+        padding: 2.5rem;
+    }
+
+    .info-group {
+        margin-bottom: 2rem;
+    }
+
+    .info-label {
+        font-weight: 700;
+        color: var(--secondary-blue);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .info-value {
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .map-container {
+        border-radius: 20px;
+        overflow: hidden;
+        height: 300px;
+        background: var(--admin-bg);
+        border: 1px solid var(--accent-blue);
+    }
+
+    .staff-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 15px;
+        background: var(--admin-bg);
+        margin-bottom: 10px;
+        transition: transform 0.2s;
+    }
+
+    .staff-item:hover {
+        transform: translateX(5px);
+        background: var(--accent-blue);
+    }
+
+    .staff-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .status-pill {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <a href="@Url.Action("Index")" class="btn btn-link text-decoration-none fw-bold p-0" style="color: var(--secondary-blue);">
+            <i class="fa-solid fa-arrow-left me-2"></i> Quay lại
+        </a>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Edit", new { id = Model.BranchId })" class="btn btn-primary rounded-pill px-4 fw-bold">
+                <i class="fa-solid fa-pen-to-square me-2"></i> Chỉnh sửa
+            </a>
+        </div>
+    </div>
+
+    <div class="detail-container">
+        <!-- Header -->
+        <div class="detail-header">
+            @if (!string.IsNullOrEmpty(Model.Image))
+            {
+                <img src="~/uploads/branches/@Model.Image" class="detail-header-img" alt="@Model.BranchName">
+            }
+            else
+            {
+                <img src="https://images.unsplash.com/photo-1519415943484-9fa1873496d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80" class="detail-header-img" alt="Default">
+            }
+            <div class="detail-header-overlay">
+                <div class="d-flex align-items-center gap-3">
+                    <h1 class="fw-extrabold mb-0">@Model.BranchName</h1>
+                    <span class="status-pill @(Model.IsActive ? "bg-success" : "bg-danger") text-white">
+                        @(Model.IsActive ? "Đang hoạt động" : "Tạm dừng")
+                    </span>
+                </div>
+                <p class="mb-0 opacity-75"><i class="fa-solid fa-location-dot me-2"></i> @Model.Address, @Model.District, @Model.City</p>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="detail-body">
+            <div class="row g-5">
+                <!-- Cột trái: Thông tin -->
+                <div class="col-lg-7">
+                    <h4 class="fw-bold mb-4" style="color: var(--text-main);">Thông tin tổng quát</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6 info-group">
+                            <span class="info-label">Mã chi nhánh</span>
+                            <span class="info-value">@(Model.BranchCode ?? "Chưa thiết lập")</span>
+                        </div>
+                        <div class="col-md-6 info-group">
+                            <span class="info-label">Số điện thoại</span>
+                            <span class="info-value">@Model.Phone</span>
+                        </div>
+                        <div class="col-md-6 info-group">
+                            <span class="info-label">Email liên hệ</span>
+                            <span class="info-value">@(Model.Email ?? "Chưa thiết lập")</span>
+                        </div>
+                        <div class="col-md-6 info-group">
+                            <span class="info-label">Giờ hoạt động</span>
+                            <span class="info-value text-primary">@Model.OpeningTime.ToString(@"hh\:mm") - @Model.ClosingTime.ToString(@"hh\:mm")</span>
+                        </div>
+                    </div>
+
+                    <div class="info-group">
+                        <span class="info-label">Mô tả</span>
+                        <p class="text-muted">@(Model.Description ?? "Không có mô tả cho chi nhánh này.")</p>
+                    </div>
+
+                    <h4 class="fw-bold mb-4 mt-5" style="color: var(--text-main);">Vị trí trên bản đồ</h4>
+                    <div class="map-container">
+                        @if (!string.IsNullOrEmpty(Model.GoogleMapLink) && Model.GoogleMapLink.Contains("embed"))
+                        {
+                            <iframe src="@Model.GoogleMapLink" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        }
+                        else if (!string.IsNullOrEmpty(Model.GoogleMapLink))
+                        {
+                            <div class="d-flex align-items-center justify-content-center flex-column h-100 p-4 text-center">
+                                <i class="fa-solid fa-map-location-dot text-primary mb-3" style="font-size: 3rem;"></i>
+                                <p class="fw-bold mb-3">Vị trí đã được thiết lập</p>
+                                <a href="@Model.GoogleMapLink" target="_blank" class="btn btn-outline-primary rounded-pill px-4">
+                                    <i class="fa-solid fa-external-link me-2"></i> Mở trên Google Maps
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center justify-content-center h-100 flex-column p-4 text-center">
+                                <i class="fa-solid fa-map-slash text-muted mb-3" style="font-size: 3rem;"></i>
+                                <p class="text-muted">Chưa có liên kết bản đồ</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Cột phải: Nhân sự -->
+                <div class="col-lg-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0" style="color: var(--text-main);">Đội ngũ nhân sự</h4>
+                        <span class="badge bg-primary rounded-pill">@ViewBag.TotalSystemStaff nhân viên (Toàn hệ thống)</span>
+                    </div>
+
+                    <div class="staff-list">
+                        <div class="text-center py-5" style="background: var(--admin-bg); border-radius: 20px; border: 2px dashed var(--accent-blue);">
+                            <i class="fa-solid fa-users-viewfinder text-primary mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="fw-bold">Tổng số: @ViewBag.TotalSystemStaff nhân viên</h5>
+                            <p class="text-muted small px-4 mb-0">Hệ thống ghi nhận tổng cộng @ViewBag.TotalSystemStaff nhân sự đang hoạt động dựa trên dữ liệu Quản lý Nhân sự.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

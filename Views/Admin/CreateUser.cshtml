@@ -1,0 +1,100 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["CreateAccount"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var roles = ViewBag.Roles as List<string> ?? new List<string>();
+    var branches = ViewBag.Branches as IEnumerable<SpaN5.Models.Branch> ?? new List<SpaN5.Models.Branch>();
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gold text-white text-center py-4 border-0">
+                    <h2 class="mb-0 font-playfair">@Localizer["CreateNewAccount"]</h2>
+                    <p class="mb-0 mt-2 text-white-50">@Localizer["CreateAccountDesc"]</p>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post" asp-action="CreateUser">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Username"] <span class="text-danger">*</span></label>
+                            <input type="text" name="Username" class="form-control" value="@ViewBag.Username" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Password"] <span class="text-danger">*</span></label>
+                            <input type="password" name="Password" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["FullName"]</label>
+                            <input type="text" name="FullName" class="form-control" value="@ViewBag.FullName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Email"]</label>
+                            <input type="email" name="Email" class="form-control" value="@ViewBag.Email" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Role"] <span class="text-danger">*</span></label>
+                            <select name="Role" id="RoleSelect" class="form-control" required>
+                                <option value="">-- Chọn role --</option>
+                                @foreach (var role in roles)
+                                {
+                                    if (ViewBag.Role != null && ViewBag.Role == role)
+                                    {
+                                        <option value="@role" selected>@role</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="BranchDiv" style="display: @(ViewBag.Role == "Staff" ? "block" : "none");">
+                            <label class="form-label">@Localizer["Branch"] <span class="text-danger">*</span></label>
+                            <select name="BranchId" class="form-control">
+                                <option value="">-- Chọn chi nhánh --</option>
+                                @foreach (var branch in branches)
+                                {
+                                    if (ViewBag.BranchId != null && ViewBag.BranchId == branch.BranchId)
+                                    {
+                                        <option value="@branch.BranchId" selected>@branch.BranchName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@branch.BranchId">@branch.BranchName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-gold w-100 py-2 rounded-pill fw-bold">@Localizer["CreateAccount"]</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('RoleSelect').addEventListener('change', function () {
+            var branchDiv = document.getElementById('BranchDiv');
+            if (this.value === 'Staff') {
+                branchDiv.style.display = 'block';
+            } else {
+                branchDiv.style.display = 'none';
+                document.querySelector('select[name="BranchId"]').value = '';
+            }
+        });
+    </script>
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

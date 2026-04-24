@@ -1,0 +1,306 @@
+@model IEnumerable<SpaN5.Models.Supplier>
+@{
+    ViewData["Title"] = "Quản lý Nhà cung cấp";
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+    }
+
+    .table-modern {
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        width: 100%;
+    }
+
+    .table-modern thead th {
+        background: transparent;
+        border: none;
+        color: #64748b;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 12px 24px;
+    }
+
+    .table-modern tbody tr {
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .table-modern tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-modern tbody td {
+        padding: 20px 24px;
+        border: none;
+    }
+
+    .table-modern tbody td:first-child { border-radius: 16px 0 0 16px; }
+    .table-modern tbody td:last-child { border-radius: 0 16px 16px 0; }
+
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-active { background: #ecfdf5; color: #10b981; }
+    .status-inactive { background: #fef2f2; color: #ef4444; }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        border: none;
+        background: #f8fafc;
+        color: #64748b;
+    }
+
+    .btn-icon:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 12px 24px;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        color: white;
+    }
+
+    .search-input {
+        background: #f1f5f9;
+        border: 2px solid transparent;
+        border-radius: 14px;
+        padding: 12px 20px;
+        padding-left: 45px;
+        transition: all 0.3s;
+        width: 300px;
+    }
+
+    .search-input:focus {
+        background: #fff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+
+    .search-container { position: relative; }
+    .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+</style>
+
+<div class="glass-card">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #0f172a;">Nhà cung cấp</h2>
+            <p class="text-muted small mb-0">Quản lý mạng lưới cung ứng vật tư Spa</p>
+        </div>
+        <div class="d-flex gap-3">
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" placeholder="Tìm tên, số điện thoại..." id="supplierSearch">
+            </div>
+            <button class="btn btn-add" onclick="showAddModal()">
+                <i class="fa-solid fa-plus me-2"></i> Thêm mới
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Nhà cung cấp</th>
+                    <th>Người liên hệ</th>
+                    <th>Số điện thoại</th>
+                    <th>Mã số thuế</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="supplierTableBody">
+                @foreach (var s in Model)
+                {
+                    <tr data-name="@s.Name.ToLower()" data-phone="@(s.Phone?.ToLower() ?? "")">
+                        <td>
+                            <div class="fw-bold text-dark">@s.Name</div>
+                            <div class="small text-muted">@s.Email</div>
+                        </td>
+                        <td>@s.ContactName</td>
+                        <td>@s.Phone</td>
+                        <td class="font-monospace small">@s.TaxCode</td>
+                        <td>
+                            <span class="status-badge @(s.IsActive ? "status-active" : "status-inactive")" style="cursor: pointer" onclick="toggleStatus(@s.SupplierId)">
+                                @(s.IsActive ? "Hoạt động" : "Tạm ngưng")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn-icon me-1" title="Chỉnh sửa" onclick="showEditModal(@s.SupplierId)">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn-icon" title="Lịch sử nhập" onclick="window.location.href='/Admin/Inventory/PurchaseOrders?supplierId=@s.SupplierId'">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal fade" id="supplierModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="modal-title fw-bold" id="modalTitle">Thêm Nhà cung cấp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="supplierForm">
+                    <input type="hidden" id="SupplierId" name="SupplierId">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Tên nhà cung cấp <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-pill p-3" name="Name" required placeholder="Tên công ty / Cửa hàng">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Người liên hệ</label>
+                            <input type="text" class="form-control rounded-pill p-3" name="ContactName" placeholder="Tên đại diện">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Số điện thoại</label>
+                            <input type="text" class="form-control rounded-pill p-3" name="Phone" placeholder="0123...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Email</label>
+                            <input type="email" class="form-control rounded-pill p-3" name="Email" placeholder="example@email.com">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Mã số thuế</label>
+                            <input type="text" class="form-control rounded-pill p-3" name="TaxCode" placeholder="MST công ty">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Địa chỉ</label>
+                            <textarea class="form-control p-3" name="Address" rows="2" style="border-radius: 16px;" placeholder="Địa chỉ trụ sở"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Ghi chú</label>
+                            <textarea class="form-control p-3" name="Note" rows="2" style="border-radius: 16px;" placeholder="Thông tin thêm..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-add px-4" onclick="saveSupplier()">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const supplierModal = new bootstrap.Modal(document.getElementById('supplierModal'));
+        const form = document.getElementById('supplierForm');
+
+        // Tìm kiếm nhanh
+        document.getElementById('supplierSearch').addEventListener('input', function(e) {
+            const val = e.target.value.toLowerCase();
+            document.querySelectorAll('#supplierTableBody tr').forEach(tr => {
+                const name = tr.dataset.name;
+                const phone = tr.dataset.phone;
+                tr.style.display = (name.includes(val) || phone.includes(val)) ? '' : 'none';
+            });
+        });
+
+        function showAddModal() {
+            form.reset();
+            document.getElementById('SupplierId').value = '';
+            document.getElementById('modalTitle').innerText = 'Thêm Nhà cung cấp';
+            supplierModal.show();
+        }
+
+        function showEditModal(id) {
+            $.get(`/Admin/Inventory/GetSupplier?id=${id}`, function(res) {
+                document.getElementById('modalTitle').innerText = 'Chỉnh sửa Nhà cung cấp';
+                for (const key in res) {
+                    const input = form.querySelector(`[name="${key.charAt(0).toUpperCase() + key.slice(1)}"]`);
+                    if (input) input.value = res[key];
+                }
+                document.getElementById('SupplierId').value = res.supplierId;
+                supplierModal.show();
+            });
+        }
+
+        function saveSupplier() {
+            const formData = new FormData(form);
+            const id = formData.get('SupplierId');
+            const url = id ? '/Admin/Inventory/EditSupplier' : '/Admin/Inventory/AddSupplier';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: $(form).serialize(),
+                success: function(res) {
+                    if (res.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công',
+                            text: 'Đã lưu thông tin nhà cung cấp!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi', res.message || 'Không thể lưu dữ liệu', 'error');
+                    }
+                }
+            });
+        }
+
+        function toggleStatus(id) {
+            $.post('/Admin/Inventory/ToggleSupplierStatus', { id: id }, function(res) {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    Swal.fire('Lỗi', 'Không thể thay đổi trạng thái', 'error');
+                }
+            });
+        }
+    </script>
+}

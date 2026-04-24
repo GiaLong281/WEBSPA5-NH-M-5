@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = "Kết quả Chấm công";
+    Layout = "~/Areas/Staff/Views/Shared/_StaffLayout.cshtml";
+    var staff = ViewBag.Staff as SpaN5.Models.Staff;
+    var attendance = ViewBag.Attendance as SpaN5.Models.Attendance;
+    var error = ViewBag.Error as string;
+}
+
+<style>
+    .result-container {
+        max-width: 500px;
+        margin: 50px auto;
+        text-align: center;
+        background: white;
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    .status-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 25px;
+    }
+    .status-success { background: #DCFCE7; color: #16A34A; }
+    .status-error { background: #FEE2E2; color: #DC2626; }
+    .info-card {
+        background: #F8FAF6;
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 30px;
+        text-align: left;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        border-bottom: 1px dashed #E2E8F0;
+        padding-bottom: 10px;
+    }
+    .info-row:last-child { border: none; margin-bottom: 0; padding-bottom: 0; }
+    .label { color: #64748B; font-weight: 500; font-size: 0.9rem; }
+    .value { color: #1E293B; font-weight: 700; font-size: 0.9rem; }
+</style>
+
+<div class="result-container shadow">
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <div class="status-icon status-error">
+            <i class="bi bi-x-circle-fill"></i>
+        </div>
+        <h3 class="fw-bold text-danger">CHẤM CÔNG THẤT BẠI</h3>
+        <p class="text-muted">@error</p>
+        <a href="/Staff/Home/Index" class="btn btn-outline-secondary rounded-pill px-4 mt-3">Quay lại Trang chủ</a>
+    }
+    else
+    {
+        <div class="status-icon status-success">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h3 class="fw-bold text-success">CHẤM CÔNG THÀNH CÔNG</h3>
+        <p class="text-muted">@ViewBag.Message</p>
+
+        <div class="info-card">
+            <div class="info-row">
+                <span class="label">Nhân viên:</span>
+                <span class="value">@staff?.FullName</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Chức vụ:</span>
+                <span class="value">@staff?.Position</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Ngày làm việc:</span>
+                <span class="value">@DateTime.Today.ToString("dd/MM/yyyy")</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Giờ ghi nhận:</span>
+                <span class="value text-primary">@attendance?.CheckInTime?.ToString("HH:mm:ss")</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Trạng thái:</span>
+                <span class="value text-success"><i class="bi bi-patch-check-fill me-1"></i> ĐÃ ĐI LÀM</span>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="/Staff/Home/Index" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                <i class="bi bi-house-door me-2"></i>Vào Trang làm việc
+            </a>
+        </div>
+    }
+</div>

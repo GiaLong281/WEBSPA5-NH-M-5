@@ -1,4 +1,4 @@
-﻿namespace SpaN5.Models
+namespace SpaN5.Models
 {
     public class ServiceMaterial
     {
@@ -8,8 +8,11 @@
         public Service Service { get; set; }
 
         public int MaterialId { get; set; }
-        public Material Material { get; set; }
+        public Material Material { get; set; } = null!;
 
-        public int Quantity { get; set; }
+        public int? ServiceStepId { get; set; }
+        public ServiceStep? ServiceStep { get; set; }
+
+        public double Quantity { get; set; } // Định mức tiêu hao (gram)
     }
 }

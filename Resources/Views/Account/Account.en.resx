@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <data name="Login"><value>Login</value></data>
+  <data name="WelcomeBack"><value>Welcome back!</value></data>
+  <data name="Username"><value>Username</value></data>
+  <data name="EnterUsername"><value>Enter username</value></data>
+  <data name="Password"><value>Password</value></data>
+  <data name="EnterPassword"><value>Enter password</value></data>
+  <data name="RememberMe"><value>Remember me</value></data>
+  <data name="NoAccount"><value>Don't have an account?</value></data>
+  <data name="SignUpNow"><value>Sign up now</value></data>
+  <data name="Register"><value>Register</value></data>
+  <data name="BeccomeMember"><value>Become a SpaN5 member</value></data>
+  <data name="FullName"><value>Full Name</value></data>
+  <data name="ExampleName"><value>John Doe</value></data>
+  <data name="Phone"><value>Phone Number</value></data>
+  <data name="ExamplePhone"><value>0123456789</value></data>
+  <data name="Email"><value>Email (Optional)</value></data>
+  <data name="ExampleEmail"><value>example@email.com</value></data>
+  <data name="MinPassword"><value>At least 6 characters</value></data>
+  <data name="ConfirmPassword"><value>Confirm Password</value></data>
+  <data name="ReEnterPassword"><value>Re-enter password</value></data>
+  <data name="IAgree"><value>I have read and agree to the</value></data>
+  <data name="HaveAccount"><value>Already have an account?</value></data>
+  <data name="LoginNow"><value>Login now</value></data>
+  <data name="Profile"><value>Profile</value></data>
+  <data name="AccountInfo"><value>Account Information</value></data>
+  <data name="Role"><value>Role</value></data>
+  <data name="Update"><value>Update</value></data>
+  <data name="ChangePass"><value>Change Password</value></data>
+  <data name="CurrentPassword"><value>Current Password</value></data>
+  <data name="NewPassword"><value>New Password</value></data>
+  <data name="ConfirmNewPassword"><value>Confirm New Password</value></data>
+  <data name="AccessDenied"><value>Access Denied</value></data>
+  <data name="AccessDeniedMsg"><value>403 - Access Denied</value></data>
+  <data name="NoPermission"><value>You do not have permission to access this page.</value></data>
+  <data name="BackToHome"><value>Back to Home</value></data>
+</root>

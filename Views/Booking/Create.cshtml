@@ -1,0 +1,316 @@
+@model SpaN5.Models.ViewModels.BookingViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Đặt lịch";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isLoggedIn = User.Identity?.IsAuthenticated == true;
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gold text-white text-center py-4 border-0">
+                    <h2 class="mb-0 font-playfair">Đặt lịch hẹn</h2>
+                    <p class="mb-0 mt-2 text-white-50">Vui lòng điền thông tin bên dưới</p>
+                </div>
+
+                <div class="card-body p-5">
+                    <form id="bookingForm" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 class="font-playfair text-gold mb-3">Thông tin khách hàng</h4>
+                                <div class="mb-3">
+                                    <label asp-for="FullName" class="form-label">Họ tên</label>
+                                    @if (isLoggedIn)
+                                    {
+                                        <input asp-for="FullName" class="form-control" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input asp-for="FullName" class="form-control" />
+                                    }
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label">Email</label>
+                                    @if (isLoggedIn)
+                                    {
+                                        <input asp-for="Email" class="form-control" type="email" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input asp-for="Email" class="form-control" type="email" />
+                                    }
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Phone" class="form-label">Số điện thoại</label>
+                                    @if (isLoggedIn)
+                                    {
+                                        <input asp-for="Phone" class="form-control" readonly />
+                                    }
+                                    else
+                                    {
+                                        <input asp-for="Phone" class="form-control" />
+                                    }
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h4 class="font-playfair text-gold mb-3">Thông tin đặt lịch</h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Chọn dịch vụ</label>
+                                    <div class="input-group mb-2">
+                                        <select id="serviceSelector" class="form-control">
+                                            <option value="">-- Chọn dịch vụ --</option>
+                                            @foreach (var sv in (ViewBag.AllServices as List<SpaN5.Models.ViewModels.ServiceInfo> ?? new List<SpaN5.Models.ViewModels.ServiceInfo>()))
+                                            {
+                                                <option value="@sv.ServiceId" data-duration="@sv.Duration" data-price="@sv.Price">
+                                                    @sv.ServiceName (@sv.Duration phút - @sv.Price.ToString("N0")đ)
+                                                </option>
+                                            }
+                                        </select>
+                                        <button type="button" class="btn btn-outline-gold" id="addServiceBtn">+ Thêm</button>
+                                    </div>
+                                    <div id="selectedServicesList" class="list-group mb-2">
+                                        <!-- Danh sách dịch vụ đã chọn sẽ hiển thị ở đây -->
+                                    </div>
+                                    <div id="SelectedServiceIdsInputs"></div>
+                                    <input type="hidden" id="SelectedServiceIdsCombined" name="SelectedServiceIdsCombined" value="" />
+                                    <span asp-validation-for="SelectedServiceIds" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="BranchId" class="form-label">Chi nhánh</label>
+                                    <select asp-for="BranchId" class="form-control" asp-items="ViewBag.Branches" required>
+                                        <option value="">-- Chọn chi nhánh --</option>
+                                    </select>
+                                    <span asp-validation-for="BranchId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="BookingDate" class="form-label">Ngày</label>
+                                    <input asp-for="BookingDate" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                    <span asp-validation-for="BookingDate" class="text-danger"></span>
+                                    <div id="dateWarning" class="text-warning small mt-1" style="display:none;"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Thời gian</label>
+                                    <select id="timeSlot" name="StartTime" class="form-control" required disabled>
+                                        <option value="">-- Chọn giờ --</option>
+                                    </select>
+                                    <span class="text-danger" id="timeError"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" asp-for="AutoAssignStaff" id="autoAssignToggle">
+                                        <label class="form-check-label fw-bold text-gold" for="autoAssignToggle">Tự động chọn nhân viên cho tôi</label>
+                                    </div>
+                                    <div class="small text-muted mt-1">Hệ thống sẽ gán nhân viên rảnh nhất cho bạn.</div>
+                                </div>
+
+                                <div class="mb-3" id="staffSelectionContainer" style="display:none;">
+                                    <label asp-for="StaffId" class="form-label">Chọn nhân viên ưa thích</label>
+                                    <select asp-for="StaffId" class="form-control" id="staffId">
+                                        <option value="">-- Trước hết hãy chọn giờ --</option>
+                                    </select>
+                                    <span asp-validation-for="StaffId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Notes" class="form-label">Ghi chú</label>
+                                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Yêu cầu thêm..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-gold rounded-pill px-5 py-2 fw-bold">ĐẶT LỊCH</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            var branchId = $('#BranchId');
+            var bookingDate = $('#BookingDate');
+            var timeSlot = $('#timeSlot');
+            var dateWarning = $('#dateWarning');
+            var autoAssignToggle = $('#autoAssignToggle');
+            var staffSelectionContainer = $('#staffSelectionContainer');
+            var staffSelect = $('#staffId');
+            var selectedServices = []; // { id, name, duration, price }
+
+            function updateSelectedServicesUI() {
+                var container = $('#selectedServicesList');
+                container.empty();
+
+                if (selectedServices.length === 0) {
+                    container.html('<div class="text-muted small">Chưa có dịch vụ nào được chọn</div>');
+                } else {
+                    var totalDuration = 0;
+                    var totalPrice = 0;
+
+                    selectedServices.forEach(function (sv) {
+                        totalDuration += sv.duration;
+                        totalPrice += sv.price;
+
+                        container.append(`
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                ${sv.name} (${sv.duration} phút - ${sv.price.toLocaleString()}đ)
+                                <button type="button" class="btn btn-sm btn-danger remove-service" data-id="${sv.id}">Xóa</button>
+                            </div>
+                        `);
+                    });
+
+                    container.append(`
+                        <div class="list-group-item active bg-gold border-0 fw-bold">
+                            Tổng cộng: ${totalDuration} phút - ${totalPrice.toLocaleString()} VNĐ
+                        </div>
+                    `);
+                }
+
+                var inputsContainer = $('#SelectedServiceIdsInputs');
+                inputsContainer.empty();
+
+                // Tạo các field cho model binder List<int>
+                selectedServices.forEach(function (sv, idx) {
+                    inputsContainer.append(`<input type="hidden" name="SelectedServiceIds[${idx}]" value="${sv.id}" />`);
+                });
+
+                $('#SelectedServiceIdsCombined').val(selectedServices.map(function (s) { return s.id; }).join(','));
+                loadTimeSlots();
+            }
+
+            $('#addServiceBtn').click(function () {
+                var select = $('#serviceSelector');
+                var id = select.val();
+                if (!id) return;
+                var name = select.find('option:selected').text().split('(')[0].trim();
+                var duration = parseInt(select.find('option:selected').data('duration'));
+                var price = parseFloat(select.find('option:selected').data('price'));
+
+                if (selectedServices.some(function (s) { return s.id == id; })) {
+                    alert('Dịch vụ đã được chọn rồi!');
+                    return;
+                }
+
+                selectedServices.push({ id: parseInt(id), name: name, duration: duration, price: price });
+                updateSelectedServicesUI();
+                select.val('');
+            });
+
+            $(document).on('click', '.remove-service', function () {
+                var id = $(this).data('id');
+                selectedServices = selectedServices.filter(function (s) { return s.id != id; });
+                updateSelectedServicesUI();
+            });
+
+            branchId.add(bookingDate).change(function () {
+                loadTimeSlots();
+            });
+
+            autoAssignToggle.change(function() {
+                if ($(this).is(':checked')) {
+                    staffSelectionContainer.slideUp();
+                    staffSelect.prop('required', false);
+                } else {
+                    staffSelectionContainer.slideDown();
+                    staffSelect.prop('required', true);
+                    loadAvailableStaff();
+                }
+            });
+
+            timeSlot.change(function() {
+                if (!autoAssignToggle.is(':checked')) {
+                    loadAvailableStaff();
+                }
+            });
+
+            async function loadAvailableStaff() {
+                var branch = branchId.val();
+                var date = bookingDate.val();
+                var time = timeSlot.val();
+                var serviceIds = $('#SelectedServiceIdsCombined').val();
+
+                if (!branch || !date || !time || !serviceIds) {
+                    staffSelect.html('<option value="">-- Hãy chọn giờ trước --</option>');
+                    return;
+                }
+
+                staffSelect.html('<option value="">-- Đang tải nhân viên... --</option>');
+
+                try {
+                    const res = await fetch(`/api/ApiBooking/GetAvailableStaff?branchId=${branch}&date=${date}&time=${time}&serviceIds=${serviceIds}`);
+                    const staffs = await res.json();
+
+                    staffSelect.empty();
+                    if (staffs.length === 0) {
+                        staffSelect.append('<option disabled selected>Không có nhân viên rảnh</option>');
+                        alert('Không có nhân viên rảnh trong khung giờ này. Vui lòng chọn giờ khác.');
+                    } else {
+                        staffSelect.append('<option value="">-- Chọn nhân viên --</option>');
+                        staffs.forEach(function (s) {
+                            staffSelect.append(`<option value="${s.staffId}">${s.fullName} (${s.position})</option>`);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Lỗi tải nhân viên:', error);
+                    staffSelect.html('<option value="">-- Lỗi tải dữ liệu --</option>');
+                }
+            }
+
+            async function loadTimeSlots() {
+                var branch = branchId.val();
+                var date = bookingDate.val();
+                var serviceIds = $('#SelectedServiceIdsCombined').val();
+
+                if (!branch || !date || !serviceIds) {
+                    timeSlot.prop('disabled', true).html('<option value="">-- Vui lòng chọn đủ thông tin --</option>');
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/api/ApiBooking/GetTimeSlots?branchId=${branch}&date=${date}&serviceIds=${serviceIds}`);
+                    const slots = await res.json();
+                    timeSlot.empty();
+                    if (slots.length === 0) {
+                        timeSlot.append('<option value="">-- Không có khung giờ trống --</option>');
+                        timeSlot.prop('disabled', true);
+                        dateWarning.text('Chi nhánh có thể không mở cửa hoặc đã kín lịch.').show();
+                    } else {
+                        timeSlot.append('<option value="">-- Chọn giờ --</option>');
+                        slots.forEach(function (slot) {
+                            timeSlot.append(`<option value="${slot.value}">${slot.time}</option>`);
+                        });
+                        timeSlot.prop('disabled', false);
+                        dateWarning.hide();
+                    }
+                } catch (error) {
+                    console.error('Lỗi tải giờ:', error);
+                    timeSlot.html('<option value="">-- Lỗi tải dữ liệu --</option>').prop('disabled', true);
+                }
+            }
+
+            // Khởi tạo UI ban đầu
+            updateSelectedServicesUI();
+        });
+    </script>
+}

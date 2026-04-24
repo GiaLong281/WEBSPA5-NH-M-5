@@ -1,0 +1,144 @@
+@model IEnumerable<SpaN5.Models.Payment>
+@{
+    ViewData["Title"] = "Lịch sử Thanh toán & Hóa đơn";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .payment-card {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+    }
+    
+    .payment-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+    
+    .payment-table th {
+        padding: 15px 20px;
+        color: var(--secondary-blue);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .payment-row {
+        background: #FDFDFF;
+        border-radius: 16px;
+        transition: all 0.2s ease;
+    }
+    
+    .payment-row:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    }
+    
+    .payment-row td {
+        padding: 20px;
+        vertical-align: middle;
+        border: none;
+    }
+    
+    .payment-row td:first-child { border-radius: 16px 0 0 16px; }
+    .payment-row td:last-child { border-radius: 0 16px 16px 0; }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+    .status-paid { background: #E6F6ED; color: #00B050; }
+    
+    .amount-text {
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: var(--primary-blue);
+    }
+</style>
+
+<div class="row align-items-center mb-4">
+    <div class="col">
+        <h2 class="fw-bold mb-1" style="letter-spacing: -1px;">Lịch sử Thanh toán</h2>
+        <p class="text-muted small">Tra cứu thông tin khách hàng, dịch vụ sử dụng và số tiền đã thu.</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="location.reload()">
+            <i class="fa-solid fa-arrows-rotate me-2"></i> Làm mới dữ liệu
+        </button>
+    </div>
+</div>
+
+<div class="payment-card">
+    <div class="table-responsive">
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>Thông tin thanh toán</th>
+                    <th>Khách hàng</th>
+                    <th>Dịch vụ đã sử dụng</th>
+                    <th>Phương thức</th>
+                    <th>Số tiền thu</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(!Model.Any()) {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu thanh toán nào</td>
+                    </tr>
+                }
+                @foreach(var item in Model) {
+                    <tr class="payment-row">
+                        <td>
+                            <div class="fw-bold text-main">Mã Lịch: @item.Booking?.BookingCode</div>
+                            <div class="text-muted smaller mt-1"><i class="fa-regular fa-clock me-1"></i> @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-main fs-6">@item.Booking?.Customer?.FullName</div>
+                            <div class="text-muted smaller"><i class="fa-solid fa-phone me-1"></i> @item.Booking?.Customer?.Phone</div>
+                        </td>
+                        <td>
+                            <ul class="list-unstyled mb-0 m-0">
+                                @if(item.Booking != null && item.Booking.BookingDetails != null) {
+                                    foreach(var detail in item.Booking.BookingDetails) {
+                                        <li class="smaller fw-bold text-secondary mb-1">
+                                            <i class="fa-solid fa-spa me-1 text-primary opacity-50"></i> @detail.Service?.ServiceName
+                                            <div class="text-muted smaller fw-normal ms-4" style="font-size: 0.7rem;">
+                                                <i class="fa-solid fa-user-sparkles me-1"></i> KTV: @(detail.Staff?.FullName ?? "N/A")
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border fw-bold px-3 py-2">
+                                @if(item.Method == SpaN5.Models.PaymentMethod.Cash) {
+                                    <i class="fa-solid fa-money-bill text-success me-1"></i> @("Tiền mặt")
+                                } else {
+                                    <i class="fa-solid fa-building-columns text-primary me-1"></i> @("Chuyển khoản")
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            <div class="amount-text">@item.Amount.ToString("N0")đ</div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-paid">
+                                <i class="fa-solid fa-circle-check me-1"></i> Hoàn thành
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

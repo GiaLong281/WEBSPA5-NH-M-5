@@ -1,19 +1,33 @@
 :root {
-    --gold: #c5a880;
-    --gold-hover: #b39368;
-    --dark-green: #2c4c3b;
-    --beige: #f9f6f0;
-    --navy: #1a2b3c;
-    --light-gray: #f2f2f2;
+    --gold: #b68a63;
+    --gold-dark: #8c6a4d;
+    --gold-soft: #d9b48f;
+    --navy: #12202d;
+    --navy-deep: #0a141d;
+    --beige: #fdfaf7;
+    --cream: #fffcf9;
+    --text: #1d2433;
+    --muted: #6b7280;
+    --line: rgba(182, 138, 99, 0.15);
+    --shadow-sm: 0 10px 22px rgba(18, 32, 45, 0.04);
+    --shadow-md: 0 18px 45px rgba(18, 32, 45, 0.08);
+    --shadow-lg: 0 24px 60px rgba(18, 32, 45, 0.12);
+    --radius-sm: 12px;
+    --radius: 20px;
+    --radius-lg: 30px;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
     font-family: 'Inter', sans-serif;
-    color: #333;
+    color: var(--text);
     background-color: var(--beige);
     margin: 0;
     padding: 0;
-    padding-top: 76px; /* Offset for fixed navbar */
+    overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6, .font-playfair {
@@ -22,111 +36,133 @@ h1, h2, h3, h4, h5, h6, .font-playfair {
 
 /* Navbar */
 .spa-navbar {
-    background-color: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-    padding: 15px 0;
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    padding: 20px 0;
+    transition: all 0.4s ease;
+}
+
+.spa-navbar.scrolled {
+    padding: 12px 0;
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
 .spa-brand {
-    font-weight: 700;
-    color: var(--dark-green) !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--navy-deep) !important;
 }
 
-.text-gold {
-    color: var(--gold) !important;
+.spa-brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.2rem;
+    box-shadow: 0 8px 20px rgba(182, 138, 99, 0.3);
 }
 
-.spa-navbar .nav-link {
-    color: #555 !important;
-    font-weight: 500;
+.navbar-nav .nav-link {
+    color: var(--text) !important;
+    font-weight: 600;
     margin: 0 10px;
-    position: relative;
-    transition: color 0.3s ease;
+    padding: 8px 12px !important;
+    border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
-.spa-navbar .nav-link:hover, .spa-navbar .nav-link.active {
+.navbar-nav .nav-link:hover, 
+.navbar-nav .nav-link.active {
     color: var(--gold) !important;
+    background: rgba(182, 138, 99, 0.05);
 }
 
-/* Custom Buttons */
+/* Buttons */
 .btn-gold {
-    background-color: var(--gold);
-    color: white;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: #fff;
     border: none;
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-weight: 600;
     transition: all 0.3s ease;
 }
 
 .btn-gold:hover {
-    background-color: var(--gold-hover);
-    color: white;
-    box-shadow: 0 4px 15px rgba(197, 168, 128, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(182, 138, 99, 0.3);
+    color: #fff;
 }
 
 .btn-outline-gold {
-    border: 2px solid var(--gold);
+    border: 1.5px solid var(--gold);
     color: var(--gold);
+    padding: 11px 27px;
+    border-radius: 999px;
+    font-weight: 600;
     transition: all 0.3s ease;
 }
 
 .btn-outline-gold:hover {
     background-color: var(--gold);
-    color: white;
+    color: #fff;
+}
+
+/* Cards */
+.service-card {
+    background: #fff;
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Footer */
 .spa-footer {
-    background-color: var(--navy);
-    color: white;
+    background: var(--navy);
+    color: rgba(255,255,255,0.8);
+    padding: 80px 0 30px;
 }
 
 .footer-links a {
     color: rgba(255,255,255,0.6);
     text-decoration: none;
-    transition: color 0.3s ease;
+    margin-bottom: 12px;
     display: inline-block;
-    padding-bottom: 5px;
+    transition: all 0.3s ease;
 }
 
 .footer-links a:hover {
     color: var(--gold);
-    transform: translateX(5px);
-}
-
-.social-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.social-icon:hover {
-    background-color: var(--gold);
-    color: white;
-    transform: translateY(-3px);
-}
-
-/* Utils */
-.transition-all {
-    transition: all 0.3s ease;
+    padding-left: 8px;
 }
 
 /* Preloader */
 #spa-preloader {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: var(--beige);
+    inset: 0;
     z-index: 99999;
-    transition: opacity 0.8s ease, visibility 0.8s ease;
+    background: var(--beige);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 #spa-preloader.fade-out {
@@ -134,12 +170,20 @@ h1, h2, h3, h4, h5, h6, .font-playfair {
     visibility: hidden;
 }
 
-.animate-pulse {
-    animation: pulse 2s infinite ease-in-out;
-}
+/* Utilities */
+.section-pad { padding: 100px 0; }
+.text-gold { color: var(--gold) !important; }
+.bg-gold { background-color: var(--gold) !important; }
+.rounded-soft { border-radius: var(--radius) !important; }
+.shadow-premium { box-shadow: var(--shadow-md) !important; }
 
-@keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.8; }
+/* Responsive adjustments */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: #fff;
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
 }

@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Thống kê";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var monthlyRevenue = ViewBag.MonthlyRevenue as IEnumerable<dynamic> ?? new List<dynamic>();
+}
+<div class="container py-5">
+    <h1>Thống kê doanh thu</h1>
+    <p>Tổng doanh thu: @ViewBag.TotalRevenue.ToString("N0") VNĐ</p>
+    <h3>Doanh thu 12 tháng gần nhất</h3>
+    <canvas id="revenueChart" style="max-width:800px; max-height:400px;"></canvas>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const monthlyRevenue = @Html.Raw(Json.Serialize(monthlyRevenue));
+        const labels = monthlyRevenue.map(m => m.Month + "/" + m.Year);
+        const data = monthlyRevenue.map(m => m.Total);
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: data,
+                    borderColor: 'rgb(198, 164, 59)',
+                    backgroundColor: 'rgba(198, 164, 59, 0.2)',
+                    tension: 0.1
+                }]
+            }
+        });
+    </script>
+}
