@@ -1,0 +1,331 @@
+@model IEnumerable<SpaN5.Models.Attendance>
+@{
+    ViewData["Title"] = "Bảng Lương & Chấm Công";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    
+    var currentMonth = ViewBag.CurrentMonth as int?;
+    var currentYear = ViewBag.CurrentYear as int?;
+    var workingDays = ViewBag.WorkingDays as int? ?? 0;
+    var totalSpaRevenue = ViewBag.TotalSpaRevenue as decimal? ?? 0;
+    var totalCommission = ViewBag.TotalCommission as decimal? ?? 0;
+    var baseSalary = ViewBag.BaseSalary as decimal? ?? 0;
+    var basicSalaryEarned = ViewBag.BasicSalaryEarned as decimal? ?? 0;
+    var totalSalary = ViewBag.TotalSalary as decimal? ?? 0;
+    
+    var leaveRequests = ViewBag.LeaveRequests as IEnumerable<SpaN5.Models.LeaveRequest>;
+}
+
+<style>
+    /* Lấy lại theme Xanh của Admin, mix thêm sự sang trọng */
+    .admin-salary-wrapper {
+        padding: 20px;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .page-title {
+        color: #1e293b;
+        font-weight: 800;
+        margin-bottom: 24px;
+        border-left: 5px solid #0ea5e9;
+        padding-left: 12px;
+    }
+
+    .salary-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        transition: transform 0.2s;
+    }
+    
+    .salary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    .card-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+    }
+
+    .bg-blue-light { background: #e0f2fe; color: #0284c7; }
+    .bg-green-light { background: #dcfce7; color: #16a34a; }
+    .bg-purple-light { background: #f3e8ff; color: #9333ea; }
+    .bg-yellow-light { background: #fef9c3; color: #ca8a04; }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        color: #0f172a;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-top: 8px;
+    }
+
+    .highlight-salary {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: white;
+    }
+
+    .highlight-salary .stat-label { color: #94a3b8; }
+    .highlight-salary .stat-value { color: #38bdf8; }
+
+    /* Tables */
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        margin-top: 24px;
+    }
+
+    .table-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Form Xin Nghỉ */
+    .leave-form {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px dashed #cbd5e1;
+    }
+</style>
+
+<div class="admin-salary-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title">CHẤM CÔNG & LƯƠNG</h2>
+        
+        <form method="get" class="d-flex gap-2">
+            <select name="month" class="form-select form-select-sm fw-bold">
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option value="@i" selected="@(i == currentMonth)">Tháng @i</option>
+                }
+            </select>
+            <select name="year" class="form-select form-select-sm fw-bold">
+                @for (int i = DateTime.Today.Year - 1; i <= DateTime.Today.Year + 1; i++)
+                {
+                    <option value="@i" selected="@(i == currentYear)">Năm @i</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold">Xem</button>
+        </form>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><i class="fa-solid fa-check-circle"></i> Thành công!</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Lỗi!</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Tổng thu nhập -->
+        <div class="col-md-3">
+            <div class="salary-card highlight-salary">
+                <div class="card-icon-wrapper" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="stat-label">TỔNG THU NHẬP MONG ĐỢI</div>
+                <div class="stat-value">@totalSalary.ToString("N0") <span class="fs-5">đ</span></div>
+                <div class="mt-3 text-sm" style="color: #cbd5e1;">
+                    <i class="fa-solid fa-info-circle"></i> Đã bao gồm lương ngày công và thưởng hoa hồng.
+                </div>
+            </div>
+        </div>
+
+        <!-- Lương ngày công -->
+        <div class="col-md-3">
+            <div class="salary-card">
+                <div class="card-icon-wrapper bg-blue-light">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div class="stat-label">LƯƠNG NGÀY CÔNG</div>
+                <div class="stat-value">@basicSalaryEarned.ToString("N0") <span class="fs-5 text-muted">đ</span></div>
+                <div class="mt-2 text-muted" style="font-size: 0.85rem;">
+                    Ngày đi làm: <strong>@workingDays ngày</strong><br/>
+                    (Tính trên chuẩn 26 ngày/tháng)
+                </div>
+            </div>
+        </div>
+
+        <!-- Doanh thu Spa -->
+        <div class="col-md-3">
+            <div class="salary-card">
+                <div class="card-icon-wrapper bg-purple-light">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="stat-label">DOANH THU SPA TRONG CA</div>
+                <div class="stat-value">@totalSpaRevenue.ToString("N0") <span class="fs-5 text-muted">đ</span></div>
+                <div class="mt-2 text-muted" style="font-size: 0.85rem;">
+                    Đã thanh toán trong những ngày có mặt
+                </div>
+            </div>
+        </div>
+
+        <!-- Hoa hồng quản lý -->
+        <div class="col-md-3">
+            <div class="salary-card border-warning" style="background-color: #fffbeb;">
+                <div class="card-icon-wrapper bg-yellow-light">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                </div>
+                <div class="stat-label text-warning">HOA HỒNG THƯỞNG (0.5%)</div>
+                <div class="stat-value text-dark">@totalCommission.ToString("N0") <span class="fs-5 text-muted">đ</span></div>
+                <div class="mt-2 text-muted" style="font-size: 0.85rem;">
+                    Ghi nhận sự nỗ lực quản lý của bạn!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-md-7">
+            <div class="table-container h-100">
+                <h4 class="table-title"><i class="fa-solid fa-clock-rotate-left text-primary"></i> Lịch sử Chấm công (Tháng @currentMonth)</h4>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Giờ Vào</th>
+                                    <th>Giờ Ra</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var att in Model)
+                                {
+                                    <tr>
+                                        <td><span class="fw-bold text-dark"><i class="fa-regular fa-calendar text-muted me-1"></i> @att.Date.ToString("dd/MM/yyyy")</span></td>
+                                        <td>
+                                            @if (att.CheckInTime.HasValue)
+                                            {
+                                                <span class="badge bg-primary">@att.CheckInTime.Value.ToString("HH:mm")</span>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (att.CheckOutTime.HasValue)
+                                            {
+                                                <span class="badge bg-secondary">@att.CheckOutTime.Value.ToString("HH:mm")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger" style="font-size: 0.85rem;">Đang làm</span>
+                                            }
+                                        </td>
+                                        <td><i class="fa-solid fa-check-circle text-success"></i> Hợp lệ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-calendar-xmark fs-1 mb-3"></i>
+                        <h5>Chưa có dữ liệu chấm công</h5>
+                        <p>Bạn chưa thực hiện chấm công bằng mã QR trong tháng này.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="table-container h-100">
+                <h4 class="table-title"><i class="fa-solid fa-plane-departure text-warning"></i> Quản lý Ngày nghỉ</h4>
+                
+                <form action="/Admin/Staff/SubmitLeave" method="post" class="leave-form mb-4">
+                    @Html.AntiForgeryToken()
+                    <h6 class="fw-bold mb-3">Đăng ký nghỉ phép mới</h6>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Từ ngày</label>
+                            <input type="date" name="FromDate" class="form-control form-control-sm" required min="@DateTime.Today.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted small">Đến ngày</label>
+                            <input type="date" name="ToDate" class="form-control form-control-sm" required min="@DateTime.Today.ToString("yyyy-MM-dd")">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Lý do xin nghỉ</label>
+                        <textarea name="Reason" class="form-control form-control-sm" rows="2" required placeholder="Ghi rõ lý do..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-sm fw-bold w-100 text-dark"><i class="fa-solid fa-paper-plane"></i> Gửi Đơn Xin Nghỉ</button>
+                </form>
+
+                <h6 class="fw-bold mb-3">Lịch sử xin nghỉ</h6>
+                @if (leaveRequests != null && leaveRequests.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var lr in leaveRequests)
+                        {
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 0.9rem;">@lr.FromDate.ToString("dd/MM") - @lr.ToDate.ToString("dd/MM")</div>
+                                        <div class="text-muted" style="font-size: 0.8rem;">@lr.Reason</div>
+                                    </div>
+                                    <div>
+                                        @if (lr.Status == SpaN5.Models.LeaveRequestStatus.Pending)
+                                        {
+                                            <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                        }
+                                        else if (lr.Status == SpaN5.Models.LeaveRequestStatus.Approved)
+                                        {
+                                            <span class="badge bg-success">Đã duyệt</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Từ chối</span>
+                                        }
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="text-muted text-center py-3 small">Chưa có lịch sử xin nghỉ.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.DataProtection;
 using SpaN5.Models;
 using SpaN5.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
+using SpaN5.Hubs;
 
 namespace SpaN5.Areas.Staff.Controllers
 {
@@ -15,12 +17,14 @@ namespace SpaN5.Areas.Staff.Controllers
         private readonly SpaDbContext _context;
         private readonly IInventoryService _inventoryService;
         private readonly IDataProtector _protector;
+        private readonly IHubContext<BookingHub> _hubContext;
 
-        public HomeController(SpaDbContext context, IInventoryService inventoryService, IDataProtectionProvider provider)
+        public HomeController(SpaDbContext context, IInventoryService inventoryService, IDataProtectionProvider provider, IHubContext<BookingHub> hubContext)
         {
             _context = context;
             _inventoryService = inventoryService;
             _protector = provider.CreateProtector("SpaN5.QR.Protector");
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> Index(string view = "day")
@@ -746,7 +750,9 @@ namespace SpaN5.Areas.Staff.Controllers
             var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
             if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
             {
-                return RedirectToAction("Login", "Account", new { area = "" });
+                // Nếu chưa đăng nhập trên trình duyệt điện thoại, yêu cầu đăng nhập trước
+                var returnUrl = Url.Action("CheckInQR", "Home", new { area = "Staff", token = token });
+                return RedirectToAction("Login", "Auth", new { area = "Admin", returnUrl = returnUrl });
             }
 
             var staff = await _context.Staffs.FindAsync(staffId);
@@ -861,6 +867,82 @@ namespace SpaN5.Areas.Staff.Controllers
             ViewBag.Staff = staff;
             ViewBag.Attendance = attendance;
             return View("AttendanceResult");
+        }
+        [HttpGet]
+        public async Task<IActionResult> Commission(int? month, int? year)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
+            {
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+
+            var currentMonth = month ?? DateTime.Today.Month;
+            var currentYear = year ?? DateTime.Today.Year;
+            var startDate = new DateTime(currentYear, currentMonth, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            // Truy vấn các ca làm việc đã hoàn thành
+            var completedDetails = await _context.BookingDetails
+                .Include(bd => bd.Booking)
+                .Include(bd => bd.Service)
+                .Where(bd => bd.StaffId == staffId && 
+                             bd.Status == DetailStatus.Completed &&
+                             bd.Booking.BookingDate >= startDate && 
+                             bd.Booking.BookingDate <= endDate)
+                .OrderByDescending(bd => bd.Booking.BookingDate)
+                .ToListAsync();
+
+            // Tính toán hoa hồng (10%)
+            decimal commissionRate = 0.1m;
+            decimal totalCommission = completedDetails.Sum(bd => bd.PriceAtTime * commissionRate);
+            decimal totalRevenue = completedDetails.Sum(bd => bd.PriceAtTime);
+
+            // Truy vấn số ngày đi làm
+            var workingDays = await _context.Attendances
+                .Where(a => a.StaffId == staffId && a.Date >= startDate && a.Date <= endDate)
+                .CountAsync();
+
+            // Tính lương cơ bản
+            decimal baseSalary = 6000000; // Lương cơ bản cố định
+            decimal basicSalaryEarned = (baseSalary / 26) * workingDays;
+            decimal totalSalary = basicSalaryEarned + totalCommission;
+
+            ViewBag.CurrentMonth = currentMonth;
+            ViewBag.CurrentYear = currentYear;
+            ViewBag.TotalCommission = totalCommission;
+            ViewBag.TotalRevenue = totalRevenue;
+            ViewBag.CompletedServicesCount = completedDetails.Count;
+            ViewBag.WorkingDays = workingDays;
+            ViewBag.CommissionRate = commissionRate;
+            ViewBag.BaseSalary = baseSalary;
+            ViewBag.BasicSalaryEarned = basicSalaryEarned;
+            ViewBag.TotalSalary = totalSalary;
+
+            return View(completedDetails);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RequestEmergencySupport(string message)
+        {
+            var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
+            if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
+            {
+                return Json(new { success = false, message = "Không xác định được nhân viên." });
+            }
+
+            var staff = await _context.Staffs.FindAsync(staffId);
+            if (staff == null) return Json(new { success = false, message = "Không tìm thấy nhân viên." });
+
+            // Tìm phòng mà KTV này đang làm việc (nếu có ca InProgress)
+            var activeBooking = await _context.BookingDetails
+                .FirstOrDefaultAsync(bd => bd.StaffId == staffId && bd.Status == DetailStatus.InProgress);
+            
+            string roomInfo = activeBooking?.RoomNumber != null ? $"Phòng {activeBooking.RoomNumber}" : "Không rõ phòng";
+
+            // Bắn SignalR tới tất cả Client (đặc biệt là màn hình Admin/Lễ tân)
+            await _hubContext.Clients.All.SendAsync("ReceiveEmergencyRequest", roomInfo, staff.FullName, message);
+
+            return Json(new { success = true });
         }
     }
 }

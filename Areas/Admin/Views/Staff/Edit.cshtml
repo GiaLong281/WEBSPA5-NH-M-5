@@ -36,6 +36,15 @@
                         <input asp-for="Phone" class="form-control rounded-3 border-0 bg-light py-2" />
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label small fw-bold">Giới tính</label>
+                        <select asp-for="Gender" class="form-select rounded-3 border-0 bg-light py-2">
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label small fw-bold">Vị trí (Chức danh)</label>
                         <select asp-for="Position" class="form-select rounded-3 border-0 bg-light py-2">
                             <option value="Technician">Kỹ thuật viên</option>

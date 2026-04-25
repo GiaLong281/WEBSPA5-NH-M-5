@@ -1,0 +1,327 @@
+@model IEnumerable<SpaN5.Models.BookingDetail>
+@{
+    ViewData["Title"] = "Thu nhập & Hoa hồng";
+    Layout = "~/Areas/Staff/Views/Shared/_StaffLayout.cshtml";
+    
+    var currentMonth = ViewBag.CurrentMonth as int?;
+    var currentYear = ViewBag.CurrentYear as int?;
+    var totalCommission = ViewBag.TotalCommission as decimal? ?? 0;
+    var totalRevenue = ViewBag.TotalRevenue as decimal? ?? 0;
+    var count = ViewBag.CompletedServicesCount as int? ?? 0;
+    var days = ViewBag.WorkingDays as int? ?? 0;
+    var baseSalary = ViewBag.BaseSalary as decimal? ?? 0;
+    var basicSalaryEarned = ViewBag.BasicSalaryEarned as decimal? ?? 0;
+    var totalSalary = ViewBag.TotalSalary as decimal? ?? 0;
+}
+
+<style>
+    /* Gold & Luxury Theme */
+    :root {
+        --gold-primary: #D4AF37;
+        --gold-light: #F9F6E8;
+        --gold-dark: #AA8A2A;
+        --gold-gradient: linear-gradient(135deg, #F3E7E9 0%, #E3EEFF 99%, #E3EEFF 100%);
+        --luxury-dark: #1F2937;
+        --card-bg: #ffffff;
+    }
+
+    .commission-dashboard {
+        padding: 2rem;
+        background-color: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title-gold {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--luxury-dark);
+        margin: 0;
+        background: -webkit-linear-gradient(45deg, #1F2937, #D4AF37);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .month-selector {
+        background: var(--card-bg);
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Cards */
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .gold-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .gold-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .gold-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 5px;
+        background: linear-gradient(90deg, #D4AF37, #FDE047, #D4AF37);
+    }
+
+    .gold-card.main-card {
+        background: linear-gradient(135deg, #1F2937, #111827);
+        color: white;
+    }
+    
+    .gold-card.main-card::before {
+        background: linear-gradient(90deg, #FDE047, #D4AF37, #FDE047);
+    }
+
+    .card-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .icon-gold { background: var(--gold-light); color: var(--gold-primary); }
+    .icon-dark-gold { background: rgba(212, 175, 55, 0.2); color: #FDE047; }
+    
+    .card-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .main-card .card-title { color: #9CA3AF; }
+
+    .card-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--luxury-dark);
+        margin: 0;
+    }
+
+    .main-card .card-value { color: #FDE047; }
+
+    .card-subtitle {
+        font-size: 0.85rem;
+        color: #94A3B8;
+        margin-top: 0.5rem;
+    }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--luxury-dark);
+        display: flex; align-items: center; gap: 8px;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+    .custom-table th {
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        padding: 12px 16px;
+        border: none;
+    }
+
+    .custom-table th:first-child { border-radius: 8px 0 0 8px; }
+    .custom-table th:last-child { border-radius: 0 8px 8px 0; }
+
+    .custom-table td {
+        padding: 16px;
+        background: white;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    .custom-table tr td:first-child { border-left: 1px solid #f1f5f9; border-radius: 12px 0 0 12px; }
+    .custom-table tr td:last-child { border-right: 1px solid #f1f5f9; border-radius: 0 12px 12px 0; }
+
+    .custom-table tbody tr { transition: all 0.2s; }
+    .custom-table tbody tr:hover td { background: var(--gold-light); cursor: pointer; }
+
+    .service-name { font-weight: 700; color: var(--luxury-dark); }
+    .booking-date { font-size: 0.85rem; color: #64748b; }
+    .amount-text { font-weight: 700; color: var(--gold-dark); }
+    
+    .badge-success {
+        background: #DCFCE7;
+        color: #16A34A;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #94a3b8;
+    }
+    .empty-state i { font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem; }
+</style>
+
+<div class="commission-dashboard">
+    <div class="page-header">
+        <h1 class="page-title-gold"><i class="fa-solid fa-crown me-2"></i> BẢNG HOA HỒNG</h1>
+        <form method="get" class="month-selector d-flex align-items-center gap-2">
+            <i class="fa-regular fa-calendar text-muted"></i>
+            <select name="month" class="form-select form-select-sm border-0 bg-transparent fw-bold text-dark" onchange="this.form.submit()">
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option value="@i" selected="@(i == currentMonth)">Tháng @i</option>
+                }
+            </select>
+            <select name="year" class="form-select form-select-sm border-0 bg-transparent fw-bold text-dark" onchange="this.form.submit()">
+                @for (int i = DateTime.Today.Year - 1; i <= DateTime.Today.Year + 1; i++)
+                {
+                    <option value="@i" selected="@(i == currentYear)">Năm @i</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="gold-card main-card">
+            <div class="card-icon icon-dark-gold"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div class="card-title">TỔNG THU NHẬP (LƯƠNG + HOA HỒNG)</div>
+            <div class="card-value">@totalSalary.ToString("N0") <span class="fs-4 text-white">VNĐ</span></div>
+            <div class="card-subtitle mt-2">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Lương cơ bản (@days/26 ngày):</span>
+                    <span class="fw-bold">@basicSalaryEarned.ToString("N0") đ</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Hoa hồng dịch vụ:</span>
+                    <span class="fw-bold text-warning">@totalCommission.ToString("N0") đ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="gold-card">
+            <div class="card-icon icon-gold"><i class="fa-solid fa-spa"></i></div>
+            <div class="card-title">CA HOÀN THÀNH</div>
+            <div class="card-value">@count <span class="fs-4 text-muted">Ca</span></div>
+            <div class="card-subtitle">Doanh thu mang về: @totalRevenue.ToString("N0") đ</div>
+        </div>
+
+        <div class="gold-card">
+            <div class="card-icon icon-gold"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="card-title">NGÀY LÀM VIỆC</div>
+            <div class="card-value">@days <span class="fs-4 text-muted">Ngày</span></div>
+            <div class="card-subtitle">Chấm công hợp lệ trong tháng</div>
+        </div>
+    </div>
+
+    <!-- Details Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-title"><i class="fa-solid fa-list-check text-warning"></i> Lịch sử Giao dịch (Tháng @currentMonth/@currentYear)</div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Khách hàng</th>
+                            <th>Dịch vụ</th>
+                            <th>Ngày giờ</th>
+                            <th>Doanh thu</th>
+                            <th>Hoa hồng (10%)</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            decimal comm = item.PriceAtTime * 0.1m;
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-light rounded-circle p-2 text-secondary"><i class="fa-solid fa-user"></i></div>
+                                        <span class="fw-bold text-dark">@(item.Booking?.Customer?.FullName ?? "Khách hàng")</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="service-name">@item.Service?.ServiceName</div>
+                                </td>
+                                <td>
+                                    <div class="booking-date"><i class="fa-regular fa-clock me-1"></i> @(item.Booking != null ? item.Booking.BookingDate.ToString("dd/MM/yyyy") + " " + item.Booking.StartTime.ToString("HH:mm") : "")</div>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-bold">@item.PriceAtTime.ToString("N0") đ</span>
+                                </td>
+                                <td>
+                                    <span class="amount-text">+ @comm.ToString("N0") đ</span>
+                                </td>
+                                <td>
+                                    <span class="badge-success">Đã cộng</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fa-solid fa-box-open"></i>
+                <h5 class="fw-bold mt-2">Chưa có dữ liệu</h5>
+                <p>Bạn chưa hoàn thành ca dịch vụ nào trong tháng này.</p>
+            </div>
+        }
+    </div>
+</div>

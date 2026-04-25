@@ -76,6 +76,7 @@ namespace SpaN5.Areas.Admin.Controllers
                     var claims = new List<System.Security.Claims.Claim>
                     {
                         new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new System.Security.Claims.Claim("UserId", user.Id.ToString()),
                         new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, user.Username),
                         new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, user.Role)
                     };

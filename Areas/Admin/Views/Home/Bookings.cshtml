@@ -941,7 +941,8 @@
                             const disabled = s.isBusy ? 'disabled' : '';
                             const busyStatus = s.isBusy ? ' (Đang bận)' : ' (Rảnh)';
                             const specText = s.specialization ? ` [${s.specialization}]` : '';
-                            sSelect.innerHTML += `<option value="${s.staffId}" ${disabled}>${s.fullName}${specText}${busyStatus}</option>`;
+                            const genderText = s.gender ? ` - ${s.gender}` : '';
+                            sSelect.innerHTML += `<option value="${s.staffId}" ${disabled}>${s.fullName}${genderText}${specText}${busyStatus}</option>`;
                         });
                         checkInModal.show();
                     }

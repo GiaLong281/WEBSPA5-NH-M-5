@@ -339,8 +339,13 @@
                 {
                     <div class="menu-label">Người dùng</div>
                     <div class="nav-item">
-                        <a href="/Admin/Staff" class="nav-link @(Context.Request.Path.ToString().StartsWith("/Admin/Staff") && !Context.Request.Path.ToString().Contains("AttendanceQR") ? "active" : "")">
+                        <a href="/Admin/Staff" class="nav-link @(Context.Request.Path == "/Admin/Staff" ? "active" : "")">
                             <i class="fa-solid fa-user-shield"></i> Quản lý Nhân sự
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/Admin/Staff/PayrollManagement" class="nav-link @(Context.Request.Path == "/Admin/Staff/PayrollManagement" ? "active" : "")">
+                            <i class="fa-solid fa-file-invoice-dollar text-primary"></i> Quản lý Lương (Tổng)
                         </a>
                     </div>
                     <div class="nav-item">
@@ -359,17 +364,29 @@
                     </div>
                 }
 
-                <div class="menu-label">Vận hành</div>
-                <div class="nav-item">
-                    <a href="/Admin/Staff/AttendanceQR?role=ktv" class="nav-link @(Context.Request.Query["role"] == "ktv" ? "active" : "")">
-                        <i class="fa-solid fa-qrcode text-info"></i> Mã QR (KTV)
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/Admin/Staff/AttendanceQR?role=letan" class="nav-link @(Context.Request.Query["role"] == "letan" ? "active" : "")">
-                        <i class="fa-solid fa-qrcode text-warning"></i> Mã QR (Lễ tân)
-                    </a>
-                </div>
+                @if (!User.IsInRole("Admin"))
+                {
+                    <div class="menu-label">Cá nhân</div>
+                    <div class="nav-item">
+                        <a href="/Admin/Staff/MySalary" class="nav-link @(Context.Request.Path == "/Admin/Staff/MySalary" ? "active" : "")">
+                            <i class="fa-solid fa-wallet text-success"></i> Chấm công & Lương
+                        </a>
+                    </div>
+
+                    <div class="menu-label">Điểm danh (QR)</div>
+                    <div class="nav-item">
+                        <a href="/Admin/Staff/AttendanceQR?role=ktv" class="nav-link @(Context.Request.Query["role"] == "ktv" ? "active" : "")">
+                            <i class="fa-solid fa-qrcode text-info"></i> Mã QR (KTV)
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/Admin/Staff/AttendanceQR?role=letan" class="nav-link @(Context.Request.Query["role"] == "letan" ? "active" : "")">
+                            <i class="fa-solid fa-qrcode text-warning"></i> Mã QR (Lễ tân)
+                        </a>
+                    </div>
+                }
+
+                <div class="menu-label">Vận hành Spa</div>
                 <div class="nav-item">
                     <a href="/Admin/ManageServices" class="nav-link">
                         <i class="fa-solid fa-spa"></i> Dịch vụ
@@ -457,6 +474,30 @@
 
             <!-- Main Content -->
             <main class="main-content">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                text: '@TempData["ErrorMessage"]'
+                            });
+                        });
+                    </script>
+                }
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: '@TempData["SuccessMessage"]'
+                            });
+                        });
+                    </script>
+                }
                 @RenderBody()
             </main>
         </div>
@@ -565,6 +606,50 @@
                 bellBtn.removeClass('bell-ringing');
                 void bellBtn[0].offsetWidth; // kích hoạt reflow để reset animation
                 bellBtn.addClass('bell-ringing');
+            });
+
+            // Lắng nghe yêu cầu hỗ trợ khẩn cấp từ KTV
+            connection.on("ReceiveEmergencyRequest", function (roomInfo, staffName, message) {
+                // Hiển thị SweetAlert Popup cảnh báo đỏ
+                Swal.fire({
+                    title: '🚨 YÊU CẦU KHẨN CẤP',
+                    html: `
+                        <div class="alert alert-danger fs-5 fw-bold text-center">
+                            <i class="fa-solid fa-bell-concierge"></i> ${roomInfo}<br/>
+                            KTV: ${staffName}
+                        </div>
+                        <p class="fs-4 text-danger fw-bold mb-0">CẦN GẤP:</p>
+                        <p class="fs-3 fw-bold text-dark border p-3 bg-light rounded">${message}</p>
+                    `,
+                    icon: 'warning',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Đã nhận yêu cầu & Đang mang vào',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+
+                // Phát âm thanh báo động (Alarm)
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    function playAlarm(freq, time, duration) {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'square';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.5, time);
+                        gain.gain.linearRampToValueAtTime(0, time + duration);
+                        osc.start(time);
+                        osc.stop(time + duration);
+                    }
+                    const now = ctx.currentTime;
+                    // Kêu 3 nhịp Ting Ting Ting nhanh
+                    playAlarm(800, now, 0.2);
+                    playAlarm(1200, now + 0.3, 0.2);
+                    playAlarm(800, now + 0.6, 0.2);
+                    playAlarm(1200, now + 0.9, 0.4);
+                } catch(e) { console.log("Audio not supported"); }
             });
 
             connection.start().then(function () {

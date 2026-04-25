@@ -316,8 +316,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-graph-up-arrow"></i> Hiệu suất
+                <a href="/Staff/Home/Commission" class="nav-link @(action == "Commission" ? "active" : "")">
+                    <i class="bi bi-wallet2"></i> Thu nhập & Hoa hồng
                 </a>
             </li>
             <li class="nav-item">
@@ -365,12 +365,73 @@
         </main>
     </div>
 
+    <!-- Floating Action Button: Gọi Hỗ Trợ Khẩn Cấp -->
+    <button class="btn btn-danger rounded-circle shadow-lg position-fixed" id="btnEmergencySupport" style="bottom: 30px; right: 30px; width: 60px; height: 60px; z-index: 9999; animation: pulse-red 2s infinite;">
+        <i class="fa-solid fa-bell text-white fs-4"></i>
+    </button>
+    <style>
+        @@keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+    </style>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.getElementById('menu-toggle')?.addEventListener('click', function() {
             document.getElementById('sidebar-wrapper').classList.toggle('show');
+        });
+
+        // Xử lý Gọi hỗ trợ khẩn cấp
+        document.getElementById('btnEmergencySupport').addEventListener('click', function() {
+            Swal.fire({
+                title: '🚨 GỌI LỄ TÂN HỖ TRỢ',
+                html: `
+                    <p class="text-muted mb-3">Bạn đang cần mang gấp món đồ nào vào phòng?</p>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center mb-3" id="quickOptions">
+                        <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="$('#emergencyMessage').val('Khăn tắm / Khăn đắp')">Khăn tắm</button>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="$('#emergencyMessage').val('Tinh dầu massage')">Tinh dầu</button>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="$('#emergencyMessage').val('Nước suối / Trà')">Nước uống</button>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill" onclick="$('#emergencyMessage').val('Hỗ trợ làm sạch phòng')">Dọn phòng</button>
+                    </div>
+                    <input type="text" id="emergencyMessage" class="form-control text-center" placeholder="Hoặc nhập yêu cầu khác...">
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-paper-plane me-1"></i> Gửi Yêu Cầu',
+                cancelButtonText: 'Hủy',
+                confirmButtonColor: '#dc3545',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const msg = document.getElementById('emergencyMessage').value.trim();
+                    if (!msg) {
+                        Swal.showValidationMessage('Vui lòng nhập hoặc chọn đồ cần hỗ trợ!');
+                        return false;
+                    }
+                    return msg;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Gọi AJAX
+                    $.post('/Staff/Home/RequestEmergencySupport', { message: result.value }, function(res) {
+                        if (res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đã gửi yêu cầu!',
+                                text: 'Lễ tân đã nhận được thông báo và sẽ mang vào ngay.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire('Lỗi', res.message || 'Không thể gửi yêu cầu', 'error');
+                        }
+                    }).fail(function() {
+                        Swal.fire('Lỗi', 'Có lỗi kết nối mạng.', 'error');
+                    });
+                }
+            });
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

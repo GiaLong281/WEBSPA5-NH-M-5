@@ -553,6 +553,7 @@ namespace SpaN5.Areas.Admin.Controllers
                 .Select(s => new { 
                     s.StaffId, 
                     s.FullName,
+                    gender = s.Gender ?? "Chưa rõ",
                     specialization = s.Specialization != null ? s.Specialization.ServiceName : "Tổng quát",
                     isBusy = busyStaffIds.Contains(s.StaffId) 
                 })

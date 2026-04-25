@@ -71,6 +71,8 @@ namespace SpaN5.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 // 1. Lưu thông tin Nhân sự
+                staff.CreatedAt = DateTime.Now;
+                staff.Status = "active";
                 _context.Staffs.Add(staff);
                 await _context.SaveChangesAsync();
 
@@ -121,7 +123,18 @@ namespace SpaN5.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(staff);
+                    var existingStaff = await _context.Staffs.FindAsync(id);
+                    if (existingStaff == null) return NotFound();
+
+                    existingStaff.FullName = staff.FullName;
+                    existingStaff.Email = staff.Email;
+                    existingStaff.Phone = staff.Phone;
+                    existingStaff.Position = staff.Position;
+                    existingStaff.Status = staff.Status;
+                    existingStaff.SpecializationId = staff.SpecializationId;
+                    existingStaff.Gender = staff.Gender;
+                    
+                    _context.Update(existingStaff);
                     
                     var user = await _context.Users.FirstOrDefaultAsync(u => u.StaffId == id);
                     if (user != null)
@@ -203,6 +216,154 @@ namespace SpaN5.Areas.Admin.Controllers
         public IActionResult AttendanceQR(string role = "ktv")
         {
             ViewBag.Role = role.ToLower();
+            return View();
+        }
+
+        // GET: Admin/Staff/MySalary
+        public async Task<IActionResult> MySalary(int? month, int? year)
+        {
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+            {
+                return RedirectToAction("Login", "Auth", new { area = "Admin" });
+            }
+
+            var currentMonth = month ?? DateTime.Today.Month;
+            var currentYear = year ?? DateTime.Today.Year;
+            var startDate = new DateTime(currentYear, currentMonth, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            // Tìm nhân viên (lễ tân) đang đăng nhập (thường qua UserId hoặc phải link với Staff)
+            var user = await _context.Users.Include(u => u.Staff).FirstOrDefaultAsync(u => u.Id == userId);
+            var staffId = user?.StaffId ?? 0;
+            if (staffId == 0)
+            {
+                TempData["ErrorMessage"] = "Tài khoản Lễ tân của bạn chưa được liên kết với mã Nhân sự (Staff). Vui lòng dùng tài khoản Admin để liên kết!";
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
+
+            // Truy vấn số ngày đi làm của lễ tân này
+            var workingDays = await _context.Attendances
+                .Where(a => a.StaffId == staffId && a.Date >= startDate && a.Date <= endDate)
+                .CountAsync();
+
+            var attendances = await _context.Attendances
+                .Where(a => a.StaffId == staffId && a.Date >= startDate && a.Date <= endDate)
+                .OrderByDescending(a => a.Date)
+                .ToListAsync();
+
+            // Tính tổng doanh thu của toàn Spa trong những ngày người này CÓ đi làm
+            var workingDates = attendances.Select(a => a.Date.Date).ToList();
+            
+            decimal totalSpaRevenue = 0;
+            if (workingDates.Any())
+            {
+                totalSpaRevenue = await _context.Payments
+                    .Where(p => p.Status == PaymentStatus.Paid && workingDates.Contains(p.CreatedAt.Date))
+                    .SumAsync(p => p.Amount);
+            }
+
+            // Tính lương
+            decimal baseSalary = 6000000;
+            decimal basicSalaryEarned = (baseSalary / 26) * workingDays;
+            
+            // Hoa hồng lễ tân (0.5% doanh thu)
+            decimal commissionRate = 0.005m;
+            decimal totalCommission = totalSpaRevenue * commissionRate;
+            
+            decimal totalSalary = basicSalaryEarned + totalCommission;
+
+            var leaveRequests = await _context.LeaveRequests
+                .Where(lr => lr.StaffId == staffId)
+                .OrderByDescending(lr => lr.CreatedAt)
+                .Take(10)
+                .ToListAsync();
+
+            ViewBag.CurrentMonth = currentMonth;
+            ViewBag.CurrentYear = currentYear;
+            ViewBag.WorkingDays = workingDays;
+            ViewBag.TotalSpaRevenue = totalSpaRevenue;
+            ViewBag.TotalCommission = totalCommission;
+            ViewBag.BaseSalary = baseSalary;
+            ViewBag.BasicSalaryEarned = basicSalaryEarned;
+            ViewBag.TotalSalary = totalSalary;
+            ViewBag.CommissionRate = commissionRate;
+            ViewBag.LeaveRequests = leaveRequests;
+
+            return View(attendances);
+        }
+
+        // POST: Admin/Staff/SubmitLeave
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitLeave(DateTime FromDate, DateTime ToDate, string Reason)
+        {
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                return RedirectToAction("Login", "Auth", new { area = "Admin" });
+
+            var user = await _context.Users.Include(u => u.Staff).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user?.StaffId == null) return NotFound();
+
+            if (FromDate > ToDate || FromDate < DateTime.Today)
+            {
+                TempData["ErrorMessage"] = "Ngày xin nghỉ không hợp lệ.";
+                return RedirectToAction("MySalary");
+            }
+
+            var request = new LeaveRequest
+            {
+                StaffId = user.StaffId.Value,
+                FromDate = FromDate,
+                ToDate = ToDate,
+                Reason = Reason,
+                Status = LeaveRequestStatus.Pending,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.LeaveRequests.Add(request);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã gửi đơn xin nghỉ phép thành công. Vui lòng chờ duyệt.";
+            return RedirectToAction("MySalary");
+        }
+
+        // GET: Admin/Staff/PayrollManagement
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PayrollManagement(int? month, int? year)
+        {
+            var currentMonth = month ?? DateTime.Today.Month;
+            var currentYear = year ?? DateTime.Today.Year;
+            var startDate = new DateTime(currentYear, currentMonth, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var staffs = await _context.Staffs
+                .Include(s => s.Specialization)
+                .Where(s => s.Status == "active")
+                .ToListAsync();
+
+            var attendances = await _context.Attendances
+                .Where(a => a.Date >= startDate && a.Date <= endDate)
+                .ToListAsync();
+
+            var allPayments = await _context.Payments
+                .Where(p => p.Status == PaymentStatus.Paid && p.CreatedAt >= startDate && p.CreatedAt <= endDate)
+                .ToListAsync();
+
+            var bookingDetails = await _context.BookingDetails
+                .Include(bd => bd.Booking)
+                .Include(bd => bd.Service)
+                .Where(bd => bd.Booking.BookingDate >= startDate && bd.Booking.BookingDate <= endDate && bd.Booking.Status == BookingStatus.Completed)
+                .ToListAsync();
+
+            ViewBag.Month = currentMonth;
+            ViewBag.Year = currentYear;
+            ViewBag.KtvList = staffs.Where(s => s.Position == "Technician" || s.Position == "Therapist").ToList();
+            ViewBag.ReceptionistList = staffs.Where(s => s.Position == "Receptionist" || s.Position == "Lễ tân" || s.Position == "Manager").ToList();
+            ViewBag.Attendances = attendances;
+            ViewBag.AllPayments = allPayments;
+            ViewBag.BookingDetails = bookingDetails;
+
             return View();
         }
 
