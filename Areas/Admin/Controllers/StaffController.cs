@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using SpaN5.Models;
 using StaffModel = SpaN5.Models.Staff;
 
@@ -13,11 +14,32 @@ namespace SpaN5.Areas.Admin.Controllers
     {
         private readonly SpaDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IDataProtector _protector;
 
-        public StaffController(SpaDbContext context, IPasswordHasher<User> passwordHasher)
+        public StaffController(SpaDbContext context, IPasswordHasher<User> passwordHasher, IDataProtectionProvider provider)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _protector = provider.CreateProtector("SpaN5.QR.Protector");
+        }
+
+        [HttpGet]
+        public IActionResult GetDynamicQR()
+        {
+            // Sinh token chứa Role và Thời gian (Ticks) để chống gian lận
+            var time = DateTime.UtcNow.Ticks.ToString();
+            
+            var ktvToken = _protector.Protect($"KTV|{time}");
+            var letanToken = _protector.Protect($"LETAN|{time}");
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var ktvLink = baseUrl + $"/Staff/Home/CheckInQR?token={Uri.EscapeDataString(ktvToken)}";
+            var letanLink = baseUrl + $"/Staff/Home/CheckInQR?token={Uri.EscapeDataString(letanToken)}";
+
+            var ktvQrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(ktvLink)}";
+            var letanQrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={Uri.EscapeDataString(letanLink)}";
+
+            return Json(new { success = true, ktvQrUrl, letanQrUrl });
         }
 
         // GET: Admin/Staff
@@ -178,10 +200,9 @@ namespace SpaN5.Areas.Admin.Controllers
         }
 
         // GET: Admin/Staff/AttendanceQR
-        public IActionResult AttendanceQR()
+        public IActionResult AttendanceQR(string role = "ktv")
         {
-            // Mã bí mật khớp với logic trong Staff/HomeController/CheckInQR
-            ViewBag.QRCodeValue = "SPA_ZEN_2024";
+            ViewBag.Role = role.ToLower();
             return View();
         }
 

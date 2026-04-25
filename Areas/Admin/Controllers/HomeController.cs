@@ -172,8 +172,11 @@ namespace SpaN5.Areas.Admin.Controllers
             return View(allActiveBookings.Where(b => b.BookingDate.Date == today).ToList());
         }
 
-        public async Task<IActionResult> Rooms()
+        public async Task<IActionResult> Rooms(string? date)
         {
+            var targetDate = string.IsNullOrEmpty(date) ? DateTime.Today : DateTime.ParseExact(date, "yyyy-MM-dd", null).Date;
+            ViewBag.TargetDate = targetDate;
+
             var services = await _context.Services.Where(s => s.IsActive).ToListAsync();
             var activeDetails = await _context.BookingDetails
                 .Include(bd => bd.Service)
@@ -181,13 +184,12 @@ namespace SpaN5.Areas.Admin.Controllers
                 .Where(bd => (bd.Status == DetailStatus.InProgress || bd.Booking.Status == BookingStatus.InProgress) && bd.RoomNumber != null)
                 .ToListAsync();
 
-            // LẤY DANH SÁCH LỊCH HẸN SẮP TỚI TRONG NGÀY (Confirmed, Accepted)
-            var today = DateTime.Today;
+            // LẤY DANH SÁCH LỊCH HẸN THEO NGÀY ĐƯỢC CHỌN (Confirmed, Accepted, Pending)
             var upcomingBookings = await _context.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Service)
                 .Include(b => b.BookingDetails).ThenInclude(bd => bd.Staff)
-                .Where(b => b.BookingDate.Date == today && 
+                .Where(b => b.BookingDate.Date == targetDate && 
                            (b.Status == BookingStatus.Confirmed || b.Status == BookingStatus.Accepted || b.Status == BookingStatus.Pending))
                 .OrderBy(b => b.StartTime)
                 .ToListAsync();

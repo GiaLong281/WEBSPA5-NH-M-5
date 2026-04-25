@@ -204,7 +204,7 @@
                                 <a class="btn btn-gold" asp-controller="Booking" asp-action="Index">Đặt lịch ngay</a>
                             </li>
 
-                            @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Receptionist") || User.IsInRole("Staff")))
+                            @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || User.IsInRole("Receptionist") || User.IsInRole("Staff") || User.IsInRole("Therapist")))
                             {
                                 <li class="nav-item dropdown ms-lg-2">
                                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
@@ -213,10 +213,18 @@
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 rounded-3 mt-2">
                                         <li class="px-3 py-2 border-bottom mb-2 text-center">
                                             <div class="small fw-bold text-main">@User.Identity.Name</div>
+                                            <div class="smaller text-muted">@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value</div>
                                         </li>
-                                        <li><a class="dropdown-item rounded-2 py-2 fw-600" asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user-gear me-2 text-primary opacity-75"></i> Hồ sơ cá nhân</a></li>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Receptionist"))
+                                        {
+                                            <li><a class="dropdown-item rounded-2 py-2 fw-600" href="/Admin/Home/Index"><i class="fa-solid fa-chart-line me-2 text-primary opacity-75"></i> Vào trang quản trị</a></li>
+                                        }
+                                        else if (User.IsInRole("Staff") || User.IsInRole("Therapist"))
+                                        {
+                                            <li><a class="dropdown-item rounded-2 py-2 fw-600" href="/Staff/Home/Index"><i class="fa-solid fa-spa me-2 text-success opacity-75"></i> Cổng Kỹ thuật viên</a></li>
+                                        }
                                         <li><hr class="dropdown-divider opacity-50"></li>
-                                        <li><a class="dropdown-item rounded-2 py-2 fw-600 text-danger" href="/Auth/Logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất</a></li>
+                                        <li><a class="dropdown-item rounded-2 py-2 fw-600 text-danger" href="/Admin/Auth/Logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất</a></li>
                                     </ul>
                                 </li>
                             }

@@ -90,7 +90,7 @@ namespace SpaN5.Areas.Admin.Controllers
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
                     {
-                        IsPersistent = true,
+                        IsPersistent = false, // Sửa thành false: Tự động đăng xuất khi tắt trình duyệt
                         ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
                     });
 

@@ -231,13 +231,39 @@
 
         .notification-dot {
             position: absolute;
-            top: 0;
-            right: 2px;
-            width: 8px;
-            height: 8px;
+            top: -4px;
+            right: -2px;
+            min-width: 18px;
+            height: 18px;
             background: #FF5B5B;
             border: 2px solid var(--white);
-            border-radius: 50%;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            display: none; /* Ẩn mặc định */
+        }
+
+        @@keyframes ring-bell {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(25deg) scale(1.1); }
+            20% { transform: rotate(-25deg) scale(1.1); }
+            30% { transform: rotate(20deg) scale(1.1); }
+            40% { transform: rotate(-20deg) scale(1.1); }
+            50% { transform: rotate(15deg) scale(1.1); }
+            60% { transform: rotate(-15deg) scale(1.1); }
+            70% { transform: rotate(10deg) scale(1.1); }
+            80% { transform: rotate(-10deg) scale(1.1); }
+            90% { transform: rotate(5deg) scale(1.1); }
+            100% { transform: rotate(0) scale(1); }
+        }
+        .bell-ringing i {
+            animation: ring-bell 1s ease-in-out;
+            color: #FF5B5B !important;
         }
 
         .user-profile {
@@ -335,8 +361,13 @@
 
                 <div class="menu-label">Vận hành</div>
                 <div class="nav-item">
-                    <a href="/Admin/Staff/AttendanceQR" class="nav-link @(Context.Request.Path == "/Admin/Staff/AttendanceQR" ? "active" : "")">
-                        <i class="fa-solid fa-qrcode"></i> Chấm công QR (Dành cho NV)
+                    <a href="/Admin/Staff/AttendanceQR?role=ktv" class="nav-link @(Context.Request.Query["role"] == "ktv" ? "active" : "")">
+                        <i class="fa-solid fa-qrcode text-info"></i> Mã QR (KTV)
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Staff/AttendanceQR?role=letan" class="nav-link @(Context.Request.Query["role"] == "letan" ? "active" : "")">
+                        <i class="fa-solid fa-qrcode text-warning"></i> Mã QR (Lễ tân)
                     </a>
                 </div>
                 <div class="nav-item">
@@ -437,6 +468,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     
     <script>
         $(document).ready(function() {
@@ -478,6 +510,73 @@
                         e.preventDefault();
                     }
                 }
+            });
+
+            // --- SIGNALR REAL-TIME NOTIFICATIONS ---
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/bookingHub")
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            connection.on("ReceiveNewBooking", function (bookingCode, customerName) {
+                // Hiển thị thông báo góc phải màn hình
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    title: 'Đơn đặt lịch mới!',
+                    html: `<b>${customerName}</b> vừa đặt lịch (Mã: <b>${bookingCode}</b>)`,
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+
+                // Chạy âm thanh Ting Ting (Sử dụng Web Audio API tích hợp sẵn)
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    function playTone(freq, time, duration) {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0, time);
+                        gain.gain.linearRampToValueAtTime(0.3, time + 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
+                        osc.start(time);
+                        osc.stop(time + duration);
+                    }
+                    const now = ctx.currentTime;
+                    playTone(1046.50, now, 0.5);       // Nốt Đô (C6)
+                    playTone(1567.98, now + 0.15, 0.8); // Nốt Sol (G6) - Tạo hiệu ứng Ting Ting êm ái
+                } catch(e) { console.log("Audio not supported"); }
+                
+                // Cập nhật dấu chấm đỏ ở nút chuông và rung
+                if (typeof window.unreadNotifications === 'undefined') window.unreadNotifications = 0;
+                window.unreadNotifications++;
+                $('.notification-dot').text(window.unreadNotifications).css('display', 'flex');
+                
+                const bellBtn = $('.icon-btn').has('.fa-bell');
+                bellBtn.removeClass('bell-ringing');
+                void bellBtn[0].offsetWidth; // kích hoạt reflow để reset animation
+                bellBtn.addClass('bell-ringing');
+            });
+
+            connection.start().then(function () {
+                console.log("Đã kết nối SignalR - BookingHub");
+            }).catch(function (err) {
+                console.error("Lỗi kết nối SignalR: " + err.toString());
+            });
+
+            // Xóa thông báo khi click vào chuông
+            $('.icon-btn').has('.fa-bell').click(function() {
+                window.unreadNotifications = 0;
+                $('.notification-dot').css('display', 'none');
             });
         });
     </script>

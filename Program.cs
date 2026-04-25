@@ -11,6 +11,9 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 builder.Services.AddControllersWithViews(options => { options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; })
     .AddViewLocalization().AddDataAnnotationsLocalization();
 
+builder.Services.AddSignalR();
+builder.Services.AddDataProtection();
+
 builder.Services.AddDbContext<SpaDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("SpaConnection")));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -50,6 +53,7 @@ app.MapAreaControllerRoute(name: "staff", areaName: "Staff", pattern: "Staff/{co
 app.MapAreaControllerRoute(name: "admin", areaName: "Admin", pattern: "Admin/{controller=Home}/{action=Index}/{id?}");
 app.MapControllerRoute(name: "login", pattern: "Login", defaults: new { area = "Admin", controller = "Auth", action = "Login" });
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapHub<SpaN5.Hubs.BookingHub>("/bookingHub");
 
 using (var scope = app.Services.CreateScope()) {
     var context = scope.ServiceProvider.GetRequiredService<SpaDbContext>();

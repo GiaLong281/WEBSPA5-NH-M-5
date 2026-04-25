@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using SpaN5.Models;
 using SpaN5.Services;
 using System.Security.Claims;
@@ -13,11 +14,13 @@ namespace SpaN5.Areas.Staff.Controllers
     {
         private readonly SpaDbContext _context;
         private readonly IInventoryService _inventoryService;
+        private readonly IDataProtector _protector;
 
-        public HomeController(SpaDbContext context, IInventoryService inventoryService)
+        public HomeController(SpaDbContext context, IInventoryService inventoryService, IDataProtectionProvider provider)
         {
             _context = context;
             _inventoryService = inventoryService;
+            _protector = provider.CreateProtector("SpaN5.QR.Protector");
         }
 
         public async Task<IActionResult> Index(string view = "day")
@@ -738,12 +741,8 @@ namespace SpaN5.Areas.Staff.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CheckInQR(string code)
+        public async Task<IActionResult> CheckInQR(string code = null, string token = null)
         {
-            // Mã bí mật riêng biệt cho từng bộ phận
-            const string KTV_SECRET = "SPA_KTV_2024";
-            const string LETAN_SECRET = "SPA_LETAN_2024";
-
             var staffIdClaim = User.Claims.FirstOrDefault(c => c.Type == "StaffId")?.Value;
             if (string.IsNullOrEmpty(staffIdClaim) || !int.TryParse(staffIdClaim, out int staffId))
             {
@@ -753,15 +752,63 @@ namespace SpaN5.Areas.Staff.Controllers
             var staff = await _context.Staffs.FindAsync(staffId);
             if (staff == null) return NotFound();
 
-            // Kiểm tra mã quét có khớp với vị trí không
             bool isValid = false;
-            if (code == KTV_SECRET && (staff.Position?.Contains("Kỹ thuật") == true || staff.Position?.Contains("Staff") == true))
+
+            // Xử lý Dynamic QR Token
+            if (!string.IsNullOrEmpty(token))
             {
-                isValid = true;
+                try
+                {
+                    var decrypted = _protector.Unprotect(token);
+                    var parts = decrypted.Split('|');
+                    if (parts.Length == 2)
+                    {
+                        var role = parts[0];
+                        var ticksStr = parts[1];
+                        
+                        if (long.TryParse(ticksStr, out long ticks))
+                        {
+                            var generatedTime = new DateTime(ticks, DateTimeKind.Utc);
+                            // Mã QR chỉ hợp lệ trong 60 giây (Tính cả thời gian thao tác quét)
+                            if ((DateTime.UtcNow - generatedTime).TotalSeconds <= 60)
+                            {
+                                if (role == "KTV" && (staff.Position?.Contains("Kỹ thuật") == true || staff.Position?.Contains("Staff") == true || staff.Position?.Contains("Therapist") == true))
+                                {
+                                    isValid = true;
+                                }
+                                else if (role == "LETAN" && (staff.Position?.Contains("Lễ tân") == true || staff.Position?.Contains("Receptionist") == true || staff.Position?.Contains("Admin") == true))
+                                {
+                                    isValid = true;
+                                }
+                            }
+                            else
+                            {
+                                ViewBag.Error = "Mã QR đã hết hạn! Vui lòng yêu cầu Lễ tân làm mới mã QR.";
+                                return View("AttendanceResult");
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Lỗi giải mã (token bị sửa đổi hoặc sai secret)
+                    isValid = false;
+                }
             }
-            else if (code == LETAN_SECRET && (staff.Position?.Contains("Lễ tân") == true || staff.Position?.Contains("Receptionist") == true || staff.Position?.Contains("Admin") == true))
+            // Hỗ trợ mã tĩnh cũ (fallback) nếu truyền `code` thay vì `token`
+            else if (!string.IsNullOrEmpty(code))
             {
-                isValid = true;
+                const string KTV_SECRET = "SPA_KTV_2024";
+                const string LETAN_SECRET = "SPA_LETAN_2024";
+                
+                if (code == KTV_SECRET && (staff.Position?.Contains("Kỹ thuật") == true || staff.Position?.Contains("Staff") == true))
+                {
+                    isValid = true;
+                }
+                else if (code == LETAN_SECRET && (staff.Position?.Contains("Lễ tân") == true || staff.Position?.Contains("Receptionist") == true || staff.Position?.Contains("Admin") == true))
+                {
+                    isValid = true;
+                }
             }
 
             if (!isValid)
@@ -775,6 +822,7 @@ namespace SpaN5.Areas.Staff.Controllers
 
             if (attendance == null)
             {
+                // Quét lần 1: Check-in
                 attendance = new Attendance
                 {
                     StaffId = staffId,
@@ -785,12 +833,29 @@ namespace SpaN5.Areas.Staff.Controllers
                 _context.Attendances.Add(attendance);
                 await _context.SaveChangesAsync();
                 ViewBag.Success = true;
-                ViewBag.Message = "Chào mừng bạn! Chấm công VÀO thành công.";
+                ViewBag.IsCheckIn = true;
+                ViewBag.Message = "Đã điểm danh VÀO CA làm việc.";
             }
             else
             {
-                ViewBag.Success = true;
-                ViewBag.Message = "Bạn đã ghi nhận ngày làm việc hôm nay.";
+                // Quét lần > 1: Check-out
+                if (attendance.CheckOutTime == null)
+                {
+                    attendance.CheckOutTime = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    ViewBag.Success = true;
+                    ViewBag.IsCheckIn = false;
+                    ViewBag.Message = "Đã điểm danh TAN CA. Cảm ơn bạn đã làm việc chăm chỉ!";
+                }
+                else
+                {
+                    // Nếu muốn cho phép ghi đè Check-out (vd quét lại thì cập nhật giờ ra về)
+                    attendance.CheckOutTime = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    ViewBag.Success = true;
+                    ViewBag.IsCheckIn = false;
+                    ViewBag.Message = "Đã cập nhật lại giờ TAN CA.";
+                }
             }
 
             ViewBag.Staff = staff;

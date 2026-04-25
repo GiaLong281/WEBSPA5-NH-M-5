@@ -156,7 +156,10 @@
         <h2 class="fw-800 mb-1">Hệ thống Sơ đồ & Lịch Phòng</h2>
         <p class="text-muted smaller mb-0">Theo dõi trạng thái, bảo trì và xem lịch trình đặt phòng trong tương lai.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-3 align-items-center">
+        <form method="get" class="d-flex gap-2">
+            <input type="date" name="date" class="form-control rounded-pill px-3 shadow-sm" style="border: 1px solid var(--accent-blue);" value="@(((DateTime)ViewBag.TargetDate).ToString("yyyy-MM-dd"))" onchange="this.form.submit()" />
+        </form>
         <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="location.reload()"><i class="fa-solid fa-arrows-rotate me-2"></i> Làm mới</button>
     </div>
 </div>
@@ -179,7 +182,7 @@
             <div class="service-schedule-tooltip">
                 <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-primary"></i> 
-                    Lịch hẹn hôm nay (@svc.ServiceName)
+                    Lịch hẹn (@(((DateTime)ViewBag.TargetDate).ToString("dd/MM/yyyy")))
                 </h6>
                 @{
                     var upcoming = (ViewBag.UpcomingGrouped as List<SpaN5.Models.Booking>)

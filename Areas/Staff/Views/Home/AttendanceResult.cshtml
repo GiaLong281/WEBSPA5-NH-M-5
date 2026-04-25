@@ -51,7 +51,7 @@
     @if (!string.IsNullOrEmpty(error))
     {
         <div class="status-icon status-error">
-            <i class="bi bi-x-circle-fill"></i>
+            <i class="fa-solid fa-circle-xmark"></i>
         </div>
         <h3 class="fw-bold text-danger">CHẤM CÔNG THẤT BẠI</h3>
         <p class="text-muted">@error</p>
@@ -60,7 +60,7 @@
     else
     {
         <div class="status-icon status-success">
-            <i class="bi bi-check-circle-fill"></i>
+            <i class="fa-solid fa-circle-check"></i>
         </div>
         <h3 class="fw-bold text-success">CHẤM CÔNG THÀNH CÔNG</h3>
         <p class="text-muted">@ViewBag.Message</p>
@@ -79,18 +79,36 @@
                 <span class="value">@DateTime.Today.ToString("dd/MM/yyyy")</span>
             </div>
             <div class="info-row">
-                <span class="label">Giờ ghi nhận:</span>
-                <span class="value text-primary">@attendance?.CheckInTime?.ToString("HH:mm:ss")</span>
+                <span class="label">Giờ Check-in (Vào):</span>
+                <span class="value text-primary">@(attendance?.CheckInTime?.ToString("HH:mm:ss") ?? "--:--:--")</span>
             </div>
+            @if (attendance?.CheckOutTime != null)
+            {
+                <div class="info-row">
+                    <span class="label">Giờ Check-out (Ra):</span>
+                    <span class="value text-primary">@attendance.CheckOutTime.Value.ToString("HH:mm:ss")</span>
+                </div>
+            }
             <div class="info-row">
                 <span class="label">Trạng thái:</span>
-                <span class="value text-success"><i class="bi bi-patch-check-fill me-1"></i> ĐÃ ĐI LÀM</span>
+                @if (ViewBag.IsCheckIn == true)
+                {
+                    <span class="value text-success"><i class="fa-solid fa-user-check me-1"></i> ĐÃ ĐI LÀM</span>
+                }
+                else if (ViewBag.IsCheckIn == false)
+                {
+                    <span class="value text-warning" style="color: #F59E0B !important;"><i class="fa-solid fa-person-walking-arrow-right me-1"></i> ĐÃ TAN CA</span>
+                }
+                else
+                {
+                    <span class="value text-success"><i class="fa-solid fa-user-check me-1"></i> ĐÃ ĐI LÀM</span>
+                }
             </div>
         </div>
 
         <div class="mt-4">
             <a href="/Staff/Home/Index" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
-                <i class="bi bi-house-door me-2"></i>Vào Trang làm việc
+                <i class="fa-solid fa-house me-2"></i> Vào Trang làm việc
             </a>
         </div>
     }

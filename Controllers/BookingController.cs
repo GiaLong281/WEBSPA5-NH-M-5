@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SpaN5.Models;
 using SpaN5.Models.ViewModels;
@@ -12,11 +13,13 @@ namespace SpaN5.Controllers
     {
         private readonly SpaDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IHubContext<SpaN5.Hubs.BookingHub> _hubContext;
 
-        public BookingController(SpaDbContext context, IConfiguration configuration)
+        public BookingController(SpaDbContext context, IConfiguration configuration, IHubContext<SpaN5.Hubs.BookingHub> hubContext)
         {
             _context = context;
             _configuration = configuration;
+            _hubContext = hubContext;
         }
 
         // ==========================================
@@ -176,6 +179,9 @@ namespace SpaN5.Controllers
                 });
             }
             await _context.SaveChangesAsync();
+
+            // Gửi thông báo realtime tới lễ tân/admin
+            await _hubContext.Clients.All.SendAsync("ReceiveNewBooking", bookingCode, customer.FullName);
 
             TempData["SuccessMessage"] = $"Đặt lịch thành công! Mã đơn hàng: {bookingCode}";
             return RedirectToAction(nameof(Upcoming));
@@ -355,6 +361,10 @@ namespace SpaN5.Controllers
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
+
+            // Gửi thông báo realtime tới lễ tân/admin
+            await _hubContext.Clients.All.SendAsync("ReceiveNewBooking", booking.BookingCode, customer.FullName);
+
             return Json(new { success = true, redirectUrl = Url.Action("Success", new { bookingCode = booking.BookingCode }) });
         }
 
