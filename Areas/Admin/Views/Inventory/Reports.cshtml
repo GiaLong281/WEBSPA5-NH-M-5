@@ -257,8 +257,8 @@
                 foreach(var leak in topLeaks) {
                     <div class="material-leak-item">
                         <div>
-                            <div class="fw-bold small">@leak.MaterialName</div>
-                            <div class="smaller text-muted">Hao hụt: +@leak.TotalDiff.ToString("N1") đơn vị</div>
+                            <div class="fw-bold text-dark" style="font-size: 0.9rem;">@leak.MaterialName</div>
+                            <div class="smaller text-muted">Hao hụt: <span class="text-danger fw-bold">+@leak.TotalDiff.ToString("N1") @leak.Unit</span></div>
                         </div>
                         <div class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
                             +@leak.LeakRate.ToString("N1")%
@@ -302,8 +302,9 @@
                     <thead>
                         <tr class="text-muted small text-uppercase fw-bold" style="border-bottom: 2px solid #f1f5f9;">
                             <th>Kỹ thuật viên</th>
-                            <th class="text-center">Định mức tổng (g)</th>
-                            <th class="text-center">Thực tế dùng (g)</th>
+                            <th class="text-start">Vật tư lãng phí nhất</th>
+                            <th class="text-center">Định mức (g)</th>
+                            <th class="text-center">Thực tế (g)</th>
                             <th class="text-center">Chênh lệch</th>
                             <th class="text-center">Tỷ lệ Lệch</th>
                             <th class="text-end">Đánh giá</th>
@@ -312,7 +313,7 @@
                     <tbody>
                         @if (staffWaste == null || !staffWaste.Any())
                         {
-                            <tr><td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu tiêu thụ để phân tích.</td></tr>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">Chưa có dữ liệu tiêu thụ để phân tích.</td></tr>
                         }
                         else
                         {
@@ -320,8 +321,22 @@
                             {
                                 var diff = s.TotalActual - s.TotalStandard;
                                 var wasteClass = s.WasteRate > 15 ? "waste-high" : (s.WasteRate < 5 ? "waste-low" : "waste-mid");
+                                var topMaterial = ((IEnumerable<dynamic>)s.TopLeakedMaterials).FirstOrDefault();
+                                
                                 <tr>
                                     <td class="fw-bold text-main">@s.StaffName</td>
+                                    <td class="text-start">
+                                        @if (topMaterial != null && topMaterial.Diff > 0)
+                                        {
+                                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 py-1" style="font-size: 0.7rem;">
+                                                @topMaterial.Name (+@topMaterial.Diff.ToString("N1") @topMaterial.Unit)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-success smaller"><i class="fa-solid fa-check-circle"></i> Chuẩn</span>
+                                        }
+                                    </td>
                                     <td class="text-center fw-600">@s.TotalStandard.ToString("N1")</td>
                                     <td class="text-center fw-600">@s.TotalActual.ToString("N1")</td>
                                     <td class="text-center @(diff > 0 ? "text-danger" : "text-success") fw-bold">
@@ -481,7 +496,7 @@
                                 if(m.Diff > 0) {
                                     html += '<div class="d-flex justify-content-between mb-1 small">';
                                     html += '<span>' + m.Name + '</span>';
-                                    html += '<span class="text-danger fw-bold">+' + Math.round(m.Diff*10)/10 + '</span>';
+                                    html += '<span class="text-danger fw-bold">+' + Math.round(m.Diff*10)/10 + ' ' + (m.Unit || "g") + '</span>';
                                     html += '</div>';
                                 }
                             });

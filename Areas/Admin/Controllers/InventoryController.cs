@@ -212,10 +212,11 @@ namespace SpaN5.Areas.Admin.Controllers
                         ? (g.Sum(c => c.ActualQuantity) - g.Sum(c => c.StandardQuantity)) / g.Sum(c => c.StandardQuantity) * 100 
                         : 0,
                     // Top lãng phí của người này
-                    TopLeakedMaterials = g.GroupBy(x => x.Material?.MaterialName ?? "Khác")
+                    TopLeakedMaterials = g.GroupBy(x => x.Material != null ? x.Material.MaterialName : "Khác")
                         .Select(mg => new { 
                             Name = mg.Key, 
-                            Diff = mg.Sum(x => x.ActualQuantity - x.StandardQuantity) 
+                            Diff = mg.Sum(x => x.ActualQuantity - x.StandardQuantity),
+                            Unit = mg.First().Material?.Unit ?? "đơn vị"
                         })
                         .OrderByDescending(x => x.Diff)
                         .Take(3)
@@ -255,7 +256,8 @@ namespace SpaN5.Areas.Admin.Controllers
                 .Select(g => new {
                     MaterialName = g.Key,
                     TotalDiff = g.Sum(c => c.ActualQuantity - c.StandardQuantity),
-                    LeakRate = g.Sum(c => c.StandardQuantity) > 0 ? (g.Sum(c => c.ActualQuantity - c.StandardQuantity) / g.Sum(c => c.StandardQuantity) * 100) : 0
+                    LeakRate = g.Sum(c => c.StandardQuantity) > 0 ? (g.Sum(c => c.ActualQuantity - c.StandardQuantity) / g.Sum(c => c.StandardQuantity) * 100) : 0,
+                    Unit = g.First().Material?.Unit ?? "đơn vị"
                 })
                 .OrderByDescending(x => x.TotalDiff)
                 .Take(5)
