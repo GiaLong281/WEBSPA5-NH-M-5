@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Power Admin | Azure Spa Enterprise</title>
+    
+    <!-- CSS Core -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --admin-bg: #f4f7fe;
+            --sidebar-bg: #ffffff;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+            --primary-blue: #4318FF;
+            --secondary-blue: #707EAE;
+            --accent-blue: #E9EDF7;
+            --text-main: #1B254B;
+            --text-muted: #A3AED0;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --card-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--admin-bg);
+            color: var(--text-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #wrapper {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar-wrapper {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--accent-blue);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        #sidebar-wrapper .sidebar-brand {
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-right: 12px;
+            box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.3);
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-name span { color: var(--primary-blue); font-weight: 400; font-size: 0.8rem; display: block; letter-spacing: 2px; text-transform: uppercase; margin-top: -4px;}
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 2rem 1rem;
+            scrollbar-width: thin;
+        }
+
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 10px; }
+
+        .menu-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 1.5rem 0.5rem 0.75rem 0.5rem;
+            opacity: 0.8;
+        }
+
+        .nav-item { margin-bottom: 0.4rem; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--secondary-blue);
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 24px;
+            margin-right: 12px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+            background: var(--accent-blue);
+        }
+
+        .nav-link.active {
+            background: var(--white);
+            color: var(--text-main);
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        .nav-link.active::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 4px;
+            background: var(--primary-blue);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .nav-link.active i { color: var(--primary-blue); }
+
+        /* --- CONTENT WRAPPER --- */
+        #page-content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* --- TOPBAR --- */
+        .admin-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            z-index: 999;
+        }
+
+        .breadcrumb-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .breadcrumb-section .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            background: var(--white);
+            padding: 10px 15px;
+            border-radius: 30px;
+            box-shadow: var(--card-shadow);
+            gap: 15px;
+        }
+
+        .header-search {
+            position: relative;
+            width: 200px;
+        }
+
+        .header-search input {
+            background: var(--admin-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px 8px 35px;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .header-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-blue);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-blue);
+            font-size: 1.1rem;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .icon-btn:hover { color: var(--primary-blue); }
+
+        .notification-dot {
+            position: absolute;
+            top: 0;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background: #FF5B5B;
+            border: 2px solid var(--white);
+            border-radius: 50%;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 10px;
+            border-left: 1px solid var(--accent-blue);
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 0 2rem 2rem 2rem;
+            flex: 1;
+        }
+
+        /* Mobile Menu Toggle */
+        #menu-toggle {
+            display: none;
+            background: var(--white);
+            border: none;
+            color: var(--primary-blue);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+        }
+
+        @@media (max-width: 992px) {
+            #sidebar-wrapper {
+                position: fixed;
+                margin-left: -100%;
+            }
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: 0;
+            }
+            #menu-toggle { display: block; margin-right: 15px; }
+            .admin-header { padding: 1rem; }
+            .topbar-right { padding: 5px 10px; gap: 8px; }
+            .header-search { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <a href="/Admin/Home/Index" class="sidebar-brand">
+                <div class="brand-logo"><i class="fa-solid fa-gem"></i></div>
+                <div class="brand-name">
+                    AZURE
+                    <span>@(User.IsInRole("Admin") ? "Power Admin" : "Receptionist Portal")</span>
+                </div>
+            </a>
+            
+            <div class="sidebar-nav">
+                <div class="menu-label">Trung tâm</div>
+                <div class="nav-item">
+                    <a href="/Admin/Home/Index" class="nav-link @(Context.Request.Path == "/Admin/Home/Index" ? "active" : "")">
+                        <i class="fa-solid fa-house"></i> Dashboard
+                    </a>
+                </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="menu-label">Người dùng</div>
+                    <div class="nav-item">
+                        <a href="/Admin/Staff" class="nav-link @(Context.Request.Path.ToString().StartsWith("/Admin/Staff") ? "active" : "")">
+                            <i class="fa-solid fa-user-shield"></i> Quản lý Nhân sự
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/Booking/CustomerList" class="nav-link">
+                            <i class="fa-solid fa-users"></i> Khách hàng (Admin)
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="menu-label">Khách hàng</div>
+                    <div class="nav-item">
+                        <a href="/Booking/CustomerList" class="nav-link">
+                            <i class="fa-solid fa-users"></i> Danh sách khách
+                        </a>
+                    </div>
+                }
+
+                <div class="menu-label">Vận hành</div>
+                <div class="nav-item">
+                    <a href="/Admin/ManageServices" class="nav-link">
+                        <i class="fa-solid fa-spa"></i> Dịch vụ
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Home/Rooms" class="nav-link @(Context.Request.Path == "/Admin/Home/Rooms" ? "active" : "")">
+                        <i class="fa-solid fa-door-open"></i> Sơ đồ Phòng
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Home/Bookings" class="nav-link @(Context.Request.Path == "/Admin/Home/Bookings" ? "active" : "")">
+                        <i class="fa-solid fa-calendar-check"></i> Lịch hẹn (Timeline)
+                    </a>
+                </div>
+
+                <div class="menu-label">Hậu cần & Tài chính</div>
+                <div class="nav-item">
+                    <a href="/Admin/Inventory" class="nav-link @(Context.Request.Path.ToString().StartsWith("/Admin/Inventory") ? "active" : "")">
+                        <i class="fa-solid fa-boxes-stacked"></i> Kho nguyên liệu
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/Admin/Home/Payments" class="nav-link @(Context.Request.Path == "/Admin/Home/Payments" ? "active" : "")">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Lịch sử Thanh toán
+                    </a>
+                </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="menu-label">Báo cáo & Hệ thống</div>
+                    <div class="nav-item">
+                        <a href="/Admin/Inventory/Reports" class="nav-link @(Context.Request.Path == "/Admin/Inventory/Reports" ? "active" : "")">
+                            <i class="fa-solid fa-chart-line"></i> Phân tích
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/Admin/Home/Configuration" class="nav-link @(Context.Request.Path == "/Admin/Home/Configuration" ? "active" : "")">
+                            <i class="fa-solid fa-gear"></i> Cấu hình
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Topbar -->
+            <header class="admin-header">
+                <div class="d-flex align-items-center">
+                    <button id="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                    <div class="breadcrumb-section">
+                        <div class="page-title">@ViewData["Title"]</div>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="header-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Tìm nhanh...">
+                    </div>
+                    <button class="icon-btn">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button class="icon-btn">
+                        <i class="fa-regular fa-moon"></i>
+                    </button>
+                    <div class="user-profile dropdown">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=4318FF&color=fff" alt="User" class="user-avatar" data-bs-toggle="dropdown" />
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3 rounded-4">
+                            <li><a class="dropdown-item py-2 px-3 fw-bold" href="#"><i class="fa-regular fa-user me-2"></i> Hồ sơ</a></li>
+                            <li><hr class="dropdown-divider opacity-50"></li>
+                            <li><a class="dropdown-item py-2 px-3 text-danger fw-bold" href="/Admin/Auth/Logout"><i class="fa-solid fa-power-off me-2"></i> Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                @RenderBody()
+            </main>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $("#menu-toggle").click(function(e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+
+            // Auto-collapse sidebar on mobile
+            if($(window).width() < 992) {
+                $("#wrapper").removeClass("toggled");
+            }
+        });
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

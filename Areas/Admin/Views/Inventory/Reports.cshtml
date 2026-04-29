@@ -1,0 +1,528 @@
+@{
+    ViewData["Title"] = "Phân tích Tiêu hao & Hiệu suất";
+    Layout = "_AdminLayout";
+    var staffWaste = ViewBag.StaffWaste as IEnumerable<dynamic>;
+    var profitAnalysis = ViewBag.ProfitAnalysis as IEnumerable<dynamic>;
+}
+
+<style>
+    .report-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+    .report-card:hover {
+        transform: translateY(-5px);
+    }
+    .chart-container {
+        min-height: 350px;
+    }
+    .stat-pill {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    .waste-high { color: #EE5D50; background: #FFF5F5; }
+    .waste-low { color: #05CD99; background: #E6F6EC; }
+    .waste-mid { color: #FFB800; background: #FFF9E6; }
+
+    .material-leak-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        border-left: 6px solid #ef4444;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.1);
+    }
+    .material-leak-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .material-leak-item:last-child { border-bottom: none; }
+
+    /* AI ADVISOR PANEL PRO MAX */
+    .ai-command-center {
+        background: #0f172a;
+        border-radius: 32px;
+        padding: 35px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+        margin-bottom: 30px;
+    }
+
+    .ai-command-center::after {
+        content: '';
+        position: absolute;
+        top: -20%;
+        left: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%);
+        filter: blur(80px);
+        pointer-events: none;
+    }
+
+    .glass-visual-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        padding: 25px;
+        height: 100%;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .glass-visual-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .strategy-action-pill {
+        background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .strategy-action-pill:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+    }
+
+    .radar-selector {
+        background: #1e293b;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #ffffff !important;
+        border-radius: 12px;
+        padding: 8px 12px;
+        font-size: 0.82rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+    .radar-selector option {
+        background: #0f172a;
+        color: white;
+        padding: 10px;
+    }
+    .radar-selector:hover {
+        border-color: #6366f1;
+        background: #334155;
+    }
+
+    .glow-text-success { text-shadow: 0 0 15px rgba(16, 185, 129, 0.7); color: #10b981; }
+    .glow-text-warning { text-shadow: 0 0 15px rgba(245, 158, 11, 0.7); color: #f59e0b; }
+    .glow-text-danger { text-shadow: 0 0 15px rgba(239, 68, 68, 0.7); color: #ef4444; }
+
+    /* WHITE TEXT BOOST - Targeted */
+    .ai-command-center h1, .ai-command-center h2, .ai-command-center h3, 
+    .ai-command-center h4, .ai-command-center h5, .ai-command-center h6 {
+        color: #ffffff !important;
+    }
+    .ai-command-center .strategy-text {
+        color: rgba(255,255,255,0.9) !important;
+    }
+
+    .neon-border-primary { border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+    .neon-border-success { border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+    
+    .glass-visual-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+</style>
+
+<!-- AZURE AI COMMAND CENTER PRO MAX -->
+<div class="ai-command-center">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20 px-3 py-2 rounded-pill mb-3">
+                <i class="fa-solid fa-microchip me-2"></i>AZURE AI PRO MAX CORE v2.0
+            </span>
+            <h1 class="fw-800 text-white mb-2" style="font-size: 2.5rem; letter-spacing: -1.5px;">Visual Intelligence Wall</h1>
+            <p class="text-muted opacity-75">Hệ thống phân tích đa tầng dữ liệu thời gian thực. Ra quyết định dựa trên trí tuệ hình ảnh.</p>
+        </div>
+        <div class="col-lg-6 text-lg-end">
+            <div class="d-inline-flex gap-4">
+                <div class="text-center">
+                    <div class="smaller text-muted text-uppercase tracking-wider">Business Health</div>
+                    <div class="h4 fw-bold glow-text-success mb-0">OPTIMAL</div>
+                </div>
+                <div class="text-center border-start border-white border-opacity-10 ps-4">
+                    <div class="smaller text-muted text-uppercase tracking-wider">Prediction Accuracy</div>
+                    <div class="h4 fw-bold text-white mb-0">96.8%</div>
+                </div>
+                <div class="text-center border-start border-white border-opacity-10 ps-4">
+                    <div class="smaller text-muted text-uppercase tracking-wider">ROI Potential</div>
+                    <div class="h4 fw-bold glow-text-warning mb-0">+14.2%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- 1. KPI Radar Wall (Multi-Staff) -->
+        <div class="col-lg-5">
+            <div class="glass-visual-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0">Radar Đánh giá KPI 360°</h5>
+                    <div class="d-flex gap-2">
+                        <select id="staff1" class="radar-selector"></select>
+                        <select id="staff2" class="radar-selector"></select>
+                        <select id="staff3" class="radar-selector"></select>
+                    </div>
+                </div>
+                <div id="radarKPIChart" style="min-height: 380px;"></div>
+                <div class="smaller text-muted text-center mt-3">
+                    <i class="fa-solid fa-circle-info me-1"></i> So sánh đa kênh giúp nhận diện đúng thế mạnh từng KTV.
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Heatmap Visual Intelligence -->
+        <div class="col-lg-7">
+            <div class="glass-visual-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-bold mb-0">Heatmap Mật độ Vận hành</h5>
+                        <p class="smaller text-muted mb-0">Phân tích 7 ngày x 24 giờ</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Live Feed</span>
+                    </div>
+                </div>
+                <div id="occupancyHeatmap" style="min-height: 350px;"></div>
+                
+                <!-- Action Corner -->
+                <div class="mt-4 p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);">
+                    <div class="row align-items-center">
+                        @if (ViewBag.AIInsights != null)
+                        {
+                            var primaryInsight = ((List<SpaN5.Services.StrategicRecommendation>)ViewBag.AIInsights).FirstOrDefault();
+                            if (primaryInsight != null)
+                            {
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold text-white mb-2"><i class="fa-solid @primaryInsight.Icon me-2" style="color: @primaryInsight.Color"></i>@primaryInsight.Title</h6>
+                                    <p class="smaller strategy-text mb-0">@Html.Raw(primaryInsight.Message)</p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button class="strategy-action-pill">@primaryInsight.Action</button>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="report-card">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-circle-notch me-2 text-primary"></i>Tỷ lệ Tiêu thụ thực tế</h5>
+                    <div id="donutChart" class="chart-container"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="report-card">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-bar me-2 text-success"></i>So sánh Định mức vs Thực tế</h5>
+                    <div id="barChart" class="chart-container"></div>
+                    <p class="smaller text-muted mt-2"><i class="fa-solid fa-info-circle me-1"></i> Di chuột vào cột để xem chi tiết vật tư lãng phí.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="material-leak-card h-100">
+            <h5 class="fw-bold mb-4 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Điểm nóng lãng phí</h5>
+            @{
+                var topLeaks = ViewBag.TopMaterialLeaks as IEnumerable<dynamic>;
+            }
+            @if(topLeaks != null) {
+                foreach(var leak in topLeaks) {
+                    <div class="material-leak-item">
+                        <div>
+                            <div class="fw-bold small">@leak.MaterialName</div>
+                            <div class="smaller text-muted">Hao hụt: +@leak.TotalDiff.ToString("N1") đơn vị</div>
+                        </div>
+                        <div class="badge bg-danger bg-opacity-10 text-danger rounded-pill">
+                            +@leak.LeakRate.ToString("N1")%
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+ nhận diện nhanh các điểm nóng lãng phí vật tư.
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Financial BI Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-12">
+        <div class="report-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-money-bill-trend-up me-2 text-warning"></i>Phân tích Lợi nhuận gộp theo Gói dịch vụ</h5>
+                <span class="badge bg-light text-dark rounded-pill px-3">Đã trừ giá vốn vật tư</span>
+            </div>
+            <div id="profitChart" class="chart-container" style="min-height: 400px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Table Row -->
+<div class="row">
+    <div class="col-12">
+        <div class="glass-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0"><i class="fa-solid fa-table-list me-2 text-primary"></i>Bảng chi tiết chỉ số theo nhân viên</h4>
+                <a href="@Url.Action("ConsumptionLog", "Inventory")" class="btn btn-primary rounded-pill px-4 fw-bold">
+                    <i class="fa-solid fa-magnifying-glass-chart me-2"></i>Xem Nhật ký Truy vết Chuyên sâu
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-muted small text-uppercase fw-bold" style="border-bottom: 2px solid #f1f5f9;">
+                            <th>Kỹ thuật viên</th>
+                            <th class="text-center">Định mức tổng (g)</th>
+                            <th class="text-center">Thực tế dùng (g)</th>
+                            <th class="text-center">Chênh lệch</th>
+                            <th class="text-center">Tỷ lệ Lệch</th>
+                            <th class="text-end">Đánh giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (staffWaste == null || !staffWaste.Any())
+                        {
+                            <tr><td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu tiêu thụ để phân tích.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var s in staffWaste)
+                            {
+                                var diff = s.TotalActual - s.TotalStandard;
+                                var wasteClass = s.WasteRate > 15 ? "waste-high" : (s.WasteRate < 5 ? "waste-low" : "waste-mid");
+                                <tr>
+                                    <td class="fw-bold text-main">@s.StaffName</td>
+                                    <td class="text-center fw-600">@s.TotalStandard.ToString("N1")</td>
+                                    <td class="text-center fw-600">@s.TotalActual.ToString("N1")</td>
+                                    <td class="text-center @(diff > 0 ? "text-danger" : "text-success") fw-bold">
+                                        @(diff > 0 ? "+" : "")@diff.ToString("N1") g
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="stat-pill @wasteClass">
+                                            @(s.WasteRate > 0 ? "+" : "")@s.WasteRate.ToString("N1")%
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (s.WasteRate > 15) { <span class="badge bg-danger rounded-pill px-3">Lãng phí</span> }
+                                        else if (s.WasteRate < 0) { <span class="badge bg-warning text-dark rounded-pill px-3">Cần check</span> }
+                                        else { <span class="badge bg-success rounded-pill px-3">Chuẩn</span> }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Data from C#
+            const staffKPIs = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.StaffKPIs));
+            const heatmapMatrix = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.HeatmapData));
+            const wasteData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(staffWaste));
+            const profitData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(profitAnalysis));
+
+            // Load Select Options for Radar
+            const selectors = ["#staff1", "#staff2", "#staff3"];
+            selectors.forEach((sel, i) => {
+                const el = document.querySelector(sel);
+                el.innerHTML = `<option value="">--- Chọn KTV ${i+1} ---</option>` + 
+                    staffKPIs.map(s => `<option value="${s.StaffId}" ${i===0 && s.StaffId === staffKPIs[0].StaffId ? 'selected' : ''}>${s.StaffName}</option>`).join("");
+                el.addEventListener('change', updateRadar);
+            });
+
+            // 1. RADAR KPI CHART
+            let radarChart;
+            function updateRadar() {
+                const s1 = document.querySelector("#staff1").value;
+                const s2 = document.querySelector("#staff2").value;
+                const s3 = document.querySelector("#staff3").value;
+                
+                const series = [];
+                [s1, s2, s3].forEach((sid, idx) => {
+                    if(sid) {
+                        const s = staffKPIs.find(k => k.StaffId == sid);
+                        series.push({
+                            name: s.StaffName,
+                            data: [s.Skill, s.Speed, s.Retention, s.Review, s.Upsell, s.CrossSell, s.Compliance]
+                        });
+                    }
+                });
+
+                const options = {
+                    series: series,
+                    chart: { height: 380, type: 'radar', foreColor: '#94a3b8', toolbar: { show: false }, dropShadow: { enabled: true, blur: 8, left: 1, top: 1, opacity: 0.2 } },
+                    xaxis: { categories: ['Tay nghề', 'Tốc độ', 'Khách quay lại', 'Review', 'Upsell', 'Cross-sell', 'Tuân thủ'], labels: { style: { colors: '#cbd5e1', fontSize: '11px', fontWeight: 600 } } },
+                    colors: ['#6366f1', '#10b981', '#f59e0b'],
+                    markers: { size: 5, hover: { size: 7 } },
+                    fill: { opacity: 0.3 },
+                    stroke: { width: 3, curve: 'smooth' },
+                    legend: { show: true, position: 'bottom', labels: { colors: '#fff' } }
+                };
+
+                if(radarChart) radarChart.destroy();
+                radarChart = new ApexCharts(document.querySelector("#radarKPIChart"), options);
+                radarChart.render();
+            }
+            updateRadar();
+
+            // 2. OCCUPANCY HEATMAP
+            const days = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"];
+            // Chuyển ma trận 7x24 sang định dạng ApexCharts
+            const heatmapSeries = [];
+            for (let d = 0; d < 7; d++) {
+                const dayData = [];
+                for (let h = 0; h < 24; h++) {
+                    dayData.push({ x: h + "h", y: heatmapMatrix[d][h] });
+                }
+                heatmapSeries.push({ name: days[d], data: dayData });
+            }
+
+            const heatmapOptions = {
+                series: heatmapSeries,
+                chart: { height: 400, type: 'heatmap', toolbar: { show: false }, animations: { enabled: true } },
+                dataLabels: { 
+                    enabled: true, 
+                    style: { colors: ['#fff'], fontSize: '10px' },
+                    formatter: function(val) { return val > 0 ? val : ''; }
+                },
+                xaxis: { 
+                    labels: { style: { colors: '#ffffff', fontSize: '12px', fontWeight: 600 } },
+                    position: 'top'
+                },
+                yaxis: {
+                    labels: { style: { colors: '#ffffff', fontSize: '12px', fontWeight: 600 } }
+                },
+                colors: ["#6366f1"],
+                plotOptions: {
+                    heatmap: {
+                        shadeIntensity: 0.5,
+                        radius: 5,
+                        useFillColorAsStroke: true,
+                        colorScale: {
+                            ranges: [
+                                { from: 0, to: 0, name: 'Trống', color: '#0f172a' },
+                                { from: 1, to: 1, name: 'Thấp', color: '#6366f1' },
+                                { from: 2, to: 3, name: 'T.Bình', color: '#8b5cf6' },
+                                { from: 4, to: 6, name: 'Cao', color: '#f59e0b' },
+                                { from: 7, to: 100, name: 'Cực đại', color: '#ef4444' }
+                            ]
+                        }
+                    }
+                }
+            };
+            new ApexCharts(document.querySelector("#occupancyHeatmap"), heatmapOptions).render();
+
+            // 3. DONUT / BAR / PROFIT (Old Stats)
+            if (wasteData && wasteData.length > 0) {
+                const names = wasteData.map(d => d.StaffName);
+                const actuals = wasteData.map(d => d.TotalActual);
+                const donutOptions = {
+                    series: actuals.map(v => Math.round(v * 10) / 10),
+                    chart: { type: 'donut', height: 350, foreColor: '#334155' },
+                    labels: names,
+                    legend: { position: 'bottom', labels: { colors: '#334155' } },
+                    dataLabels: { style: { colors: ['#ffffff'] } }
+                };
+                new ApexCharts(document.querySelector("#donutChart"), donutOptions).render();
+
+                const barOptions = {
+                    series: [
+                        { name: 'Định mức', data: wasteData.map(d => Math.round(d.TotalStandard * 10) / 10) }, 
+                        { name: 'Thực tế', data: actuals.map(v => Math.round(v * 10) / 10) }
+                    ],
+                    chart: { type: 'bar', height: 350, foreColor: '#334155' },
+                    xaxis: { categories: names, labels: { style: { colors: '#334155', fontWeight: 600 } } },
+                    yaxis: { labels: { style: { colors: '#334155' } } },
+                    tooltip: { 
+                        theme: 'light',
+                        custom: function({series, seriesIndex, dataPointIndex, w}) {
+                            const data = wasteData[dataPointIndex];
+                            if(!data) return '';
+                            let html = '<div class="p-3 shadow-lg border-0" style="min-width: 200px;">';
+                            html += '<div class="fw-bold mb-2 border-bottom pb-1">' + data.StaffName + '</div>';
+                            html += '<div class="smaller text-muted mb-2">Chi tiết lãng phí:</div>';
+                            data.TopLeakedMaterials.forEach(m => {
+                                if(m.Diff > 0) {
+                                    html += '<div class="d-flex justify-content-between mb-1 small">';
+                                    html += '<span>' + m.Name + '</span>';
+                                    html += '<span class="text-danger fw-bold">+' + Math.round(m.Diff*10)/10 + '</span>';
+                                    html += '</div>';
+                                }
+                            });
+                            if(data.TopLeakedMaterials.every(m => m.Diff <= 0)) {
+                                html += '<div class="text-success smaller"><i class="fa-solid fa-check-circle me-1"></i>Sử dụng rất chuẩn</div>';
+                            }
+                            html += '</div>';
+                            return html;
+                        }
+                    }
+                };
+                new ApexCharts(document.querySelector("#barChart"), barOptions).render();
+            }
+
+            if (profitData && profitData.length > 0) {
+                const profitOptions = {
+                    series: [{ name: 'Lợi nhuận gộp', data: profitData.map(d => Math.round(d.Profit)) }],
+                    chart: { type: 'bar', height: 400, toolbar: { show: true }, foreColor: '#334155' },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 10,
+                            distributed: true,
+                            dataLabels: { position: 'top' }
+                        }
+                    },
+                    colors: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4', '#8b5cf6'],
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function (val) { return val.toLocaleString() + " đ" },
+                        offsetY: -25,
+                        style: { fontSize: '12px', colors: ["#334155"] }
+                    },
+                    xaxis: { 
+                        categories: profitData.map(d => d.ServiceName),
+                        labels: { style: { fontWeight: 700, colors: '#334155' } }
+                    },
+                    yaxis: { labels: { formatter: function (val) { return val.toLocaleString() + " đ" }, style: { colors: '#334155' } } },
+                    tooltip: { theme: 'light', y: { formatter: function (val) { return val.toLocaleString() + " VNĐ" } } }
+                };
+                new ApexCharts(document.querySelector("#profitChart"), profitOptions).render();
+            }
+        });
+    </script>
+}

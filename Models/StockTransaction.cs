@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpaN5.Models
@@ -8,9 +8,9 @@ namespace SpaN5.Models
         public int TransactionId { get; set; }
 
         public int MaterialId { get; set; }
-        public Material Material { get; set; }
+        public Material Material { get; set; } = null!;
 
-        public string Type { get; set; } // import, export
+        public string Type { get; set; } = null!; // import, export
         public int Quantity { get; set; }
 
         public string? Reason { get; set; }

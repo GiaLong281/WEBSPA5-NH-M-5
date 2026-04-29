@@ -1,0 +1,517 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Trung tâm điều khiển";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    var upcomingBookings = ViewBag.UpcomingBookings as List<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
+    var staffWorkflows = ViewBag.StaffWorkflows as List<SpaN5.Areas.Admin.Controllers.StaffWorkflowInfo> ?? new List<SpaN5.Areas.Admin.Controllers.StaffWorkflowInfo>();
+    var activeDetails = ViewBag.ActiveDetails as List<SpaN5.Models.BookingDetail> ?? new List<SpaN5.Models.BookingDetail>();
+    
+    decimal todayRevenue = ViewBag.TodayRevenue ?? 0;
+    int activeCount = ViewBag.ActiveServicesCount ?? 0;
+    int waitingCount = ViewBag.WaitingCount ?? 0;
+    var today = DateTime.Today;
+}
+
+<style>
+    /* Metric Cards */
+    .metric-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.2s ease;
+        border: 1px solid transparent;
+        height: 100%;
+    }
+    .metric-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+    
+    .m-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: var(--admin-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-right: 1.2rem;
+        color: var(--primary-blue);
+    }
+    
+    .m-info .m-label { color: var(--secondary-blue); font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
+    .m-info .m-value { color: var(--text-main); font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+
+    /* Section Styling */
+    .dashboard-section { margin-top: 2rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+    .section-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0; }
+    
+    .glass-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--accent-blue);
+    }
+
+    /* Alerts */
+    .alert-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        background: var(--admin-bg);
+        border-left: 4px solid var(--primary-blue);
+    }
+    .alert-item.warning { border-left-color: #FFB800; }
+    .alert-item.danger { border-left-color: #FF5B5B; }
+    .alert-icon { font-size: 1.2rem; margin-right: 12px; }
+    .alert-text { font-size: 0.85rem; font-weight: 600; }
+
+    /* Tables */
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .admin-table th { 
+        padding: 16px 12px; 
+        color: var(--secondary-blue); 
+        font-size: 0.75rem; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        border-bottom: 2px solid var(--accent-blue);
+        text-align: left;
+    }
+    .admin-table td { 
+        padding: 16px 12px; 
+        font-size: 0.9rem; 
+        border-bottom: 1px solid var(--accent-blue); 
+        vertical-align: middle; 
+    }
+    
+    .status-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .status-pill.success { background: #E6F6ED; color: #00B050; }
+    .status-pill.primary { background: #E9EDF7; color: #4318FF; }
+    .status-pill.warning { background: #FFF8E6; color: #FFB800; }
+
+    /* Room Grid */
+    .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+    .room-item {
+        background: var(--white);
+        border: 2px solid var(--accent-blue);
+        border-radius: 18px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        cursor: pointer;
+    }
+    .room-item.occupied {
+        border-color: #FF5B5B;
+        background: #FFF5F5;
+    }
+    .room-item.occupied .room-icon { color: #FF5B5B; }
+    .room-item.available {
+        border-color: #00B050;
+        background: #F6FFF9;
+    }
+    .room-item.available .room-icon { color: #00B050; }
+    
+    .room-icon { font-size: 24px; margin-bottom: 8px; }
+    .room-number { font-weight: 800; font-size: 1.1rem; display: block; }
+    .room-status { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .room-client { font-size: 0.75rem; font-weight: 600; margin-top: 5px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .btn-action {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        box-shadow: 0px 10px 20px rgba(67, 24, 255, 0.2);
+        transition: all 0.2s;
+    }
+    .btn-action:hover { background: #3311CC; transform: translateY(-2px); color: white; }
+</style>
+
+<!-- Welcome Row --><div class="row align-items-center mb-4"><div class="col"><h2 class="fw-bold mb-1" style="letter-spacing: -1px;">Xin chào, @(User.Identity.Name)!</h2><p class="text-muted small">Cập nhật lúc @DateTime.Now.ToString("HH:mm") - @DateTime.Now.ToString("dd/MM/yyyy")</p></div><div class="col-auto"><button class="btn btn-action" onclick="window.location.href='/Booking'"><i class="fa-solid fa-plus me-2"></i> Tạo Booking mới</button></div></div>
+
+<!-- Metrics Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #E7E9FF; color: var(--primary-blue);"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div class="m-info">
+                <div class="m-label">Doanh thu hôm nay</div>
+                <div class="m-value">@todayRevenue.ToString("N0")đ</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #E6F6ED; color: #00B050;"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="m-info">
+                <div class="m-label">Booking hoàn tất</div>
+                <div class="m-value">@upcomingBookings.Count(b => b.Status == SpaN5.Models.BookingStatus.Completed)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #FFF8E6; color: #FFB800;"><i class="fa-solid fa-users"></i></div>
+            <div class="m-info">
+                <div class="m-label">Khách đang đợi</div>
+                <div class="m-value">@waitingCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="m-icon" style="background: #FEEEEE; color: #FF5B5B;"><i class="fa-solid fa-spa"></i></div>
+            <div class="m-info">
+                <div class="m-label">Dịch vụ đang chạy</div>
+                <div class="m-value">@activeCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    @if (User.IsInRole("Admin"))
+    {
+        <!-- Left Column: Operations & Analysis -->
+        <div class="col-lg-8">
+            <div class="glass-card h-100">
+                <div class="section-header">
+                    <h3>Phân tích doanh thu & Booking</h3>
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="dropdown">7 ngày qua <i class="fa-solid fa-chevron-down ms-1"></i></button>
+                        <ul class="dropdown-menu border-0 shadow mt-2">
+                            <li><a class="dropdown-item" href="#">30 ngày qua</a></li>
+                            <li><a class="dropdown-item" href="#">Tháng này</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Right Column: Smart Alerts & Staff -->
+    <div class="@(User.IsInRole("Admin") ? "col-lg-4" : "col-lg-12")">
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3>Cảnh báo thông minh</h3>
+                    <span class="badge bg-danger rounded-pill">03</span>
+                </div>
+                <div class="alert-list">
+                    @if (ViewBag.LeaveRequests is List<LeaveRequest> lrs && lrs.Any())
+                    {
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3" style="font-size: 0.9rem; color: #ef4444;">
+                                <i class="fa-solid fa-calendar-check me-2"></i>Đơn nghỉ cần duyệt (@lrs.Count)
+                            </h5>
+                            @foreach (var lr in lrs)
+                            {
+                                <div class="alert-item warning d-block mb-3" style="border-left: 4px solid #ef4444; background: #fff5f5;">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <div class="fw-bold small text-dark me-2">@lr.Staff?.FullName</div>
+                                        <span class="badge bg-danger" style="font-size: 0.65rem;">XIN NGHỈ</span>
+                                    </div>
+                                    <div class="smaller text-muted mb-2" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-clock me-1"></i>
+                                        @if (lr.FromDate.Date == lr.ToDate.Date) { <span>Ngày @lr.FromDate.ToString("dd/MM")</span> }
+                                        else { <span>Từ @lr.FromDate.ToString("dd/MM") đến @lr.ToDate.ToString("dd/MM")</span> }
+                                    </div>
+                                    <div class="italic text-muted px-2 border-start mb-2" style="font-size: 0.75rem; border-width: 2px !important;">"@lr.Reason"</div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-danger rounded-pill px-3 py-1 fw-bold" style="font-size: 0.7rem;" onclick="approveLeave(@lr.Id)">Duyệt & Gán lại KTV</button>
+                                    </div>
+                                </div>
+                            }
+                            <hr class="opacity-10" />
+                        </div>
+                    }
+
+                    @if (ViewBag.LowStockAlerts != null)
+                    {
+                        foreach (var alert in (dynamic)ViewBag.LowStockAlerts)
+                        {
+                            <div class="alert-item danger">
+                                <i class="fa-solid fa-circle-exclamation alert-icon text-danger"></i>
+                                <div class="alert-text">SẮP HẾT: @alert.MaterialName (Còn lại: @alert.CurrentStock @alert.Unit)</div>
+                            </div>
+                        }
+                    }
+
+                    @if (waitingCount > 3) {
+                        <div class="alert-item danger">
+                            <i class="fa-solid fa-triangle-exclamation alert-icon text-danger"></i>
+                            <div class="alert-text">Khách đang đợi quá đông (@waitingCount khách). Cần thêm nhân sự hỗ trợ.</div>
+                        </div>
+                    }
+
+                    @if (staffWorkflows.Any(w => w.IsOnLeave)) {
+                        <div class="alert-item warning">
+                            <i class="fa-solid fa-user-slash alert-icon text-warning"></i>
+                            <div class="alert-text">Hôm nay có @staffWorkflows.Count(w => w.IsOnLeave) nhân viên đang nghỉ phép.</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="glass-card @(User.IsInRole("Admin") ? "mt-4" : "")">
+            <div class="section-header">
+                <h3>Đội ngũ kỹ thuật viên</h3>
+                <a href="/Admin/Staff" class="small fw-bold text-decoration-none" style="color: var(--primary-blue);">Tất cả</a>
+            </div>
+            <div class="staff-list @(User.IsInRole("Admin") ? "" : "row")">
+                @foreach (var wf in staffWorkflows.Take(User.IsInRole("Admin") ? 5 : 12)) {
+                    <div class="@(User.IsInRole("Admin") ? "d-flex" : "col-md-4 d-flex") align-items-center mb-3">
+                        <img src="https://ui-avatars.com/api/?name=@wf.Staff.FullName&background=random" class="rounded-pill me-3" width="36" />
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small">@wf.Staff.FullName</div>
+                            <div class="text-muted smaller" style="font-size: 0.7rem;">@wf.Staff.Specialization?.ServiceName</div>
+                        </div>
+                        <div class="status-pill @(wf.Staff.Status != "active" || wf.IsOnLeave ? "secondary" : (wf.IsBusy ? "warning" : "success")) small" style="font-size: 0.6rem;">
+                            @if (wf.Staff.Status != "active") {
+                                <span>NGHỈ</span>
+                            } else if (wf.IsOnLeave) {
+                                <span>ĐANG NGHỈ</span>
+                            } else {
+                                @(wf.IsBusy ? "ĐANG BẬN" : "SẴN SÀNG")
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-section mb-5">
+    <div class="glass-card">
+        <div class="section-header">
+            <h3>Hoạt động Booking gần đây</h3>
+            <a href="/Admin/Home/Bookings" class="btn btn-light btn-sm rounded-pill px-3 fw-bold border-0" style="background: var(--accent-blue); color: var(--primary-blue);">Xem tất cả</a>
+        </div>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Khách hàng</th>
+                        <th>Dịch vụ</th>
+                        <th>Thời gian</th>
+                        <th>Trạng thái</th>
+                        <th>Thanh toán</th>
+                        <th class="text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bk in Model.Take(6)) {
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@bk.Customer?.FullName</div>
+                                <div class="text-muted smaller" style="font-size: 0.75rem;">@bk.BookingCode</div>
+                            </td>
+                            <td>
+                                <div class="fw-600">@bk.BookingDetails.FirstOrDefault()?.Service?.ServiceName</div>
+                                <div class="text-muted smaller" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-user-sparkles me-1 text-primary opacity-50"></i>
+                                    KTV: @(bk.BookingDetails.FirstOrDefault()?.Staff?.FullName ?? "Chưa gán")
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold">@bk.StartTime.ToString("HH:mm")</div>
+                                <div class="text-muted smaller" style="font-size: 0.75rem;">@bk.BookingDate.ToString("dd/MM")</div>
+                            </td>
+                            <td>
+                                @{
+                                    bool isPaid = bk.Payments?.Any(p => p.Status == SpaN5.Models.PaymentStatus.Paid) ?? false;
+                                    bool readyForCheckout = bk.Status == SpaN5.Models.BookingStatus.Completed && !isPaid;
+                                }
+                                <span class="status-pill @(readyForCheckout ? "bg-success text-white" : (isPaid ? "success" : (bk.Status == SpaN5.Models.BookingStatus.InProgress ? "primary" : "warning")))">
+                                    @(readyForCheckout ? "CHỜ THANH TOÁN" : (isPaid ? "ĐÃ THANH TOÁN" : bk.Status.ToString().ToUpper()))
+                                </span>
+                            </td>
+                            <td class="fw-bold">@bk.TotalAmount.ToString("N0")đ</td>
+                            <td class="text-end">
+                                @if (readyForCheckout)
+                                {
+                                    <button class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="processCheckout(@bk.BookingId, '@bk.BookingCode', @bk.TotalAmount)">
+                                        <i class="fa-solid fa-cash-register me-1"></i> Thanh toán
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-light btn-sm rounded-circle shadow-none border-0" style="width: 32px; height: 32px;"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (User.IsInRole("Admin"))
+    {
+        <script>
+            // Revenue Chart Implementation
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChartLabels)),
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChartData)),
+                        borderColor: '#4318FF',
+                        backgroundColor: 'rgba(67, 24, 255, 0.05)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4318FF',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' }, color: '#A3AED0' } },
+                        y: { grid: { borderDash: [5, 5], color: '#E9EDF7' }, ticks: { font: { weight: 'bold' }, color: '#A3AED0', callback: value => value.toLocaleString('vi-VN') } }
+                    }
+                }
+            });
+
+            // --- THÔNG BÁO CHUYỂN CA TỨC THỜI ---
+            let lastTransferId = 0;
+            function checkTransferRequests() {
+                $.get('/Admin/Home/GetTransferRequests', function(res) {
+                    if (res.success && res.data && res.data.length > 0) {
+                        const latest = res.data[0];
+                        if (latest.id > lastTransferId) {
+                            if (lastTransferId !== 0) { // Tránh hiện thông báo cũ khi vừa load trang
+                                Swal.fire({
+                                    title: 'CẢNH BÁO CHUYỂN CA',
+                                    text: latest.message,
+                                    icon: 'warning',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: true,
+                                    confirmButtonText: 'Xem lịch',
+                                    timer: 10000
+                                }).then((result) => {
+                                    if(result.isConfirmed) window.location.href = '/Admin/Home/Bookings';
+                                });
+
+                                // Play notification sound (optional)
+                                try { new Audio('/sounds/notification.mp3').play(); } catch(e) {}
+                            }
+                            lastTransferId = latest.id;
+                        }
+                    }
+                });
+            }
+
+            // Polling mỗi 15 giây
+            setInterval(checkTransferRequests, 15000);
+            checkTransferRequests();
+
+            // --- THANH TOÁN TẠI QUẦY ---
+            function processCheckout(id, code, amount) {
+                Swal.fire({
+                    title: 'Thanh toán Booking #' + code,
+                    html: `
+                        <div class="text-start p-3 bg-light rounded-4 mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tổng tiền:</span>
+                                <strong class="fs-4 text-primary">${amount.toLocaleString()}đ</strong>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold d-block text-start">Phương thức thanh toán:</label>
+                            <select id="paymentMethod" class="form-select rounded-pill p-3 border-2">
+                                <option value="0">Tiền mặt (Cash)</option>
+                                <option value="3">Chuyển khoản (Bank Transfer)</option>
+                                <option value="1">Momo</option>
+                                <option value="2">VNPay</option>
+                            </select>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fa-solid fa-check-circle me-1"></i> Xác nhận đã thu tiền',
+                    confirmButtonColor: '#00B050',
+                    cancelButtonText: 'Đóng',
+                    preConfirm: () => {
+                        const method = document.getElementById('paymentMethod').value;
+                        return $.post('/Admin/Home/CompleteBooking', { bookingId: id, method: method });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (result.value.success) {
+                            Swal.fire('Thành công', 'Đã xác nhận thanh toán!', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', result.value.message || 'Không thể xử lý thanh toán', 'error');
+                        }
+                    }
+                });
+            }
+
+            function approveLeave(id) {
+                Swal.fire({
+                    title: 'Xác nhận duyệt nghỉ',
+                    text: "Hệ thống sẽ tự động gán khách của KTV này cho người khác rảnh. Bạn đồng ý?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý duyệt',
+                    confirmButtonColor: '#00B050'
+                }).then(r => {
+                    if (r.isConfirmed) {
+                        $.post('/Admin/Home/ApproveLeave', { requestId: id }, function(res) {
+                            if (res.success) {
+                                Swal.fire('Thành công', res.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('Lỗi', res.message, 'error');
+                            }
+                        });
+                    }
+                });
+            }
+        </script>
+    }
+}

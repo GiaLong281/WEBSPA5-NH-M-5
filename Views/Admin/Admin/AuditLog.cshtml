@@ -1,0 +1,46 @@
+@model IEnumerable<SpaN5.Models.AuditLog>
+@{
+    ViewData["Title"] = "Lịch sử thay đổi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5">
+    <h1>Lịch sử thay đổi hệ thống</h1>
+    <table class="table table-striped">
+        <thead><tr><th>Thời gian</th><th>Người dùng</th><th>Hành động</th><th>Đối tượng</th><th>ID</th><th>Chi tiết</th></tr></thead>
+        <tbody>
+            @foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@log.UserName</td>
+                    <td>@log.Action</td>
+                    <td>@log.EntityName</td>
+                    <td>@log.EntityId</td>
+                    <td><button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logModal" data-old="@log.OldValues" data-new="@log.NewValues">Xem</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="logModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Chi tiết thay đổi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <p><strong>Giá trị cũ:</strong> <span id="oldValues"></span></p>
+                <p><strong>Giá trị mới:</strong> <span id="newValues"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var logModal = document.getElementById('logModal');
+    logModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var oldVal = button.getAttribute('data-old');
+        var newVal = button.getAttribute('data-new');
+        document.getElementById('oldValues').innerText = oldVal || 'Không có';
+        document.getElementById('newValues').innerText = newVal || 'Không có';
+    });
+</script>

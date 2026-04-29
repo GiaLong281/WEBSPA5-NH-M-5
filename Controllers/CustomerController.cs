@@ -1,0 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace SpaN5.Controllers
+{
+    [Authorize(Roles = "Customer")]
+    public class CustomerController : Controller
+    {
+        public IActionResult Profile() => RedirectToAction("Profile", "Account");
+    }
+}

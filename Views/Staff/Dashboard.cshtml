@@ -1,0 +1,323 @@
+@{
+    ViewData["Title"] = "Staff Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var staff = ViewBag.Staff as SpaN5.Models.Staff;
+    var todayBookings = ViewBag.Today as List<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
+    var upcomingBookings = ViewBag.Upcoming as List<SpaN5.Models.Booking> ?? new List<SpaN5.Models.Booking>();
+    var now = ViewBag.Now as DateTime? ?? DateTime.Now;
+}
+
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row mb-4 g-4">
+        <div class="col-md-4 mb-3">
+            <a asp-controller="Staff" asp-action="Calendar" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 hover-shadow" style="min-height: 280px;">
+                    <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                        <i class="fas fa-calendar-week fa-3x text-gold mb-4"></i>
+                        <h5 class="mb-2 fw-bold">Lịch làm việc</h5>
+                        <p class="text-muted mb-0">Xem lịch cá nhân và lịch hẹn đã phân công</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a asp-controller="Staff" asp-action="Attendance" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 hover-shadow" style="min-height: 280px;">
+                    <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                        <i class="fas fa-user-clock fa-3x text-gold mb-4"></i>
+                        <h5 class="mb-2 fw-bold">Chấm công</h5>
+                        <p class="text-muted mb-0">Check-in/check-out và xem lịch sử</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a asp-controller="Staff" asp-action="Income" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 hover-shadow" style="min-height: 280px;">
+                    <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                        <i class="fas fa-dollar-sign fa-3x text-gold mb-4"></i>
+                        <h5 class="mb-2 fw-bold">Thu nhập</h5>
+                        <p class="text-muted mb-0">Xem doanh thu, hoa hồng và lương</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Xin chào, @staff?.FullName</h5>
+                    <p class="card-text">Chi nhánh: @staff?.Branch?.BranchName</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Lịch hôm nay -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-gold text-white">
+            <h4 class="mb-0">Lịch hôm nay (@DateTime.Now.ToString("dd/MM/yyyy"))</h4>
+        </div>
+        <div class="card-body">
+            @if (!todayBookings.Any())
+            {
+                <p class="text-muted">Không có lịch hẹn hôm nay.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Giờ</th>
+                                <th>Khách hàng</th>
+                                <th>Dịch vụ</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </thead
+                        <tbody>
+                            @foreach (var booking in todayBookings)
+                            {
+                                var isOngoing = booking.StartTime <= now && booking.EndTime > now;
+                                var statusText = "";
+                                var statusClass = "";
+                                switch (booking.Status)
+                                {
+                                    case BookingStatus.Pending:
+                                        statusText = "Chờ xác nhận";
+                                        statusClass = "bg-warning text-dark";
+                                        break;
+                                    case BookingStatus.Confirmed:
+                                        statusText = "Đã xác nhận";
+                                        statusClass = "bg-info";
+                                        break;
+                                    case BookingStatus.InProgress:
+                                        statusText = "Đang thực hiện";
+                                        statusClass = "bg-primary";
+                                        break;
+                                    case BookingStatus.Completed:
+                                        statusText = "Hoàn thành";
+                                        statusClass = "bg-success";
+                                        break;
+                                    case BookingStatus.Cancelled:
+                                        statusText = "Đã hủy";
+                                        statusClass = "bg-danger";
+                                        break;
+                                }
+                                var serviceNames = string.Join(", ", booking.BookingDetails.Select(bd => bd.Service?.ServiceName));
+                                
+                                <tr>
+                                    <td class="text-nowrap">@booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")</td>
+                                    <td>@booking.Customer?.FullName</td>
+                                    <td>@serviceNames</td>
+                                    <td><span class="badge @statusClass">@statusText</span></td>
+                                    <td class="text-nowrap">
+                                        @if (booking.Status == BookingStatus.Pending)
+                                        {
+                                            <form asp-action="ConfirmBooking" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                                <button type="submit" class="btn btn-sm btn-success me-1" title="Xác nhận lịch">
+                                                    <i class="fas fa-check"></i> Nhận lịch
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (booking.Status == BookingStatus.Confirmed || booking.Status == BookingStatus.InProgress)
+                                        {
+                                            <form asp-action="CompleteBooking" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                                <button type="submit" class="btn btn-sm btn-primary me-1" title="Hoàn thành">
+                                                    <i class="fas fa-check-double"></i> Hoàn thành
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (booking.Status != BookingStatus.Completed && booking.Status != BookingStatus.Cancelled)
+                                        {
+                                            <a asp-action="AddNote" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-secondary me-1" title="Ghi chú khách hàng">
+                                                <i class="fas fa-sticky-note"></i> Ghi chú
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal_@booking.BookingId">
+                                                <i class="fas fa-times"></i> Hủy
+                                            </button>
+
+                                            <!-- Modal hủy -->
+                                            <div class="modal fade" id="cancelModal_@booking.BookingId" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Xác nhận hủy lịch</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form asp-action="CancelBooking" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                                            <div class="modal-body">
+                                                                <p>Bạn có chắc chắn muốn hủy lịch của khách hàng <strong>@booking.Customer?.FullName</strong>?</p>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Lý do (tùy chọn)</label>
+                                                                    <textarea name="reason" class="form-control" rows="2"></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Lịch sắp tới -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-gold text-white">
+            <h4 class="mb-0">Lịch sắp tới</h4>
+        </div>
+        <div class="card-body">
+            @if (!upcomingBookings.Any())
+            {
+                <p class="text-muted">Không có lịch hẹn sắp tới.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Giờ</th>
+                                <th>Khách hàng</th>
+                                <th>Dịch vụ</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </thead
+                        <tbody>
+                            @foreach (var booking in upcomingBookings)
+                            {
+                                var statusText = "";
+                                var statusClass = "";
+                                switch (booking.Status)
+                                {
+                                    case BookingStatus.Pending:
+                                        statusText = "Chờ xác nhận";
+                                        statusClass = "bg-warning text-dark";
+                                        break;
+                                    case BookingStatus.Confirmed:
+                                        statusText = "Đã xác nhận";
+                                        statusClass = "bg-info";
+                                        break;
+                                    case BookingStatus.InProgress:
+                                        statusText = "Đang thực hiện";
+                                        statusClass = "bg-primary";
+                                        break;
+                                    case BookingStatus.Completed:
+                                        statusText = "Hoàn thành";
+                                        statusClass = "bg-success";
+                                        break;
+                                    case BookingStatus.Cancelled:
+                                        statusText = "Đã hủy";
+                                        statusClass = "bg-danger";
+                                        break;
+                                }
+                                var serviceNames = string.Join(", ", booking.BookingDetails.Select(bd => bd.Service?.ServiceName));
+                                
+                                <tr>
+                                    <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-nowrap">@booking.StartTime.ToString("HH:mm") - @booking.EndTime.ToString("HH:mm")</td>
+                                    <td>@booking.Customer?.FullName</td>
+                                    <td>@serviceNames</td>
+                                    <td><span class="badge @statusClass">@statusText</span></td>
+                                    <td class="text-nowrap">
+                                        @if (booking.Status == BookingStatus.Pending)
+                                        {
+                                            <form asp-action="ConfirmBooking" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                                <button type="submit" class="btn btn-sm btn-success me-1" title="Xác nhận lịch">
+                                                    <i class="fas fa-check"></i> Nhận lịch
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (booking.Status == BookingStatus.Confirmed || booking.Status == BookingStatus.InProgress)
+                                        {
+                                            <form asp-action="CompleteBooking" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                                <button type="submit" class="btn btn-sm btn-primary me-1" title="Hoàn thành">
+                                                    <i class="fas fa-check-double"></i> Hoàn thành
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (booking.Status != BookingStatus.Completed && booking.Status != BookingStatus.Cancelled)
+                                        {
+                                            <a asp-action="AddNote" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-secondary me-1" title="Ghi chú khách hàng">
+                                                <i class="fas fa-sticky-note"></i> Ghi chú
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModalUp_@booking.BookingId">
+                                                <i class="fas fa-times"></i> Hủy
+                                            </button>
+
+                                            <!-- Modal hủy -->
+                                            <div class="modal fade" id="cancelModalUp_@booking.BookingId" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Xác nhận hủy lịch</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <form asp-action="CancelBooking" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="bookingId" value="@booking.BookingId" />
+                                                            <div class="modal-body">
+                                                                <p>Bạn có chắc chắn muốn hủy lịch của khách hàng <strong>@booking.Customer?.FullName</strong>?</p>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Lý do (tùy chọn)</label>
+                                                                    <textarea name="reason" class="form-control" rows="2"></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

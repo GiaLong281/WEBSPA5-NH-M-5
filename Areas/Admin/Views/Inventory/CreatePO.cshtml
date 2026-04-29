@@ -1,0 +1,153 @@
+@model SpaN5.Models.PurchaseOrder
+@{
+    ViewData["Title"] = "Tạo đơn nhập hàng (PO)";
+    Layout = "_AdminLayout";
+    var suppliers = ViewBag.Suppliers as List<SpaN5.Models.Supplier>;
+    var materials = ViewBag.Materials as List<SpaN5.Models.Material>;
+}
+
+<div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h3 class="fw-bold mb-1 text-main"><i class="fa-solid fa-file-circle-plus me-2 text-primary"></i>Lập Đơn Nhập Hàng Mới</h3>
+            <p class="text-muted small mb-0">Hệ thống sẽ tự động tạo mã PO dựa trên ngày lập.</p>
+        </div>
+        <a href="/Admin/Inventory/PurchaseOrders" class="btn btn-light rounded-pill btn-sm fw-bold">
+            <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    <form asp-action="CreatePO" method="post" id="poForm">
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">NHÀ CUNG CẤP</label>
+                <select asp-for="SupplierId" class="form-select rounded-3 shadow-none border-light p-2" required>
+                    <option value="">-- Chọn Nhà Cung Cấp --</option>
+                    @foreach (var s in suppliers)
+                    {
+                        <option value="@s.SupplierId">@s.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">GHI CHÚ ĐƠN HÀNG</label>
+                <input asp-for="Note" class="form-control rounded-3 shadow-none border-light p-2" placeholder="VD: Hàng gấp, thanh toán chuyển khoản...">
+            </div>
+        </div>
+
+        <div class="table-responsive bg-light rounded-4 p-3 mb-4">
+            <table class="table table-hover align-middle" id="materialsTable">
+                <thead>
+                    <tr class="text-muted small text-uppercase">
+                        <th>Nguyên liệu</th>
+                        <th class="text-center" style="width: 150px;">Số lượng</th>
+                        <th class="text-center" style="width: 200px;">Đơn giá (VNĐ)</th>
+                        <th class="text-end" style="width: 200px;">Thành tiền</th>
+                        <th style="width: 50px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="poDetails">
+                    <!-- Dynamic rows go here -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="p-3">
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill fw-bold" onclick="addRow()">
+                                <i class="fa-solid fa-plus me-1"></i> Thêm vật tư
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end p-3 bg-white rounded-4 shadow-sm">
+            <div class="text-end">
+                <h5 class="text-muted mb-1 small fw-bold">TỔNG GIÁ TRỊ ĐƠN HÀNG:</h5>
+                <h2 class="fw-bold text-primary mb-3" id="grandTotalText">0 VNĐ</h2>
+                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold py-2 shadow">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> LƯU VÀ GỬI PHÊ DUYỆT
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Raw HTML for a new row -->
+<template id="rowTemplate">
+    <tr class="po-row">
+        <td>
+            <select class="form-select form-select-sm border-0 bg-white material-select" name="details[INDEX].MaterialId" required onchange="updateRow(this)">
+                <option value="">-- Chọn vật tư --</option>
+                @foreach (var m in materials)
+                {
+                    <option value="@m.MaterialId" data-price="@m.PurchasePrice" data-unit="@m.Unit">@m.MaterialName</option>
+                }
+            </select>
+        </td>
+        <td class="text-center">
+            <div class="input-group input-group-sm">
+                <input type="number" class="form-control text-center fw-bold qty-input" name="details[INDEX].Quantity" value="1" min="1" required onchange="calculateRow(this)">
+                <span class="input-group-text bg-transparent border-0 small text-muted unit-text">?</span>
+            </div>
+        </td>
+        <td class="text-center">
+            <input type="number" class="form-control form-control-sm text-end fw-bold price-input" name="details[INDEX].UnitPrice" value="0" required onchange="calculateRow(this)">
+        </td>
+        <td class="text-end fw-bold text-main line-total">0 VNĐ</td>
+        <td class="text-center">
+            <button type="button" class="btn btn-link text-danger p-0" onclick="removeRow(this)">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+@section Scripts {
+    <script>
+        let rowIndex = 0;
+
+        function addRow() {
+            const template = document.getElementById('rowTemplate').innerHTML;
+            const newRow = template.replace(/INDEX/g, rowIndex);
+            $('#poDetails').append(newRow);
+            rowIndex++;
+        }
+
+        function removeRow(btn) {
+            $(btn).closest('tr').remove();
+            calculateGrandTotal();
+        }
+
+        function updateRow(select) {
+            const row = $(select).closest('tr');
+            const price = $(select).find(':selected').data('price') || 0;
+            const unit = $(select).find(':selected').data('unit') || '?';
+            row.find('.price-input').val(price);
+            row.find('.unit-text').text(unit);
+            calculateRow(select);
+        }
+
+        function calculateRow(el) {
+            const row = $(el).closest('tr');
+            const qty = parseFloat(row.find('.qty-input').val()) || 0;
+            const price = parseFloat(row.find('.price-input').val()) || 0;
+            const total = qty * price;
+            row.find('.line-total').text(total.toLocaleString() + ' VNĐ');
+            calculateGrandTotal();
+        }
+
+        function calculateGrandTotal() {
+            let total = 0;
+            $('.po-row').each(function() {
+                const qty = parseFloat($(this).find('.qty-input').val()) || 0;
+                const price = parseFloat($(this).find('.price-input').val()) || 0;
+                total += qty * price;
+            });
+            $('#grandTotalText').text(total.toLocaleString() + ' VNĐ');
+        }
+
+        // Initialize with one row
+        $(document).ready(() => addRow());
+    </script>
+}

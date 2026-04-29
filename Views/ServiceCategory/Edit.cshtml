@@ -1,0 +1,34 @@
+@model SpaN5.Models.ServiceCategory
+@{
+    ViewData["Title"] = "Sửa loại dịch vụ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h1>Sửa loại dịch vụ</h1>
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    
+    <form asp-action="Edit" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        
+        <div class="form-group mb-3">
+            <label class="form-label">Tên loại dịch vụ <span class="text-danger">*</span></label>
+            <input name="Name" value="@Model.Name" class="form-control" required />
+            <small class="form-text text-muted">Ví dụ: Chăm sóc da, Massage, Làm móng, ...</small>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">Cập nhật</button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Nhân viên Kĩ Thuật</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #10B981; /* Emerald Green */
+            --primary-light: #D1FAE5;
+            --primary-dark: #047857;
+            --secondary: #4B5563;
+            --dark: #1F2937;
+            --bg-color: #F3F4F6;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--dark);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: #ffffff;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .sidebar-brand img {
+            height: 35px;
+            margin-right: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .menu-title {
+            padding: 0 24px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9CA3AF;
+            font-weight: 700;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .menu-title:first-child { margin-top: 0; }
+
+        .nav-link {
+            padding: 12px 24px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 1.1rem;
+            margin-right: 12px;
+            color: #9CA3AF;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: #F9FAFB;
+        }
+
+        .nav-link:hover i {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-link.active i {
+            color: var(--primary);
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Profile Widget in Sidebar */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-top: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            background: #F9FAFB;
+        }
+        
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-navbar {
+            height: 70px;
+            background: #ffffff;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .page-content {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center fw-bold fs-5 text-dark">
+                <i class="fa-solid fa-spa text-success me-2"></i> STAFF PORTAL
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-title">Công việc của tôi</div>
+            <a href="/Workspace/Dashboard" class="nav-link @(Context.Request.Path == "/Workspace/Dashboard" || Context.Request.Path == "/Workspace" ? "active" : "")">
+                <i class="fa-solid fa-clipboard-list"></i>
+                Lịch làm việc (My Tasks)
+            </a>
+
+            <div class="menu-title mt-4">Công cụ hỗ trợ</div>
+            <a href="#" onclick="showMaterialReport()" class="nav-link">
+                <i class="fa-solid fa-box-open"></i>
+                Báo thiếu vật tư
+            </a>
+            
+            <div class="menu-title mt-4">Trang khách</div>
+            <a href="/" class="nav-link">
+                <i class="fa-solid fa-globe"></i>
+                Xem web khách hàng
+            </a>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-img">
+                <i class="fa-solid fa-user-astronaut"></i>
+            </div>
+            <div style="overflow: hidden;">
+                <div class="fw-bold fs-6 text-truncate">Kỹ thuật viên</div>
+                <div style="font-size: 0.75rem" class="text-muted text-truncate">Thẻ nhân viên đang hoạt động</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-light d-lg-none me-3" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="mb-0 fw-bold d-none d-sm-block">Cổng thông tin nội bộ</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="btn btn-light rounded-circle shadow-sm" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-bell text-secondary"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="width: 300px;">
+                        <li><h6 class="dropdown-header fw-bold text-dark">Thông báo</h6></li>
+                        <li><a class="dropdown-item py-2" href="#"><div class="small fw-bold">Ca làm sắp tới</div><div class="text-muted smaller">Bạn có 1 ca làm lúc 14:00</div></a></li>
+                    </ul>
+                </div>
+                <!-- Profile Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+                        <img src="https://ui-avatars.com/api/?name=Staff&background=10B981&color=fff" width="40" height="40" class="rounded-circle shadow-sm" />
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2 text-small">
+                        <li><a class="dropdown-item py-2 rounded" href="#"><i class="fas fa-key me-2 text-muted"></i>Đổi mật khẩu</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                <button type="submit" class="dropdown-item py-2 rounded text-danger"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            @RenderBody()
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        function showMaterialReport() {
+            // Lấy danh sách Material
+            $.get('/Workspace/GetMaterials', function(res) {
+                if(res.success && res.data) {
+                    let options = res.data.map(m => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join('');
+                    
+                    Swal.fire({
+                        title: 'Khai báo Vật tư hao hụt',
+                        html: `
+                            <div class="text-start px-2">
+                                <label class="fw-bold mb-1 small text-muted">Sản phẩm / Vật tư</label>
+                                <select id="matSelect" class="form-select mb-3">${options}</select>
+                                
+                                <label class="fw-bold mb-1 small text-muted">Mức độ hao hụt / Báo dùng</label>
+                                <input type="number" id="matQty" class="form-control mb-3" placeholder="Ví dụ: 1 hoặc 0.5" step="0.1">
+                                
+                                <label class="fw-bold mb-1 small text-muted">Ghi chú (Tùy chọn)</label>
+                                <textarea id="matNote" class="form-control" rows="2" placeholder="Ví dụ: Lọ tinh dầu bị vỡ..."></textarea>
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Gửi Báo Cáo',
+                        cancelButtonText: 'Hủy',
+                        confirmButtonColor: '#10B981',
+                        preConfirm: () => {
+                            return {
+                                id: $('#matSelect').val(),
+                                qty: $('#matQty').val(),
+                                note: $('#matNote').val()
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if(!result.value.qty || result.value.qty <= 0) {
+                                Swal.fire('Lỗi', 'Vui lòng nhập số lượng hợp lệ', 'error');
+                                return;
+                            }
+                            // Post
+                            $.post('/Workspace/ReportMaterial', { materialId: result.value.id, quantity: result.value.qty, note: result.value.note }, function(r) {
+                                if(r.success) {
+                                    Swal.fire('Thành công!', 'Đã gửi báo cáo vật tư thành công.', 'success');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SpaN5")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a77eda10fa32f775d66976dec04423dbcf906313")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d51ea3a79512b05a5680754ee904a29f55711984")]
 [assembly: System.Reflection.AssemblyProductAttribute("SpaN5")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SpaN5")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

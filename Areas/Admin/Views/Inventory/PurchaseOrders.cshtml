@@ -1,0 +1,125 @@
+@model IEnumerable<SpaN5.Models.PurchaseOrder>
+@{
+    ViewData["Title"] = "Quản lý Đơn nhập hàng (PO)";
+    Layout = "_AdminLayout";
+}
+
+<div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-file-invoice me-2 text-primary"></i>Danh sách Đơn nhập hàng</h3>
+        <a href="/Admin/Inventory/CreatePO" class="btn btn-primary rounded-pill px-4 fw-bold">
+            <i class="fa-solid fa-plus me-1"></i> Tạo đơn PO mới
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="text-muted small text-uppercase fw-bold">
+                <tr>
+                    <th>Mã PO</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var po in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@po.POCode</td>
+                        <td>@po.Supplier?.Name</td>
+                        <td>@po.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="fw-bold text-main">@po.TotalAmount.ToString("N0")đ</td>
+                        <td>
+                            @switch (po.Status)
+                            {
+                                case SpaN5.Models.POStatus.Pending:
+                                    <span class="badge bg-warning text-dark rounded-pill">Đang chờ duyệt</span>
+                                    break;
+                                case SpaN5.Models.POStatus.Approved:
+                                    <span class="badge bg-info rounded-pill">Đã duyệt - Chờ hàng</span>
+                                    break;
+                                case SpaN5.Models.POStatus.Received:
+                                    <span class="badge bg-success rounded-pill">Đã nhập kho</span>
+                                    break;
+                                case SpaN5.Models.POStatus.Cancelled:
+                                    <span class="badge bg-secondary rounded-pill">Đã hủy</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (po.Status == SpaN5.Models.POStatus.Pending)
+                            {
+                                <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="approvePO(@po.POId)">Duyệt đơn</button>
+                            }
+                            else if (po.Status == SpaN5.Models.POStatus.Approved)
+                            {
+                                <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" onclick="receiveGoods(@po.POId)">Xác nhận nhận hàng</button>
+                            }
+                            <button class="btn btn-sm btn-light rounded-circle ms-1"><i class="fa-solid fa-eye"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function approvePO(id) {
+            Swal.fire({
+                title: 'Duyệt đơn hàng?',
+                text: "Xác nhận chuyển trạng thái đơn hàng sang Đã Duyệt để chờ nhận hàng.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý duyệt'
+            }).then(r => {
+                if(r.isConfirmed) {
+                    $.post('/Admin/Inventory/ApprovePO', { id: id }, function(res) {
+                        if(res.success) location.reload();
+                        else Swal.fire('Lỗi', 'Không thể duyệt đơn.', 'error');
+                    });
+                }
+            });
+        }
+
+        function receiveGoods(id) {
+            Swal.fire({
+                title: 'Xác nhận nhập kho?',
+                html: `
+                    <div class="text-start">
+                        <p class="small text-muted mb-3">Xác nhận hàng đã về đủ. Vui lòng nhập ngày hết hạn của lô hàng thực tế để hệ thống quản lý FEFO.</p>
+                        <label class="form-label fw-bold small">Ngày hết hạn (Expiry Date):</label>
+                        <input type="date" id="expiryDate" class="form-control rounded-pill p-3" value="${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]}">
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Đã nhận đủ hàng & Tiếp tục',
+                preConfirm: () => {
+                    const expiryDate = document.getElementById('expiryDate').value;
+                    if (!expiryDate) {
+                        Swal.showValidationMessage('Vui lòng chọn ngày hết hạn!');
+                        return false;
+                    }
+                    return expiryDate;
+                }
+            }).then(r => {
+                if(r.isConfirmed) {
+                    const expiryDate = r.value;
+                    Swal.fire({ title: 'Đang xử lý...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+                    $.post('/Admin/Inventory/ReceiveGoods', { id: id, expiryDate: expiryDate }, function(res) {
+                        if(res.success) {
+                            Swal.fire('Thành công', 'Đã tăng tồn kho và tạo lô hàng FEFO thành công.', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', 'Có lỗi khi nhập kho.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,27 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["TermsTitle"];
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5" style="margin-top:80px;">
+    <h1 class="font-playfair text-gold">@Localizer["TermsTitle"]</h1>
+    <p><strong>@Localizer["Version"]</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+    <p>@Localizer["Welcome"]</p>
+    <h3>@Localizer["Introduction"]</h3>
+    <p>@Localizer["IntroDesc"]</p>
+    <h3>@Localizer["UserRights"]</h3>
+    <p>- @Localizer["UserRightsDesc1"]</p>
+    <p>- @Localizer["UserRightsDesc2"]</p>
+    <p>- @Localizer["UserRightsDesc3"]</p>
+    <h3>@Localizer["CompanyRights"]</h3>
+    <p>- @Localizer["CompanyRightsDesc1"]</p>
+    <p>- @Localizer["CompanyRightsDesc2"]</p>
+    <p>- @Localizer["CompanyRightsDesc3"]</p>
+    <h3>@Localizer["DataSecurity"]</h3>
+    <p>@Localizer["DataSecurityDesc"]</p>
+    <h3>@Localizer["Dispute"]</h3>
+    <p>@Localizer["DisputeDesc"]</p>
+    <h3>@Localizer["Contact"]</h3>
+    <p>@Localizer["ContactDesc"]</p>
+</div>

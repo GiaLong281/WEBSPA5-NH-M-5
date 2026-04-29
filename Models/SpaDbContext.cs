@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SpaN5.Models.SpaN5.Models;
+using Microsoft.EntityFrameworkCore;
+using SpaN5.Models;
 
 namespace SpaN5.Models
 {
@@ -17,16 +17,40 @@ namespace SpaN5.Models
 
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingDetail> BookingDetails { get; set; }
+        
+        public DbSet<CustomerNote> CustomerNotes { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
 
         public DbSet<Payment> Payments { get; set; }
 
         public DbSet<Material> Materials { get; set; }
         public DbSet<ServiceMaterial> ServiceMaterials { get; set; }
+        public DbSet<MaterialBatch> MaterialBatches { get; set; }
+        public DbSet<MaterialConversion> MaterialConversions { get; set; }
+        public DbSet<MaterialConsumption> MaterialConsumptions { get; set; }
+        public DbSet<ServiceStep> ServiceSteps { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
+        public DbSet<Shift> Shifts { get; set; }
+        public DbSet<StaffSchedule> StaffSchedules { get; set; }
+        public DbSet<WorkSchedule> WorkSchedules { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; } 
+
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Setting> Settings { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+        
+        // Địa chỉ (HEAD)
+        public DbSet<ThanhPho> ThanhPhos { get; set; }
+        public DbSet<Quan> Quans { get; set; }
+        public DbSet<DiaChi> DiaChis { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Cấu hình quan hệ ServiceMaterial
+            // 1. Cấu hình quan hệ ServiceMaterial
             modelBuilder.Entity<ServiceMaterial>()
                 .HasKey(sm => sm.Id);
 
@@ -40,22 +64,120 @@ namespace SpaN5.Models
                 .WithMany(m => m.ServiceMaterials)
                 .HasForeignKey(sm => sm.MaterialId);
 
-            // ✅ FIX LỖI DECIMAL (QUAN TRỌNG)
+            modelBuilder.Entity<ServiceMaterial>()
+                .HasOne(sm => sm.ServiceStep)
+                .WithMany(ss => ss.Materials)
+                .HasForeignKey(sm => sm.ServiceStepId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<MaterialBatch>()
+                .HasOne(mb => mb.Material)
+                .WithMany(m => m.Batches)
+                .HasForeignKey(mb => mb.MaterialId);
+
+            modelBuilder.Entity<Material>()
+                .Property(m => m.RowVersion)
+                .IsRowVersion();
+
+            modelBuilder.Entity<PurchaseOrder>()
+                .Property(po => po.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PurchaseOrderDetail>()
+                .Property(pod => pod.UnitPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PurchaseOrderDetail>()
+                .Property(pod => pod.TotalPrice)
+                .HasPrecision(18, 2);
+
+            // 2. Cấu hình quan hệ User (HEAD)
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Customer)
+                .WithOne()
+                .HasForeignKey<User>(u => u.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Staff)
+                .WithOne()
+                .HasForeignKey<User>(u => u.StaffId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 3. FIX LỖI DECIMAL & PRECISION (Long)
             modelBuilder.Entity<ServiceMaterial>()
                 .Property(sm => sm.Quantity)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Service>()
+                .Property(s => s.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<BookingDetail>()
+                .Property(bd => bd.PriceAtTime)
+                .HasPrecision(18, 2);
+
+            // 4. StockTransaction (HEAD)
             modelBuilder.Entity<StockTransaction>(entity =>
             {
-                entity.HasKey(e => e.TransactionId);  // ← Đây là fix chính
-
-                // Optional: đặt tên cột nếu khác với property
-                // entity.Property(e => e.TransactionId).HasColumnName("TransactionId");
-
-                // Quan hệ với Material (nếu chưa có)
+                entity.HasKey(e => e.TransactionId);
                 entity.HasOne(e => e.Material)
-                      .WithMany()  // nếu Material không có collection StockTransactions thì để WithMany()
+                      .WithMany()
                       .HasForeignKey(e => e.MaterialId)
-                      .OnDelete(DeleteBehavior.Restrict); // hoặc Cascade tùy logic
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // 5. Địa chỉ relationships (HEAD)
+            modelBuilder.Entity<ThanhPho>(entity =>
+            {
+                entity.HasKey(tp => tp.MaThanhPho);
+            });
+
+            modelBuilder.Entity<Quan>(entity =>
+            {
+                entity.HasKey(q => q.MaQuan);
+                entity.HasOne(q => q.ThanhPho)
+                    .WithMany(tp => tp.Quans)
+                    .HasForeignKey(q => q.MaThanhPho);
+            });
+
+            modelBuilder.Entity<DiaChi>(entity =>
+            {
+                entity.HasKey(d => d.MaDiaChi);
+                entity.HasOne(d => d.Quan)
+                    .WithMany(q => q.DiaChis)
+                    .HasForeignKey(d => d.MaQuan);
+            });
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.HasOne(c => c.DiaChi)
+                    .WithMany(d => d.Customers)
+                    .HasForeignKey(c => c.MaDiaChi);
+            });
+
+            // 6. Review relationships (HEAD)
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(r => r.ReviewId);
+
+                entity.HasOne(r => r.Service)
+                      .WithMany(s => s.Reviews)
+                      .HasForeignKey(r => r.ServiceId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(r => r.Customer)
+                      .WithMany(c => c.Reviews)
+                      .HasForeignKey(r => r.CustomerId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

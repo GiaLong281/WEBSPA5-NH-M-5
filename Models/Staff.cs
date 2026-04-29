@@ -1,4 +1,4 @@
-﻿namespace SpaN5.Models
+namespace SpaN5.Models
 {
     public class Staff
     {
@@ -14,6 +14,9 @@
         public string Status { get; set; } = "active";
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        
+        public int? SpecializationId { get; set; }
+        public Service? Specialization { get; set; }
 
         public Branch? Branch { get; set; }
     }

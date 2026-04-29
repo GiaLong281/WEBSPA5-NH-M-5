@@ -1,0 +1,271 @@
+@model List<SpaN5.Models.BookingDetail>
+@{
+    ViewData["Title"] = "Không gian làm việc";
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+    var attendance = ViewBag.Attendance as SpaN5.Models.Attendance;
+    bool isCheckedIn = attendance != null;
+    bool isCheckedOut = isCheckedIn && attendance.CheckOutTime != null;
+}
+
+<style>
+    .workspace-header {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        border-radius: 20px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .workspace-header::after {
+        content: ''; position: absolute; right: 0; bottom: 0;
+        width: 300px; height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        transform: translate(30%, 30%);
+    }
+
+    .stat-card {
+        background: white; border-radius: 16px; padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        border: 1px solid #f3f4f6;
+    }
+
+    /* Workflow Kanban Cards */
+    .task-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-left: 5px solid #D1D5DB;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        transition: all 0.2s ease;
+    }
+    
+    .task-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.05); }
+    
+    .task-card.status-pending { border-left-color: #FBBF24; }
+    .task-card.status-inprogress { border-left-color: #3B82F6; }
+    .task-card.status-completed { border-left-color: #10B981; opacity: 0.8; }
+
+    .time-badge {
+        font-family: monospace; font-size: 1.1rem; font-weight: 800;
+        background: #F3F4F6; padding: 6px 12px; border-radius: 8px;
+        color: #4B5563;
+    }
+    
+    .checkin-btn {
+        background: white; color: var(--primary); font-weight: 700;
+        padding: 12px 25px; border-radius: 50px; border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s;
+    }
+    .checkin-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .checkout-btn {
+        background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5);
+    }
+</style>
+
+<div class="workspace-header d-flex flex-column flex-md-row justify-content-between align-items-center">
+    <div>
+        <h2 class="fw-bold mb-1">Xin chào, @ViewBag.StaffName! 👋</h2>
+        <p class="mb-0 opacity-75">Chúc bạn một ngày làm việc hiệu quả và tràn đầy năng lượng.</p>
+    </div>
+    <div class="mt-4 mt-md-0 d-flex align-items-center gap-3" style="position: relative; z-index: 2;">
+        @if (!isCheckedIn)
+        {
+            <button class="checkin-btn" onclick="toggleAttendance()"><i class="fa-solid fa-fingerprint me-2"></i> Chấm công (Check In)</button>
+        }
+        else if (!isCheckedOut)
+        {
+            <div class="text-end me-3">
+                <div class="opacity-75 small">Đã Check-in lúc:</div>
+                <div class="fw-bold fs-5">@attendance.CheckInTime?.ToString("HH:mm")</div>
+            </div>
+            <button class="checkin-btn checkout-btn" onclick="toggleAttendance()"><i class="fa-solid fa-person-walking-arrow-right me-2"></i> Kết ca (Check Out)</button>
+        }
+        else
+        {
+            <div class="text-end">
+                <div class="opacity-75 small">Hoàn thành ca làm</div>
+                <div class="fw-bold fs-5">@attendance.CheckInTime?.ToString("HH:mm") - @attendance.CheckOutTime?.ToString("HH:mm")</div>
+            </div>
+            <div class="bg-white text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="fa-solid fa-check fs-4"></i>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="stat-card d-flex align-items-center">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                <i class="fa-solid fa-calendar-check fs-5"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0">@ViewBag.TotalTasks</h3>
+                <span class="text-muted small">Ca làm trong ngày</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="stat-card d-flex align-items-center">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                <i class="fa-solid fa-check-double fs-5"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0">@ViewBag.CompletedTasks</h3>
+                <span class="text-muted small">Ca đã hoàn thành</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center">
+            <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                <i class="fa-solid fa-bolt fs-5"></i>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0">@ViewBag.Performance%</h3>
+                <span class="text-muted small">Tỷ lệ tiến độ</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tasks Workboard -->
+<h4 class="fw-bold mb-4 mt-5"><i class="fa-solid fa-list-check me-2 text-primary"></i> Phân ca Dịch vụ hôm nay</h4>
+
+@if (!Model.Any())
+{
+    <div class="text-center p-5 bg-white rounded-4 border dashed text-muted">
+        <i class="fa-regular fa-face-smile-wink fa-4x mb-3 opacity-50"></i>
+        <h5>Hiện chưa có Lịch hẹn nào cho bạn hôm nay.</h5>
+        <p>Hệ thống sẽ thông báo ngay khi có khách hàng được phân công.</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var task in Model)
+        {
+            var isPending = task.Status == SpaN5.Models.DetailStatus.Pending;
+            var isInProgress = task.Status == SpaN5.Models.DetailStatus.InProgress;
+            var isCompleted = task.Status == SpaN5.Models.DetailStatus.Completed;
+            var statusClass = isPending ? "status-pending" : isInProgress ? "status-inprogress" : "status-completed";
+            var statusText = isPending ? "CHỜ PHỤC VỤ" : isInProgress ? "ĐANG THỰC HIỆN" : "ĐÃ THEO DÕI / XONG";
+
+            <div class="col-lg-6">
+                <div class="task-card @statusClass">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="time-badge">@task.Booking.StartTime.ToString("HH:mm") - @task.Booking.EndTime.ToString("HH:mm")</div>
+                        <span class="badge @(isPending ? "bg-warning text-dark" : isInProgress ? "bg-primary" : "bg-success") rounded-pill px-3">
+                            @statusText
+                        </span>
+                    </div>
+
+                    <div class="d-flex mb-3">
+                        <div class="bg-light rounded p-2 text-center me-3" style="min-width: 60px;">
+                            <i class="fa-solid fa-spa fs-3 text-secondary"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">@task.Service.ServiceName</h5>
+                            <div class="small fw-bold text-muted">Khách hàng: <a href="/Booking/CustomerDetail/@task.Booking.Customer.CustomerId" target="_blank" class="text-primary text-decoration-none">@task.Booking.Customer.FullName</a></div>
+                            <div class="small text-muted"><i class="fa-solid fa-door-open me-1"></i> Phòng được chuyển: @(task.RoomNumber.HasValue ? $"P.{task.RoomNumber:D2}" : "Chưa gắn")</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 small text-muted">
+                        <i class="fa-solid fa-circle-info me-1"></i> Hướng dẫn liệu trình: @(string.IsNullOrEmpty(task.Service.Description) ? "Thực hiện theo quy chuẩn dịch vụ." : task.Service.Description)
+                    </div>
+
+                    <hr class="text-muted opacity-25" />
+
+                    <div class="d-flex justify-content-end gap-2">
+                        @if (isPending)
+                        {
+                            <button class="btn btn-outline-danger btn-sm" onclick="handleTask(@task.DetailId, 'reject')">Xin từ chối ca</button>
+                            <button class="btn btn-primary fw-bold" onclick="handleTask(@task.DetailId, 'start')"><i class="fa-solid fa-play me-2"></i> Bắt đầu ca làm</button>
+                        }
+                        else if (isInProgress)
+                        {
+                            <button class="btn btn-success fw-bold" onclick="showCompleteForm(@task.DetailId)"><i class="fa-solid fa-check-double me-2"></i> Hoàn thành & Ghi chú</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-light disabled" disabled>Dịch vụ đã kết thúc</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function toggleAttendance() {
+            Swal.fire({
+                title: 'Xác nhận Điểm danh',
+                text: "Xác nhận ghi nhận thời gian vào/ra ca làm?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    $.post('/Workspace/ToggleAttendance', function(r) {
+                        if(r.success) {
+                            Swal.fire({ title: 'Thành công!', text: `Hệ thống ghi nhận lúc: ${r.time}`, icon: 'success', timer: 2000 }).then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', r.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function handleTask(id, type) {
+            let title = type === 'start' ? 'Bắt đầu trực tiếp ca làm này?' : 'Xin từ chối ca làm này?';
+            let text = type === 'start' ? 'Trạng thái chuyển sang Đang Thực Hiện.' : 'Hệ thống sẽ trả lại ca làm này cho Quản lý điều phối.';
+            
+            Swal.fire({
+                title: title, text: text, icon: 'warning', showCancelButton: true, confirmButtonText: 'Xác nhận', confirmButtonColor: type === 'reject' ? '#dc3545' : '#0d6efd'
+            }).then(r => {
+                if (r.isConfirmed) {
+                    $.post('/Workspace/UpdateTaskStatus', { detailId: id, actionType: type }, function(res) {
+                        if(res.success) location.reload();
+                    });
+                }
+            })
+        }
+
+        function showCompleteForm(id) {
+            Swal.fire({
+                title: 'Bàn giao Ca làm & Ghi chú',
+                html: `
+                    <div class="text-start px-2 mt-2">
+                        <div class="alert alert-info py-2 small fw-bold mb-3"><i class="fa-solid fa-info-circle me-1"></i> Form này ghi nhận Hồ sơ Y khoa (Notes) của khách và bảo mật.</div>
+                        <label class="fw-bold mb-1">Tình trạng thực tế (Da mặt/Cơ thể khách):</label>
+                        <textarea id="noteText" class="form-control mb-3" rows="4" placeholder="Ví dụ: Da mụn viêm, khách đau vai gáy... Cần quay lại sau 7 ngày"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Hoàn thành Dịch vụ',
+                confirmButtonColor: '#10B981',
+                preConfirm: () => { return $('#noteText').val(); }
+            }).then(r => {
+                if(r.isConfirmed) {
+                    let note = r.value;
+                    if(!note) { Swal.fire('Vui lòng ghi chú', 'Quy định phải có ghi chú tiến triển khách hàng sau mỗi ca!', 'warning'); return; }
+                    
+                    $.post('/Workspace/UpdateTaskStatus', { detailId: id, actionType: 'complete', note: note }, function(res) {
+                        if(res.success) {
+                            Swal.fire('Thành công', 'Đã lưu ghi chú lịch sử và kết thúc ca.', 'success').then(() => location.reload());
+                        }
+                    });
+                }
+            })
+        }
+    </script>
+}

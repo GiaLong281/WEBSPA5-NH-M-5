@@ -1,0 +1,395 @@
+@{
+    ViewData["Title"] = "Lịch biểu của bạn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectedStaffId = ViewBag.SelectedStaffId as int?;
+}
+
+<div class="container-fluid py-4" style="margin-top: 70px;">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="font-playfair text-gold fw-bold mb-1">
+                <i class="fas fa-calendar-alt me-2"></i>Lịch biểu của bạn
+            </h1>
+            <p class="text-muted mb-0">
+                <i class="fas fa-clock me-1"></i>Quản lý và xem lịch trình chăm sóc khách hàng
+            </p>
+        </div>
+    </div>
+
+    @if (!selectedStaffId.HasValue)
+    {
+        <div class="alert alert-warning text-center py-5 rounded-4">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+            <h4 class="mb-2">Không thể xác định nhân viên</h4>
+            <p class="mb-0">Vui lòng liên hệ quản trị viên để kiểm tra thông tin tài khoản.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-lg rounded-4" style="overflow: visible;">
+            <div class="card-body p-0" style="overflow: visible;">
+                <div id="calendar" class="p-3"></div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal chi tiết -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-xl rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalTitle">
+                    <i class="fas fa-calendar-check text-gold me-2"></i>Chi tiết lịch hẹn
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="p-3 bg-soft-gold rounded-circle">
+                        <i class="fas fa-spa fa-2x text-gold"></i>
+                    </div>
+                    <div>
+                        <span class="badge mb-1" id="modalStatusBadge" style="font-size: 0.75rem;">Status</span>
+                        <h4 class="mb-0 fw-bold" id="modalCustomerName">Khách hàng</h4>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="info-card p-3 bg-light rounded-3">
+                            <div class="text-muted small text-uppercase mb-1">
+                                <i class="fas fa-hashtag me-1"></i>MÃ ĐƠN HÀNG
+                            </div>
+                            <div class="fw-bold fs-5 text-dark" id="modalBookingCode">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card p-3 bg-light rounded-3">
+                            <div class="text-muted small text-uppercase mb-1">
+                                <i class="fas fa-concierge-bell me-1"></i>DỊCH VỤ
+                            </div>
+                            <div class="fw-bold text-dark" id="modalService">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card p-3 bg-light rounded-3">
+                            <div class="text-muted small text-uppercase mb-1">
+                                <i class="fas fa-hourglass-start me-1"></i>BẮT ĐẦU
+                            </div>
+                            <div class="fw-bold text-dark" id="modalStart">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-card p-3 bg-light rounded-3">
+                            <div class="text-muted small text-uppercase mb-1">
+                                <i class="fas fa-hourglass-end me-1"></i>KẾT THÚC
+                            </div>
+                            <div class="fw-bold text-dark" id="modalEnd">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
+                <a id="btnGoToBooking" href="#" class="btn btn-gold rounded-pill px-4">
+                    <i class="fas fa-eye me-1"></i>Xem chi tiết
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FullCalendar v6.1.10 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@fullcalendar/moment@6.1.10/index.global.min.js"></script>
+    
+    <style>
+        :root {
+            --fc-border-color: rgba(18, 32, 45, 0.08);
+            --fc-today-bg-color: rgba(182, 138, 99, 0.05);
+            --fc-page-bg-color: transparent;
+            --fc-list-event-hover-bg-color: rgba(182, 138, 99, 0.08);
+        }
+
+        #calendar {
+            font-family: inherit;
+            min-height: 600px;
+        }
+
+        .card-body {
+            overflow: visible !important;
+        }
+
+        .fc .fc-toolbar-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: #2c1810;
+            font-size: 1.5rem;
+        }
+
+        .fc .fc-button-primary {
+            background-color: #2c1810;
+            border-color: #2c1810;
+            border-radius: 50px;
+            padding: 8px 20px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .fc .fc-button-primary:hover {
+            background-color: #c9a96e;
+            border-color: #c9a96e;
+        }
+
+        .fc .fc-button-primary:not(:disabled):active {
+            background-color: #c9a96e;
+            border-color: #c9a96e;
+        }
+
+        .fc .fc-button-primary:focus {
+            box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.3);
+        }
+
+        .fc .fc-col-header-cell {
+            background: #fdfbf8;
+            padding: 12px 0;
+            font-weight: 700;
+            color: #c9a96e;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .fc .fc-timegrid-slot {
+            height: 50px;
+        }
+
+        .fc-event {
+            border: 0 !important;
+            padding: 4px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .fc-event:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .fc-event-title {
+            font-weight: 600;
+            padding: 2px 4px;
+        }
+
+        .fc-day-today {
+            background-color: rgba(201, 169, 110, 0.05) !important;
+        }
+
+        .bg-soft-gold {
+            background: rgba(201, 169, 110, 0.12);
+        }
+
+        .info-card {
+            transition: all 0.2s ease;
+        }
+
+        .info-card:hover {
+            background-color: #fff8f0 !important;
+            transform: translateY(-2px);
+        }
+
+        /* Scrollbar styling */
+        .fc-scroller {
+            scrollbar-width: thin;
+        }
+
+        .fc-scroller::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .fc-scroller::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .fc-scroller::-webkit-scrollbar-thumb {
+            background: #c9a96e;
+            border-radius: 10px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            
+            // Lấy StaffId an toàn
+            var getCurrentStaffId = function() {
+                var selectedStaffId = @Html.Raw(Json.Serialize(selectedStaffId));
+                if (selectedStaffId && selectedStaffId > 0) return selectedStaffId;
+                return null;
+            };
+
+            // Hiển thị loading state
+            var showLoading = function(show) {
+                if (calendarEl) {
+                    if (show) {
+                        calendarEl.style.opacity = '0.5';
+                    } else {
+                        calendarEl.style.opacity = '1';
+                    }
+                }
+            };
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                locale: 'vi',
+                slotMinTime: '07:00:00',
+                slotMaxTime: '22:00:00',
+                slotDuration: '00:30:00',
+                allDaySlot: false,
+                contentHeight: 'auto',
+                businessHours: {
+                    daysOfWeek: [1, 2, 3, 4, 5, 6],
+                    startTime: '08:00',
+                    endTime: '20:00'
+                },
+                nowIndicator: true,
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                },
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    var staffId = getCurrentStaffId();
+                    
+                    if (!staffId || staffId <= 0) {
+                        console.warn('Không có StaffId hợp lệ');
+                        successCallback([]);
+                        return;
+                    }
+
+                    var url = `/api/ApiStaffCalendar/GetBookings?staffId=${staffId}&start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`;
+                    console.log('Fetching bookings:', url);
+                    
+                    fetch(url, {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                            if (res.status === 401) {
+                                throw new Error('Vui lòng đăng nhập lại');
+                            }
+                            if (res.status === 403) {
+                                throw new Error('Bạn không có quyền xem lịch này');
+                            }
+                            throw new Error(`HTTP ${res.status}`);
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        console.log(`Loaded ${data.length} bookings`);
+                        successCallback(data);
+                    })
+                    .catch(err => {
+                        console.error('Lỗi tải lịch:', err);
+                        failureCallback(err);
+                        // Hiển thị thông báo lỗi nhẹ nhàng
+                        if (window.toastr) {
+                            toastr.error('Không thể tải lịch làm việc. Vui lòng thử lại sau.', 'Lỗi');
+                        }
+                    });
+                },
+                eventClick: function(info) {
+                    var props = info.event.extendedProps;
+                    var statusText = props.status || '';
+                    var statusColor = getStatusColor(statusText);
+                    
+                    document.getElementById('modalTitle').innerHTML = `<i class="fas fa-calendar-check text-gold me-2"></i>Chi tiết lịch hẹn`;
+                    document.getElementById('modalCustomerName').innerText = props.customer || 'Khách hàng';
+                    
+                    var statusBadge = document.getElementById('modalStatusBadge');
+                    statusBadge.innerText = statusText;
+                    statusBadge.className = `badge mb-1 bg-${statusColor}`;
+                    
+                    document.getElementById('modalBookingCode').innerText = props.bookingCode || '-';
+                    document.getElementById('modalService').innerText = props.service || '-';
+                    
+                    var options = { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    };
+                    
+                    if (info.event.start) {
+                        document.getElementById('modalStart').innerText = info.event.start.toLocaleDateString('vi-VN', options);
+                    }
+                    if (info.event.end) {
+                        document.getElementById('modalEnd').innerText = info.event.end.toLocaleDateString('vi-VN', options);
+                    }
+                    
+                    document.getElementById('btnGoToBooking').href = `/Staff/Details/${props.bookingId || info.event.id}`;
+                    
+                    var modal = new bootstrap.Modal(document.getElementById('eventModal'));
+                    modal.show();
+                },
+                eventDidMount: function(info) {
+                    // Tooltip khi hover
+                    var title = `${info.event.title}\n${info.event.start.toLocaleTimeString('vi-VN')} - ${info.event.end.toLocaleTimeString('vi-VN')}`;
+                    info.el.setAttribute('title', title);
+                },
+                buttonText: {
+                    today: 'Hôm nay',
+                    month: 'Tháng',
+                    week: 'Tuần',
+                    day: 'Ngày'
+                },
+                loading: function(isLoading) {
+                    showLoading(isLoading);
+                }
+            });
+
+            calendar.render();
+
+            // Helper function để lấy màu status
+            function getStatusColor(status) {
+                var statusMap = {
+                    'Pending': 'warning',
+                    'Chờ xác nhận': 'warning',
+                    'Confirmed': 'info',
+                    'Đã xác nhận': 'info',
+                    'InProgress': 'primary',
+                    'Đang thực hiện': 'primary',
+                    'Completed': 'success',
+                    'Hoàn thành': 'success',
+                    'Cancelled': 'danger',
+                    'Đã hủy': 'danger'
+                };
+                return statusMap[status] || 'secondary';
+            }
+        });
+    </script>
+}

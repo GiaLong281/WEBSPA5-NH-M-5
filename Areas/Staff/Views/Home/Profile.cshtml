@@ -1,0 +1,225 @@
+@model SpaN5.Models.Staff
+
+@{
+    ViewData["Title"] = "Hồ Sơ Cá Nhân";
+}
+
+<div class="profile-container">
+    <!-- Profile Header/Avatar Section -->
+    <div class="glass-card text-center p-4 mb-4">
+        <div class="avatar-wrapper position-relative mx-auto mb-3" onclick="document.getElementById('avatarInput').click()">
+            <div class="avatar-main shadow-lg" id="profile-avatar-preview">
+                @if (string.IsNullOrEmpty(Model.Avatar))
+                {
+                    <i class="bi bi-person-fill fs-1 text-muted"></i>
+                }
+                else
+                {
+                    <img src="@Model.Avatar" alt="Avatar">
+                }
+            </div>
+            <div class="avatar-edit-badge shadow-sm">
+                <i class="bi bi-camera-fill"></i>
+            </div>
+            <input type="file" id="avatarInput" hidden accept="image/*" onchange="uploadAvatar(this)">
+        </div>
+        <h4 class="fw-bold mb-1 text-main">@Model.FullName</h4>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">
+            @Model.Position
+        </span>
+    </div>
+
+    <!-- Theme & Settings Section -->
+    <div class="glass-card p-4 mb-4">
+        <h6 class="text-uppercase small fw-bold text-muted ls-1 mb-3">Tùy chỉnh giao diện</h6>
+        <div class="d-flex align-items-center justify-content-between p-3 rounded-4 bg-inner-glass">
+            <div class="d-flex align-items-center">
+                <div class="settings-icon me-3 bg-warning-subtle text-warning">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-main">Chế độ tối (Dark Mode)</div>
+                    <div class="text-muted small">Tiết kiệm pin và dịu mắt</div>
+                </div>
+            </div>
+            <div class="form-check form-switch fs-4">
+                <input class="form-check-input custom-switch" type="checkbox" id="themeToggle" onchange="toggleTheme(this)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="glass-card p-4">
+        <h6 class="text-uppercase small fw-bold text-muted ls-1 mb-3">Thông tin liên hệ</h6>
+        
+        <div class="info-item d-flex align-items-center mb-4">
+            <div class="info-icon me-3">
+                <i class="bi bi-telephone-fill"></i>
+            </div>
+            <div class="flex-grow-1 border-bottom-glass pb-2">
+                <div class="small text-muted">Số điện thoại</div>
+                <div class="fw-500 text-main">@Model.Phone</div>
+            </div>
+        </div>
+
+        <div class="info-item d-flex align-items-center mb-4">
+            <div class="info-icon me-3">
+                <i class="bi bi-envelope-at-fill"></i>
+            </div>
+            <div class="flex-grow-1 border-bottom-glass pb-2">
+                <div class="small text-muted">Email</div>
+                <div class="fw-500 text-main">@Model.Email</div>
+            </div>
+        </div>
+
+        <div class="info-item d-flex align-items-center mb-4">
+            <div class="info-icon me-3">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="flex-grow-1 border-bottom-glass pb-2">
+                <div class="small text-muted">Chi nhánh</div>
+                <div class="fw-500 text-main">@(Model.Branch?.BranchName ?? "Chưa rõ")</div>
+            </div>
+        </div>
+
+        <div class="info-item d-flex align-items-center">
+            <div class="info-icon me-3">
+                <i class="bi bi-calendar-check-fill"></i>
+            </div>
+            <div class="flex-grow-1">
+                <div class="small text-muted">Ngày bắt đầu</div>
+                <div class="fw-500 text-main">@Model.CreatedAt.ToString("dd/MM/yyyy")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+    .fw-500 { font-weight: 500; }
+    
+    .bg-inner-glass {
+        background: var(--card-inner-bg);
+        border: 1px solid var(--glass-border);
+    }
+
+    .border-bottom-glass {
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    /* Avatar Styling */
+    .avatar-wrapper {
+        width: 110px;
+        height: 110px;
+        cursor: pointer;
+    }
+    
+    .avatar-main {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--card-inner-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid white;
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .avatar-main img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-wrapper:active .avatar-main { transform: scale(0.95); }
+
+    .avatar-edit-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 32px;
+        height: 32px;
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        border: 2px solid white;
+    }
+
+    /* Icon Boxes */
+    .settings-icon, .info-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .info-icon {
+        background: rgba(99, 102, 241, 0.1);
+        color: #6366f1;
+    }
+
+    /* Custom Switch */
+    .custom-switch {
+        cursor: pointer;
+    }
+    .custom-switch:checked {
+        background-color: #6366f1;
+        border-color: #6366f1;
+    }
+
+    [data-theme="dark"] .avatar-main { border-color: #1e293b; }
+    [data-theme="dark"] .avatar-edit-badge { border-color: #1e293b; }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Sync theme toggle with current theme
+            const currentTheme = localStorage.getItem('staff-theme') || 'light';
+            $('#themeToggle').prop('checked', currentTheme === 'dark');
+            
+            // Set header avatar on load if it exists
+            const avatarUrl = "@Model.Avatar";
+            if (avatarUrl) window.updateHeaderAvatar(avatarUrl);
+        });
+
+        function toggleTheme(checkbox) {
+            applyTheme(checkbox.checked ? 'dark' : 'light');
+        }
+
+        function uploadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const formData = new FormData();
+                formData.append('avatarFile', input.files[0]);
+
+                // Show loading state
+                const originalContent = $('#profile-avatar-preview').html();
+                $('#profile-avatar-preview').html('<div class="spinner-border spinner-border-sm text-primary"></div>');
+
+                $.ajax({
+                    url: '/Staff/Home/UpdateAvatar',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.success) {
+                            const newUrl = res.avatarUrl + '?t=' + new Date().getTime();
+                            $('#profile-avatar-preview').html(`<img src="${newUrl}" alt="Avatar">`);
+                            window.updateHeaderAvatar(newUrl);
+                        } else {
+                            alert(res.message);
+                            $('#profile-avatar-preview').html(originalContent);
+                        }
+                    },
+                    error: function() {
+                        alert("Lỗi upload ảnh!");
+                        $('#profile-avatar-preview').html(originalContent);
+                    }
+                });
+            }
+        }
+    </script>
+}

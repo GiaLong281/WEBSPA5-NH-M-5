@@ -1,0 +1,25 @@
+@model IEnumerable<SpaN5.Models.Booking>
+@{
+    ViewData["Title"] = "Quản lý lịch hẹn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5">
+    <h1>Quản lý lịch hẹn</h1>
+    <table class="table">
+        <thead><tr><th>ID</th><th>Khách hàng</th><th>Ngày đặt</th><th>Giờ</th><th>Chi nhánh</th><th>Trạng thái</th><th>Tổng tiền</th></tr></thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                <tr>
+                    <td>@b.BookingId</td>
+                    <td>@b.Customer?.FullName</td>
+                    <td>@b.BookingDate.ToString("dd/MM/yyyy")</td>
+                    <td>@b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")</td>
+                    <td>@b.Branch?.BranchName</td>
+                    <td>@b.Status</td>
+                    <td>@b.TotalAmount.ToString("N0")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

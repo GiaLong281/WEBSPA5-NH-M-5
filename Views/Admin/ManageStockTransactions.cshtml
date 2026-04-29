@@ -1,0 +1,27 @@
+@model IEnumerable<SpaN5.Models.StockTransaction>
+@{
+    ViewData["Title"] = "Lịch sử giao dịch kho";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5">
+    <h1>Lịch sử giao dịch kho</h1>
+    <a asp-action="CreateStockTransaction" class="btn btn-success mb-3">Tạo giao dịch mới</a>
+    <table class="table">
+        <thead>
+            <tr><th>ID</th><th>Vật tư</th><th>Loại</th><th>Số lượng</th><th>Lý do</th><th>Thời gian</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.TransactionId</td>
+                    <td>@t.Material?.MaterialName</td>
+                    <td>@(t.Type == "import" ? "Nhập" : "Xuất")</td>
+                    <td>@t.Quantity</td>
+                    <td>@t.Reason</td>
+                    <td>@t.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

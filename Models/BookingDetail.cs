@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SpaN5.Models
 {
@@ -8,14 +8,20 @@ namespace SpaN5.Models
         public int DetailId { get; set; }
 
         public int BookingId { get; set; }
-        public Booking Booking { get; set; }
+        public Booking Booking { get; set; } = null!;
 
         public int ServiceId { get; set; }
-        public Service Service { get; set; }
+        public Service Service { get; set; } = null!;
 
         public int? StaffId { get; set; }
         public Staff? Staff { get; set; }
 
         public decimal PriceAtTime { get; set; }
+        public int? RoomNumber { get; set; }
+
+        public DetailStatus Status { get; set; } = DetailStatus.Pending;
+        
+        [StringLength(1000)]
+        public string? TechnicianNote { get; set; }
     }
 }

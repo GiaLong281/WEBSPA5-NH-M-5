@@ -1,0 +1,154 @@
+@model IEnumerable<SpaN5.Models.Service>
+@{
+    ViewData["Title"] = "Quản lý Gói Nguyên liệu theo Dịch vụ";
+    Layout = "_AdminLayout";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <ul class="nav nav-pills gap-2 p-2 bg-white rounded-pill shadow-sm" style="width: fit-content;">
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold" href="/Admin/Inventory">
+                    <i class="fa-solid fa-boxes-stacked me-1"></i> Kho vật tư
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold active" href="/Admin/Inventory/ServicePackages">
+                    <i class="fa-solid fa-gift me-1"></i> Gói Dịch Vụ
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold" href="/Admin/Inventory/PurchaseOrders">
+                    <i class="fa-solid fa-file-invoice me-1"></i> Đơn nhập hàng (PO)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link rounded-pill fw-bold" href="/Admin/Inventory/Reports">
+                    <i class="fa-solid fa-chart-pie me-1"></i> Báo cáo Hao hụt
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-gift me-2 text-primary"></i>Định mức theo Gói Dịch vụ</h3>
+        <p class="text-muted small mb-0">Thiết lập các nguyên liệu tiêu chuẩn khi thực hiện dịch vụ cho khách.</p>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var service in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="position-relative">
+                        <img src="@service.Image" class="card-img-top" style="height: 150px; object-fit: cover;" alt="@service.ServiceName">
+                        <div class="position-absolute top-0 end-0 m-2">
+                             <span class="badge @(service.IsVip ? "bg-warning" : "bg-primary") rounded-pill">
+                                @(service.IsVip ? "VIP" : "Standard")
+                             </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold text-main mb-3">@service.ServiceName</h5>
+                        
+                        <div class="material-list">
+                            @if (service.ServiceMaterials != null && service.ServiceMaterials.Any())
+                            {
+                                foreach (var sm in service.ServiceMaterials)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded-3">
+                                        <div class="small">
+                                            <i class="fa-solid fa-flask-vial text-primary me-1"></i> 
+                                            @sm.Material.MaterialName
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="number" class="form-control form-control-sm text-center fw-bold px-1" 
+                                                   style="width: 60px; border: none; background: transparent;"
+                                                   value="@sm.Quantity" step="0.1" 
+                                                   onchange="updateQuantity(@service.ServiceId, @sm.MaterialId, this.value)">
+                                            <span class="text-muted smaller">@sm.Material.Unit</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-3 text-muted smaller bg-light rounded-3">
+                                    <i class="fa-solid fa-circle-info me-1"></i> Chưa gán nguyên liệu.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 p-3">
+                        <button class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold" onclick="showAddMaterial(@service.ServiceId, '@service.ServiceName')">
+                            <i class="fa-solid fa-plus me-1"></i> Thêm vật tư vào gói
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateQuantity(serviceId, materialId, qty) {
+            $.post('/Admin/Inventory/UpdateServiceMaterial', { 
+                serviceId: serviceId, 
+                materialId: materialId, 
+                quantity: qty 
+            }, function(res) {
+                if(res.success) {
+                    Swal.fire({ title: 'Đã cập nhật!', icon: 'success', timer: 1000, showConfirmButton: false });
+                } else {
+                    Swal.fire('Lỗi', 'Không thể cập nhật.', 'error');
+                }
+            });
+        }
+
+        function showAddMaterial(serviceId, serviceName) {
+            Swal.fire({
+                title: 'Thêm vật tư vào gói',
+                html: `
+                    <div class="text-start">
+                        <p class="small text-muted mb-2">Dịch vụ: <strong>${serviceName}</strong></p>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Chọn vật tư:</label>
+                            <select id="newMaterialId" class="form-select">
+                                @foreach (var m in (List<SpaN5.Models.Material>)ViewBag.Materials)
+                                {
+                                    <option value="@m.MaterialId">@m.MaterialName (@m.Unit)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Định mức sử dụng:</label>
+                            <input type="number" id="newQuantity" class="form-control" value="1" step="0.1">
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Thêm ngay',
+                preConfirm: () => {
+                    return {
+                        serviceId: serviceId,
+                        materialId: $('#newMaterialId').val(),
+                        quantity: $('#newQuantity').val()
+                    }
+                }
+            }).then(r => {
+                if(r.isConfirmed) {
+                    $.post('/Admin/Inventory/AddServiceMaterial', r.value, function(res) {
+                        if(res.success) {
+                            Swal.fire('Thành công', 'Đã thêm vật tư!', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', res.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

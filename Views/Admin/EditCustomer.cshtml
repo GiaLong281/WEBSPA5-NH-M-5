@@ -1,0 +1,101 @@
+@model SpaN5.Models.Customer
+@{
+    ViewData["Title"] = "Sửa khách hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var thanhPhos = ViewBag.ThanhPhos as List<SpaN5.Models.ThanhPho> ?? new List<SpaN5.Models.ThanhPho>();
+    var quans = ViewBag.Quans as List<SpaN5.Models.Quan> ?? new List<SpaN5.Models.Quan>();
+}
+<div class="container py-5" style="margin-top: 80px;">
+    <h1>Sửa khách hàng</h1>
+    <form asp-action="EditCustomer" method="post">
+        <input type="hidden" asp-for="CustomerId" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label">Họ tên</label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label">Điện thoại</label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="BirthDate" class="form-label">Ngày sinh</label>
+            <input asp-for="BirthDate" class="form-control" type="date" />
+            <span asp-validation-for="BirthDate" class="text-danger"></span>
+        </div>
+
+        <h4>Địa chỉ</h4>
+        <div class="mb-3">
+            <label>Thành phố</label>
+            <select id="ThanhPhoId" class="form-control">
+                <option value="">-- Chọn thành phố --</option>
+                @foreach (var tp in thanhPhos)
+                {
+                    <option value="@tp.MaThanhPho">@tp.TenThanhPho</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Quận/Huyện</label>
+            <select id="MaQuan" name="MaQuan" class="form-control">
+                <option value="">-- Chọn quận --</option>
+                @foreach (var q in quans)
+                {
+                    if (Model.DiaChi != null && Model.DiaChi.MaQuan == q.MaQuan)
+                    {
+                        <option value="@q.MaQuan" selected>@q.TenQuan</option>
+                    }
+                    else
+                    {
+                        <option value="@q.MaQuan">@q.TenQuan</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Số nhà</label>
+            <input type="text" name="SoNha" class="form-control" value="@(Model.DiaChi?.SoNha)" />
+        </div>
+
+        <div class="mb-3">
+            <label>Đường</label>
+            <input type="text" name="Duong" class="form-control" value="@(Model.DiaChi?.Duong)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+        <a asp-action="ManageCustomers" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>
+
+<script>
+    document.getElementById('ThanhPhoId').addEventListener('change', function () {
+        var thanhPhoId = this.value;
+        if (thanhPhoId) {
+            fetch(`/Admin/GetQuansByThanhPho?maThanhPho=${thanhPhoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var quanSelect = document.getElementById('MaQuan');
+                    quanSelect.innerHTML = '<option value="">-- Chọn quận --</option>';
+                    data.forEach(quan => {
+                        var option = document.createElement('option');
+                        option.value = quan.maQuan;
+                        option.text = quan.tenQuan;
+                        quanSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+</script>
